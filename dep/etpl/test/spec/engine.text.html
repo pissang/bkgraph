@@ -1,0 +1,147 @@
+::default-tpl::
+<!-- target: engineTarget -->default engine
+::myengine-tpl::
+<!-- target: engineTarget -->my engine
+::variable-tpl::
+<!-- target: engineVariableTarget -->Hello ${info.name}!
+::repeat-tpl::
+<!-- target: engineRepeatTarget -->default engine
+::repeat-tpl-ignore-first::
+<!-- target: engineRepeatIgnoreTarget -->ignore
+::repeat-tpl-ignore-second::
+<!-- target: engineRepeatIgnoreTarget -->override
+::repeat-tpl-override-first::
+<!-- target: engineRepeatOverrideTarget -->ignore
+::repeat-tpl-override-second::
+<!-- target: engineRepeatOverrideTarget -->override
+::repeat-master-tpl::
+<!-- master: engineRepeatMaster -->default engine
+::repeat-master-tpl-ignore-first::
+<!-- master: engineRepeatIgnoreMaster -->ignore <!--contentplaceholder:name-->
+::repeat-master-tpl-ignore-second::
+<!-- master: engineRepeatIgnoreMaster -->override <!--contentplaceholder:name--><!-- target: engineRepeatIgnoreMasterTarget( master = engineRepeatIgnoreMaster ) --><!--content:name-->erik<!--/content-->
+::repeat-master-tpl-override-first::
+<!-- master: engineRepeatOverrideMaster -->ignore <!--contentplaceholder:name-->
+::repeat-master-tpl-override-second::
+<!-- target: engineRepeatOverrideMasterTarget( master = engineRepeatOverrideMaster ) --><!--content:name-->erik<!--/content-->
+<!-- master: engineRepeatOverrideMaster -->override <!--contentplaceholder:name-->
+::data-tpl::
+<!-- target: engineDataTarget -->Hello ${info.name} by ${info.contributor.name}[${info.contributor.email}]!
+::strip-tpl::
+<!-- target: engineStripTarget -->  
+    <ul>
+    <!-- for: ${persons} as ${person}, ${index} -->  
+        <!-- if: ${index} > 0 -->  
+        <li>${person}</li>
+        <!-- /if -->  
+    <!-- /for -->  
+    </ul>
+<!-- target: engineStripTargetIf -->  
+<!-- var: lang = 1--><!-- if: ${lang} -->
+lang
+<!-- /if -->
+<!-- target: engineStripTargetSimple -->  
+Hello World!
+::strip-data::
+({persons:['erik', 'firede', 'leeight']})
+::strip-expect::
+    <ul>
+        <li>firede</li>
+        <li>leeight</li>
+    </ul>
+
+::strip-simple-expect::
+Hello World!
+::strip-if-expect::
+lang
+
+::custom-filter-tpl::
+<!-- target: engineCustomFilterTarget -->Hello ${name}!
+::custom-filter-tpl2::
+<!-- target: engineCustomFilterTarget2 -->Hello ${name}!
+::upper-tpl::
+<!-- target: engineUpperTarget -->Hello ${name|engine-upper}!
+::upper-tpl2::
+<!-- target: engineUpperTarget2 -->Hello ${name|engine-upper2()}! Hello ${name | engine-upper2(true)}!
+::data::
+({
+    info: {
+        name: 'etpl', 
+        contributor: {
+            name:'errorrik', 
+            email:'errorrik@gmail.com'
+        }
+    }
+})
+::data-getter::
+({
+    get: function (name){
+        if ( name == 'info.name' ) {
+            return 'etpl';
+        }
+        if ( name == 'info.contributor.name' ) {
+            return 'errorrik';
+        }
+        if ( name == 'info.contributor.email' ) {
+            return 'errorrik@gmail.com';
+        }
+    }
+})
+::custom-options::
+<% target: engineCustomTarget %><!-- import: a -->
+::expect-default::
+default engine
+::expect-myengine::
+my engine
+::expect-custom-options::
+<!-- import: a -->
+::custom-variable::
+<!-- target: engineCustomVariable --><!-- var: name = "etpl" --><!-- var: yes = true -->
+Hello {{name}}! Hello {{name | engine-upper}}! Hello {{name | engine-upper2( {{yes}} )}}!
+<!--if: {{yes}}-->Hello <!--filter: engine-upper2({{yes}})-->{{name}}<!--/filter-->!<!--/if-->
+::expect-custom-variable::
+
+Hello etpl! Hello ETPL! Hello Etpl!
+Hello Etpl!
+::custom-command-variable::
+<% target: engineCustomCommandVariable %><% var: name = "etpl" %><% var: yes = true %>
+Hello {{name}}! Hello {{name | engine-upper}}! Hello {{name | engine-upper2( {{yes}} )}}!
+<%if: {{yes}}%>Hello <%filter: engine-upper2({{yes}})%>{{name}}<%/filter%>!<%/if%>
+::expect-custom-command-variable::
+
+Hello etpl! Hello ETPL! Hello Etpl!
+Hello Etpl!
+::get-tpl::
+<!-- target: engineGetSimpleTarget -->Hello etpl!
+<!-- target: engineGetImportTarget -->
+<div><!--import: engineGetSimpleTarget --></div>
+<!-- target: engineGetMasterTarget(master=engineGetMaster) -->
+<!-- content: header -->header by target
+<!-- master: engineGetMaster -->
+<header><!-- contentplaceholder: header -->my header<!-- /contentplaceholder --></header>
+<div><!--import: engineGetSimpleTarget --></div>
+<footer><!-- contentplaceholder: footer -->my footer<!-- /contentplaceholder --></footer>
+::expect-engineGetSimpleTarget::
+Hello etpl!
+
+::expect-engineGetImportTarget::
+
+<div>Hello etpl!
+</div>
+
+::expect-engineGetMasterTarget::
+
+<header>header by target
+</header>
+<div>Hello etpl!
+</div>
+<footer>my footer</footer>
+::expect-custom-filter-raw::
+Hello <b>etpl</b>!
+::expect-custom-filter-html::
+Hello &lt;b&gt;etpl&lt;/b&gt;!
+::expect-engineUpperTarget::
+Hello ETPL!
+::expect-engineUpperTarget2::
+Hello ETPL! Hello Etpl!
+::eof::

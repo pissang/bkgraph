@@ -1,0 +1,24 @@
+/** 搜索栏 */
+.bkg-searchbar {
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  height: 100px;
+  background-color: black;
+}
+.bkg-searchbar h3 {
+  color: white;
+}
+/** 边栏 */
+.bkg-sidebar {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  bottom: 0px;
+  width: 100px;
+  background-color: black;
+}
+.bkg-sidebar h3 {
+  color: white;
+}

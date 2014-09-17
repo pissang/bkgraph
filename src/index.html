@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <link rel="stylesheet" type="text/css" href="./css/index.css" />
+        <link rel="stylesheet/less" type="text/css" href="./css/bkgraph.less" />
+        <script src="//s1.bdstatic.com/r/www/cache/ecom/esl/1-8-4/esl.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/less.js/1.7.1/less.min.js"></script>
+    </head>
+    <body>
+        <div id='viewport'></div>
+        <script>
+            require.config({
+                paths: {
+                    etpl: '../dep/etpl/src/main',
+                    mock: '../mock'
+                },
+                packages: [
+                    {
+                        name: 'zrender',
+                        location: '../../zrender/src',
+                        main: 'zrender'
+                    },
+                    {
+                        name: 'echarts',
+                        location: '../../echarts/src',
+                        main: 'echarts'
+                    }
+                ]
+            });
+            require([
+                'bkgraph',
+                'text!mock/无锡.json'
+            ], function (bkg, data) {
+                var g = bkg.init('viewport', JSON.parse(data));
+                g.addComponent(new bkg.SideBar());
+                g.addComponent(new bkg.SearchBar());
+            });
+        </script>
+    </body>
+</html>

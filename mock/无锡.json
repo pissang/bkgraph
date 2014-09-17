@@ -1,0 +1,328 @@
+{
+  "nodes": [
+    {
+      "name": "无锡市",
+      "radius": 50
+    },
+    {
+      "name": "2010年",
+      "radius": 20
+    },
+    {
+      "name": "无锡",
+      "radius": 20
+    },
+    {
+      "name": "科技",
+      "radius": 20
+    },
+    {
+      "name": "机械",
+      "radius": 20
+    },
+    {
+      "name": "咨询",
+      "radius": 20
+    },
+    {
+      "name": "有限公司",
+      "radius": 20
+    },
+    {
+      "name": "盐城",
+      "radius": 20
+    },
+    {
+      "name": "华硕",
+      "radius": 20
+    },
+    {
+      "name": "组合",
+      "radius": 20
+    },
+    {
+      "name": "网站",
+      "radius": 20
+    },
+    {
+      "name": "老年人",
+      "radius": 20
+    },
+    {
+      "name": "扬州市",
+      "radius": 20
+    },
+    {
+      "name": "谈判",
+      "radius": 20
+    },
+    {
+      "name": "亨特",
+      "radius": 20
+    },
+    {
+      "name": "考试",
+      "radius": 20
+    },
+    {
+      "name": "麦库",
+      "radius": 20
+    },
+    {
+      "name": "号码",
+      "radius": 20
+    },
+    {
+      "name": "瑞达",
+      "radius": 20
+    },
+    {
+      "name": "现代",
+      "radius": 20
+    },
+    {
+      "name": "机械设备",
+      "radius": 20
+    },
+    {
+      "name": "长安镇",
+      "radius": 20
+    },
+    {
+      "name": "论证",
+      "radius": 20
+    },
+    {
+      "name": "学校",
+      "radius": 20
+    },
+    {
+      "name": "锡山区",
+      "radius": 20
+    },
+    {
+      "name": "教师",
+      "radius": 20
+    },
+    {
+      "name": "提花",
+      "radius": 20
+    },
+    {
+      "name": "重庆",
+      "radius": 20
+    }
+  ],
+  "links": [
+    {
+      "source": "无锡市",
+      "target": "2010年",
+      "weight": 1
+    },
+    {
+      "source": "无锡",
+      "target": "无锡市",
+      "weight": 1
+    },
+    {
+      "source": "科技",
+      "target": "无锡市",
+      "weight": 1
+    },
+    {
+      "source": "无锡市",
+      "target": "无锡",
+      "weight": 1
+    },
+    {
+      "source": "无锡市",
+      "target": "机械",
+      "weight": 1
+    },
+    {
+      "source": "无锡市",
+      "target": "咨询",
+      "weight": 1
+    },
+    {
+      "source": "有限公司",
+      "target": "无锡市",
+      "weight": 1
+    },
+    {
+      "source": "盐城",
+      "target": "无锡市",
+      "weight": 1
+    },
+    {
+      "source": "华硕",
+      "target": "无锡市",
+      "weight": 1
+    },
+    {
+      "source": "组合",
+      "target": "无锡市",
+      "weight": 1
+    },
+    {
+      "source": "网站",
+      "target": "无锡市",
+      "weight": 1
+    },
+    {
+      "source": "无锡市",
+      "target": "老年人",
+      "weight": 1
+    },
+    {
+      "source": "无锡市",
+      "target": "扬州市",
+      "weight": 1
+    },
+    {
+      "source": "谈判",
+      "target": "无锡市",
+      "weight": 1
+    },
+    {
+      "source": "亨特",
+      "target": "无锡市",
+      "weight": 1
+    },
+    {
+      "source": "考试",
+      "target": "无锡市",
+      "weight": 1
+    },
+    {
+      "source": "麦库",
+      "target": "无锡市",
+      "weight": 1
+    },
+    {
+      "source": "无锡市",
+      "target": "有限公司",
+      "weight": 1
+    },
+    {
+      "source": "无锡市",
+      "target": "号码",
+      "weight": 1
+    },
+    {
+      "source": "无锡市",
+      "target": "瑞达",
+      "weight": 1
+    },
+    {
+      "source": "无锡市",
+      "target": "现代",
+      "weight": 1
+    },
+    {
+      "source": "机械设备",
+      "target": "无锡市",
+      "weight": 1
+    },
+    {
+      "source": "长安镇",
+      "target": "无锡市",
+      "weight": 1
+    },
+    {
+      "source": "论证",
+      "target": "无锡市",
+      "weight": 1
+    },
+    {
+      "source": "无锡市",
+      "target": "学校",
+      "weight": 1
+    },
+    {
+      "source": "无锡市",
+      "target": "锡山区",
+      "weight": 1
+    },
+    {
+      "source": "无锡市",
+      "target": "教师",
+      "weight": 1
+    },
+    {
+      "source": "无锡市",
+      "target": "提花",
+      "weight": 1
+    },
+    {
+      "source": "无锡市",
+      "target": "重庆",
+      "weight": 1
+    },
+    {
+      "source": "科技",
+      "target": "2010年",
+      "weight": 1
+    },
+    {
+      "source": "考试",
+      "target": "2010年",
+      "weight": 1
+    },
+    {
+      "source": "无锡",
+      "target": "有限公司",
+      "weight": 1
+    },
+    {
+      "source": "无锡",
+      "target": "机械设备",
+      "weight": 1
+    },
+    {
+      "source": "机械",
+      "target": "考试",
+      "weight": 1
+    },
+    {
+      "source": "咨询",
+      "target": "科技",
+      "weight": 1
+    },
+    {
+      "source": "咨询",
+      "target": "考试",
+      "weight": 1
+    },
+    {
+      "source": "有限公司",
+      "target": "无锡",
+      "weight": 1
+    },
+    {
+      "source": "机械设备",
+      "target": "有限公司",
+      "weight": 1
+    },
+    {
+      "source": "盐城",
+      "target": "网站",
+      "weight": 1
+    },
+    {
+      "source": "网站",
+      "target": "考试",
+      "weight": 1
+    },
+    {
+      "source": "现代",
+      "target": "网站",
+      "weight": 1
+    },
+    {
+      "source": "重庆",
+      "target": "学校",
+      "weight": 1
+    }
+  ]
+}
