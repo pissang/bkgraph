@@ -1,3 +1,9 @@
+/** GraphMain */
+.bkg-viewport {
+    background-image: url(../../asset/img/bg.jpg);
+    position: relative;
+}
+
 /** 搜索栏 */
 .bkg-searchbar {
     position: absolute;
@@ -5,10 +11,159 @@
     right: 0px;
     bottom: 0px;
     height: 100px;
-    background-color: black;
+    
+    background-image: url(../../asset/img/searchbar/search-bg.png);
 
     h3 {
+        font-family: "Microsoft YaHei";
         color: white;
+        font-weight: normal;
+        font-size: 14px;
+        margin: 10px 0px 10px 40px;
+    }
+
+    .bkg-search-input {
+        
+        margin-left: 30px;
+
+        input {
+            border: none;
+            height: 37px;
+            width: 250px;
+            border-radius: 15px;
+            outline: none;
+            font-size: 14px;
+            padding-left: 15px;
+
+            float: left;
+        }
+
+        .bkg-search-btn {
+            margin-left: -63px;
+            width: 60px;
+            height: 33px;
+            background-color: #0E90FE;
+            border-radius: 15px;
+            float: left;
+            margin-top: 3px;
+
+            background-image: url(../../asset/img/searchbar/search-icon.png);
+            background-repeat: no-repeat;
+            background-position: 50% 50%;
+        }
+    }
+
+    .bkg-toggle {
+        width: 143px;
+        height: 32px;
+        position: absolute;
+        right: 50px;
+        top: -32px;
+        color: white;
+        font-family: "Microsoft YaHei";
+
+        background-image: url(../../asset/img/searchbar/toggle-btn.png);
+
+        text-align: center;
+        font-size: 18px;
+        line-height: 34px;
+
+        cursor: pointer;
+    }
+
+    .bkg-person-list {
+        position: absolute;
+        left: 320px;
+        top: 0px;
+        right: 0px;
+        bottom: 0px;
+
+        .bkg-person-list-viewport {
+            position: absolute;
+            overflow: hidden;
+            left: 50px;
+            top: 0px;
+            right: 50px;
+            bottom: 0px;
+        }
+
+        .bkg-prev-page {
+            position: absolute;
+            left: 0px;
+            top: 30px;
+            width: 25px;
+            height: 43px;
+            background-image: url(../../asset/img/searchbar/prev.png);
+            cursor: pointer;
+
+            &:hover {
+                cursor: default;
+                background-image: url(../../asset/img/searchbar/prev-hover.png);
+            }
+
+            &.disable {
+                background-image: url(../../asset/img/searchbar/prev-disable.png);
+
+                &:hover {
+                    background-image: url(../../asset/img/searchbar/prev-disable.png);
+                }
+            }
+        }
+
+        .bkg-next-page {
+            position: absolute;
+            right: 10px;
+            top: 30px;
+            width: 25px;
+            height: 43px;
+            background-image: url(../../asset/img/searchbar/next.png);
+            cursor: pointer;
+
+            &:hover {
+                background-image: url(../../asset/img/searchbar/next-hover.png);
+            }
+            &.disable {
+                cursor: default;
+                background-image: url(../../asset/img/searchbar/next-disable.png);
+
+                &:hover {
+                    background-image: url(../../asset/img/searchbar/next-disable.png);
+                }
+            }
+        }
+
+        ul {
+            margin: 7px 0px 0px 0px;
+            padding: 0px;
+            height: 85px;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            /** 图片不换行 */
+            white-space: nowrap;
+
+            -webkit-transition: left 0.5s ease-in-out;
+               -moz-transition: left 0.5s ease-in-out;
+                -ms-transition: left 0.5s ease-in-out;
+                 -o-transition: left 0.5s ease-in-out;
+                    transition: left 0.5s ease-in-out;
+        }
+        li {
+            list-style: none;
+            display: inline-block;
+            overflow: hidden;
+
+            width: 85px;
+            height: 85px;
+
+            margin-left: 1px;
+
+            img {
+                border-radius: 5px;
+                width: 85px;
+                cursor: pointer;
+            }
+        }
     }
 }
 

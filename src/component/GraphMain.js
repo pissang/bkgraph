@@ -1,5 +1,7 @@
 define(function (require) {
 
+    require('./forceLayoutWorkerExt');
+
     var zrender = require('zrender');
     var ForceLayout = require('echarts/layout/Force');
     var Graph = require('echarts/data/Graph');
@@ -13,6 +15,12 @@ define(function (require) {
     var GraphMain = function () {
 
         Component.call(this);
+
+        this.minRadius = 20;
+        this.maxRadius = 50;
+
+        this.minRelationWeight = 30;
+        this.maxRelationWeight = 40;
 
         this._kgraph = null;
         
@@ -47,28 +55,64 @@ define(function (require) {
     GraphMain.prototype.setData = function (data) {
         var graph = new Graph();
         this._graph = graph;
+        var zr = this._zr;
 
         var cx = this._kgraph.getWidth() / 2;
         var cy = this._kgraph.getHeight() / 2;
 
-        for (var i = 0; i < data.nodes.length; i++) {
-            var n = graph.addNode(data.nodes[i].name, data.nodes[i]);
+        // 映射数据
+        var max = -Infinity;
+        var min = Infinity;
+        for (var i = 0; i < data.entities.length; i++) {
+            var entity = data.entities[i];
+            min = Math.min(min, entity.hotValue);
+            max = Math.max(max, entity.hotValue);
+        }
+        var diff = max - min;
+
+        for (var i = 0; i < data.entities.length; i++) {
+            var entity = data.entities[i];
+            // 数据修正
+            entity.layerCounter = +entity.layerCounter;
+            var n = graph.addNode(entity.ID, entity);
+            var r = diff > 0 ?
+                entity.hotValue * (this.maxRadius - this.minRadius) / diff + this.minRadius
+                : (this.maxRadius + this.minRadius) / 2;
             n.layout = {
-                position: _randomInSquare(cx, cy, 800),
+                position: _randomInCircle(cx, cy, 600 * (+entity.layerCounter)),
                 // TODO
-                mass: 1,
-                radius: data.nodes[i].radius
+                mass: 0.4,
+                radius: r,
+                fixed: entity.layerCounter === 0
             };
-            if (data.nodes[i].position) {
-                n.layout.position = data.nodes[i].position;
+            if (data.entities[i].position) {
+                n.layout.position = data.entities[i].position;
+            } else if (entity.layerCounter === 0) {
+                n.layout.position = [
+                    zr.getWidth() / 2,
+                    zr.getHeight() / 2
+                ];
             }
+            n.position = Array.prototype.slice.call(n.layout.position);
         }
 
-        for (var i = 0; i < data.links.length; i++) {
-            var e = graph.addEdge(data.links[i].source, data.links[i].target, data.links[i]);
+        max = -Infinity;
+        min = Infinity;
+        for (var i = 0; i < data.relations.length; i++) {
+            var relation = data.relations[i];
+            min = Math.min(min, relation.relationWeight);
+            max = Math.max(max, relation.relationWeight);
+        }
+        diff = max - min;
+        for (var i = 0; i < data.relations.length; i++) {
+            var relation = data.relations[i];
+            var w = diff > 0 ? 
+                relation.relationWeight / diff * (this.maxRelationWeight - this.minRelationWeight) + this.minRelationWeight
+                : (this.maxRelationWeight + this.minRelationWeight) / 2;
+            var e = graph.addEdge(relation.fromID, relation.toID, relation);
             e.layout = {
-                weight: e.weight
-            }
+                weight: w
+            };
         }
 
         this.runLayout(graph, function () {
@@ -78,9 +122,13 @@ define(function (require) {
 
     GraphMain.prototype.render = function (graph) {
         var zr = this._zr;
+        // 所有实体都在 zlevel-1 层
         graph.eachNode(function (n) {
             var nodeEntity = new NodeEntity({
-                radius: n.data.radius
+                radius: n.layout.radius,
+                label: n.data.name,
+                // image: n.data.image
+                image: '../mock/avatar.jpg'
             });
             nodeEntity.initialize(zr);
 
@@ -89,15 +137,26 @@ define(function (require) {
             n.entity = nodeEntity;
         });
 
+        // 所有边都在 zlevel-0 层
         graph.eachEdge(function (e) {
             var edgeEntity = new EdgeEntity({
                 sourceEntity: e.node1.entity,
-                targetEntity: e.node2.entity
+                targetEntity: e.node2.entity,
+                label: e.data.relationName
             });
             edgeEntity.initialize(zr);
             e.entity = edgeEntity;
 
-            zr.addShape(edgeEntity.el);
+            zr.addGroup(edgeEntity.el);
+        });
+
+        zr.modLayer(1, {
+            panable: true,
+            zoomable: true
+        });
+        zr.modLayer(0, {
+            panable: true,
+            zoomable: true
         });
 
         zr.render();
@@ -109,13 +168,24 @@ define(function (require) {
             this._kgraph.getWidth() / 2,
             this._kgraph.getHeight() / 2
         ];
-        forceLayout.gravity = 0.3;
-        forceLayout.scaling = 2;
+        forceLayout.gravity = 0.6;
+        forceLayout.scaling = 15;
+        forceLayout.coolDown = 0.995;
+        forceLayout.preventOverlap = true;
 
-        forceLayout.init(graph, true);
+        graph.eachNode(function(n) {
+            n.layout.mass = n.degree() / 5;
+        })
+
+        forceLayout.init(graph, false);
         this._layout = forceLayout;
         var self = this;
         forceLayout.onupdate = function () {
+            for (var i = 0; i < graph.nodes.length; i++) {
+                if (graph.nodes[i].layout.fixed) {
+                    vec2.copy(graph.nodes[i].layout.position, graph.nodes[i].position);
+                }
+            }
             if (forceLayout.temperature < 0.01) {
                 cb && cb.call(self);
             } else {
@@ -127,10 +197,11 @@ define(function (require) {
 
     zrUtil.inherits(GraphMain, Component);
 
-    function _randomInSquare(x, y, size) {
+    function _randomInCircle(x, y, radius) {
         var v = vec2.create();
-        v[0] = (Math.random() - 0.5) * size + x;
-        v[1] = (Math.random() - 0.5) * size + y;
+        var angle = Math.random() * Math.PI * 2;
+        v[0] = Math.cos(angle) * radius + x;
+        v[1] = Math.sin(angle) * radius + y;
         return v;
     }
 

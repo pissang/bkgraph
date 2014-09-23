@@ -14,6 +14,7 @@
             require.config({
                 paths: {
                     etpl: '../dep/etpl/src/main',
+                    _: '../dep/lodash',
                     mock: '../mock'
                 },
                 packages: [
@@ -31,10 +32,10 @@
             });
             require([
                 'bkgraph',
-                'text!mock/无锡.json'
+                'text!mock/200.json'
             ], function (bkg, data) {
                 var g = bkg.init('viewport', JSON.parse(data));
-                g.addComponent(new bkg.SideBar());
+                // g.addComponent(new bkg.SideBar());
                 g.addComponent(new bkg.SearchBar());
             });
         </script>

@@ -2,6 +2,8 @@ define(function (require) {
 
     var Entity = require('./Entity');
     var LineShape = require('zrender/shape/Line');
+    var Group = require('zrender/Group');
+    var RectShape = require('zrender/shape/Rectangle');
     var zrUtil = require('zrender/tool/util');
 
     var vec2 = require('zrender/tool/vector');
@@ -13,16 +15,7 @@ define(function (require) {
         
         Entity.call(this);
 
-        this.el = new LineShape({
-            style: {
-                xStart: 0,
-                yStart: 0,
-                xEnd: 0,
-                yEnd: 0,
-                lineWidth: 2,
-                strokeColor: 'black'
-            }
-        });
+        this.el = new Group();
 
         // Configs
         opts = opts || {};
@@ -30,9 +23,54 @@ define(function (require) {
         this.sourceEntity = opts.sourceEntity || null;
 
         this.targetEntity = opts.targetEntity || null;
+
+        this.label = opts.label || '';
+
+        this.color = opts.color || '#0e90fe';
     }
 
     EdgeEntity.prototype.initialize = function (zr) {
+        this._lineShape = new LineShape({
+            style: {
+                xStart: 0,
+                yStart: 0,
+                xEnd: 0,
+                yEnd: 0,
+                lineWidth: 1,
+                opacity: 1,
+                strokeColor: this.color
+            },
+            highlightStyle: {
+                opacity: 0
+            },
+            z: 0,
+            zlevel: 0
+        });
+
+        var width = zrUtil.getContext().measureText(this.label).width + 20;
+        this._labelShape = new RectShape({
+            style: {
+                width: width,
+                height: 20,
+                text: this.label,
+                textPosition: 'inside',
+                textAlign: 'center',
+                textFont: '12px 微软雅黑',
+                color: this.color,
+                brushType: 'fill',
+                x: -width / 2,
+                y: -10,
+                radius: 10
+            },
+            highlightStyle: {
+                opacity: 0
+            },
+            z: 1
+        });
+
+        this.el.addChild(this._lineShape);
+        this.el.addChild(this._labelShape);
+
         this.update(zr);
     }
 
@@ -50,14 +88,25 @@ define(function (require) {
             vec2.scaleAndAdd(v1, p1, v, -sourceEntity.radius);
             vec2.scaleAndAdd(v2, p2, v, targetEntity.radius);
 
-            var line = this.el;
+            var line = this._lineShape;
             line.style.xStart = v1[0];
             line.style.yStart = v1[1];
             line.style.xEnd = v2[0];
             line.style.yEnd = v2[1];
 
-            zr.modShape(line.id);
+            if (this._labelShape) {
+                var labelShape = this._labelShape;
+
+                if (v[0] > 0) {
+                    vec2.negate(v, v);
+                }
+                var angle = Math.PI - Math.atan2(v[1], v[0]);
+                labelShape.rotation[0] = angle;
+                labelShape.position[0] = (v1[0] + v2[0]) / 2;
+                labelShape.position[1] = (v1[1] + v2[1]) / 2;
+            }
         }
+        zr.modGroup(this.el.id);
     }
 
     zrUtil.inherits(EdgeEntity, Entity);

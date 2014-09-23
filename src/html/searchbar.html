@@ -1,3 +1,21 @@
-<div>
-    <h3>SEARCHBAR</h3>
+<div class="bkg-search">
+    <h3>人物搜索</h3>
+    <div class="bkg-search-input">
+        <input type="text" placeholder="输入您要查找的人物">
+        <div class="bkg-search-btn"></div>
+    </div>
 </div>
+<div class="bkg-person-list">
+    <div class="bkg-prev-page disable"></div>
+    <div class="bkg-person-list-viewport">
+        <ul>
+            <!-- for: ${entities} as ${entity}-->
+            <li class="bkg-person">
+                <img src="${entity.image}" alt="">
+            </li>
+            <!-- /for -->
+        </ul>
+    </div>
+    <div class="bkg-next-page"></div>
+</div>
+<div class="bkg-toggle">隐 藏</div>

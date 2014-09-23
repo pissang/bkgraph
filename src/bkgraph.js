@@ -25,7 +25,13 @@ define(function (require) {
 
         this._root = null;
 
+        this._rawData = data;
+
         this.initialize(data);
+    }
+
+    BKGraph.prototype.getRawData = function () {
+        return this._rawData;
     }
 
     BKGraph.prototype.initialize = function (data) {
@@ -55,7 +61,7 @@ define(function (require) {
             this._root.appendChild(component.el);
         }
         
-        component.initialize(this);
+        component.initialize(this, this._rawData);
     }
 
     BKGraph.prototype.getComponentsAllByType = function (type) {
