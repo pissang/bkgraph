@@ -2893,8 +2893,8 @@ define(
              * @param {number} t
              */
             lerp: function (out, v1, v2, t) {
-                var ax = v1[0];
-                var ay = v1[1];
+                // var ax = v1[0];
+                // var ay = v1[1];
                 out[0] = v1[0] + t * (v2[0] - v1[0]);
                 out[1] = v1[1] + t * (v2[1] - v1[1]);
                 return out;
@@ -4072,7 +4072,7 @@ define('zrender/tool/curve',['require','./vector'],function(require) {
     var _v0 = vector.create();
     var _v1 = vector.create();
     var _v2 = vector.create();
-    var _v3 = vector.create();
+    // var _v3 = vector.create();
 
     function isAroundZero(val) {
         return val > -EPSILON && val < EPSILON;
@@ -4080,10 +4080,11 @@ define('zrender/tool/curve',['require','./vector'],function(require) {
     function isNotAroundZero(val) {
         return val > EPSILON || val < -EPSILON;
     }
-
+    /*
     function evalCubicCoeff(a, b, c, d, t) {
         return ((a * t + b) * t + c) * t + d;
     }
+    */
 
     /** 
      * 计算三次贝塞尔值
@@ -4413,7 +4414,7 @@ define('zrender/tool/curve',['require','./vector'],function(require) {
             if (isNotAroundZero(b)) {
                 var t1 = -c / b;
                 if (t1 >= 0 && t1 <= 1) {
-                    extrema[n++] = t1;
+                    roots[n++] = t1;
                 }
             }
         }
@@ -4450,7 +4451,7 @@ define('zrender/tool/curve',['require','./vector'],function(require) {
      */
     function quadraticExtremum(p0, p1, p2) {
         var divider = p0 + p2 - 2 * p1;
-        if (divider == 0) {
+        if (divider === 0) {
             // p1 is center of p0 and p2 
             return 0.5;
         }
@@ -4561,7 +4562,7 @@ define('zrender/tool/curve',['require','./vector'],function(require) {
         quadraticExtremum: quadraticExtremum,
 
         quadraticProjectPoint: quadraticProjectPoint
-    }
+    };
 });
 /**
  * zrender: 图形空间辅助类
@@ -4616,7 +4617,7 @@ define(
             _ctx = _ctx || util.getContext();
 
             // 未实现或不可用时(excanvas不支持)则数学运算，主要是line，brokenLine，ring
-            var _mathReturn = _mathMethod(zoneType, area, x, y);
+            var _mathReturn = _mathMethod(shape, area, x, y);
             if (typeof _mathReturn != 'undefined') {
                 return _mathReturn;
             }
@@ -4649,13 +4650,14 @@ define(
         /**
          * 用数学方法判断，三个方法中最快，但是支持的shape少
          *
-         * @param {string} zoneType ： 图形类型
+         * @param {Object} shape : 图形
          * @param {Object} area ：目标区域
          * @param {number} x ： 横坐标
          * @param {number} y ： 纵坐标
          * @return {boolean=} true表示坐标处在图形中
          */
-        function _mathMethod(zoneType, area, x, y) {
+        function _mathMethod(shape, area, x, y) {
+            var zoneType = shape.type;
             // 在矩形内则部分图形需要进一步判断
             switch (zoneType) {
                 // 贝塞尔曲线
@@ -4668,47 +4670,39 @@ define(
                             area.lineWidth, x, y
                         );
                     }
-                    else {
-                        return isInsideCubicStroke(
-                            area.xStart, area.yStart,
-                            area.cpX1, area.cpY1, 
-                            area.cpX2, area.cpY2, 
-                            area.xEnd, area.yEnd,
-                            area.lineWidth, x, y
-                        );
-                    }
-                // 线-----------------------1
+                    return isInsideCubicStroke(
+                        area.xStart, area.yStart,
+                        area.cpX1, area.cpY1, 
+                        area.cpX2, area.cpY2, 
+                        area.xEnd, area.yEnd,
+                        area.lineWidth, x, y
+                    );
+                // 线
                 case 'line':
                     return isInsideLine(
                         area.xStart, area.yStart,
                         area.xEnd, area.yEnd,
                         area.lineWidth, x, y
                     );
-                // 折线----------------------2
+                // 折线
                 case 'broken-line':
                     return isInsideBrokenLine(
                         area.pointList, area.lineWidth, x, y
                     );
-                // 文本----------------------3
-                case 'text':
-                    return true;
-                // 圆环----------------------4
+                // 圆环
                 case 'ring':
                     return isInsideRing(
                         area.x, area.y, area.r0, area.r, x, y
                     );
-                // 矩形----------------------5
-                case 'rectangle':
-                    return true;
-                // 圆形----------------------6
+                // 圆形
                 case 'circle':
                     return isInsideCircle(
                         area.x, area.y, area.r, x, y
                     );
-                // 扇形----------------------7
+                // 扇形
                 case 'sector':
                     return isInsideSector(area, x, y);
-                // 多边形---------------------8
+                // 多边形
                 case 'path':
                     return isInsidePath(
                         area.pathArray, Math.max(area.lineWidth, 5),
@@ -4718,9 +4712,19 @@ define(
                 case 'star':
                 case 'isogon':
                     return isInsidePolygon(area.pointList, x, y);
-                // 图片----------------------9
+                // 文本
+                case 'text':
+                    var rect =  area.__rect || shape.getRect(area);
+                    return isInsideRect(
+                        rect.x, rect.y, rect.width, rect.height, x, y
+                    );
+                // 矩形
+                case 'rectangle':
+                // 图片
                 case 'image':
-                    return true;
+                    return isInsideRect(
+                        area.x, area.y, area.width, area.height, x, y
+                    );
             }
         }
 
@@ -4954,7 +4958,7 @@ define(
          * 扇形包含判断
          */
         function isInsideSector(area, x, y) {
-            if (!isInsideRing(area.x, area.y, area.r0, area.r, x, y)) {
+            if (!isInsideRing(area.x, area.y, area.r0 || 0, area.r, x, y)) {
                 // 大圆外或者小圆内直接false
                 return false;
             }
@@ -5181,7 +5185,7 @@ define(
             var hasStroke = brushType === 'stroke' || brushType === 'both';
             var hasFill = brushType === 'fill' || brushType === 'both';
 
-            var roots = [-1, -1, -1];
+            // var roots = [-1, -1, -1];
             for (var i = 0; i < pathArray.length; i++) {
                 var seg = pathArray[i];
                 var p = seg.points;
@@ -5299,7 +5303,7 @@ define(
             if (hasFill) {
                 w += windingLine(xi, yi, x0, y0, x, y);
             }
-            return w != 0;
+            return w !== 0;
         }
 
         /**
@@ -7304,7 +7308,7 @@ define(
             if (this.style) {
                 this.style.__rect = null;
             }
-        }
+        };
 
         /**
          * 图形是否会触发事件
@@ -8408,7 +8412,7 @@ define(
 
         /**
          * 获取所有已创建的层
-         * @param {Array.<module:zrender/Painter~Layer>} [prevLayer]
+         * @return {Object}
          */
         Painter.prototype.getLayers = function () {
             return this._layers;
@@ -9071,7 +9075,7 @@ define(
  *     }));
  *     zr.addGroup(g);
  */
-define('zrender/Group',['require','./tool/guid','./tool/util','./mixin/Transformable','./mixin/Eventful'],function (require) {
+define('zrender/Group',['require','./tool/guid','./tool/util','./mixin/Transformable','./mixin/Eventful'],function(require) {
 
     var guid = require('./tool/guid');
     var util = require('./tool/util');
@@ -9085,7 +9089,7 @@ define('zrender/Group',['require','./tool/guid','./tool/util','./mixin/Transform
      * @extends module:zrender/mixin/Transformable
      * @extends module:zrender/mixin/Eventful
      */
-    var Group = function (options) {
+    var Group = function(options) {
 
         options = options || {};
 
@@ -9134,7 +9138,7 @@ define('zrender/Group',['require','./tool/guid','./tool/util','./mixin/Transform
      * 复制并返回一份新的包含所有儿子节点的数组
      * @return {Array.<module:zrender/Group|module:zrender/shape/Base>}
      */
-    Group.prototype.children = function () {
+    Group.prototype.children = function() {
         return this._children.slice();
     };
 
@@ -9143,7 +9147,7 @@ define('zrender/Group',['require','./tool/guid','./tool/util','./mixin/Transform
      * @param  {number} idx
      * @return {module:zrender/Group|module:zrender/shape/Base}
      */
-    Group.prototype.childAt = function (idx) {
+    Group.prototype.childAt = function(idx) {
         return this._children[idx];
     };
 
@@ -9151,7 +9155,7 @@ define('zrender/Group',['require','./tool/guid','./tool/util','./mixin/Transform
      * 添加子节点，可以是Shape或者Group
      * @param {module:zrender/Group|module:zrender/shape/Base} child
      */
-    Group.prototype.addChild = function (child) {
+    Group.prototype.addChild = function(child) {
         if (child == this) {
             return;
         }
@@ -9180,42 +9184,28 @@ define('zrender/Group',['require','./tool/guid','./tool/util','./mixin/Transform
      * 移除子节点
      * @param {module:zrender/Group|module:zrender/shape/Base} child
      */
-    Group.prototype.removeChild = function (child) {
+    Group.prototype.removeChild = function(child) {
         var idx = util.indexOf(this._children, child);
 
         this._children.splice(idx, 1);
         child.parent = null;
 
-        if (this._storage) {
+        if (child._storage) {
             
             this._storage.delFromMap(child.id);
 
             if (child instanceof Group) {
-                child.delChildrenFromStorage(this._storage);
+                child.delChildrenFromStorage(child._storage);
             }
         }
     };
-
-    Group.prototype.removeChildrenAll = function () {
-        var len = this._children.length;
-        for (var i = 0; i < len; i++) {
-            var child = this._children[i];
-            if (this._storage) {
-                this._storage.delFromMap(child.id);
-                if (child instanceof Group) {
-                    child.delChildrenFromStorage(this._storage);
-                }
-            }
-        }
-        this._children.length = 0;
-    }
 
     /**
      * 遍历所有子节点
      * @param  {Function} cb
      * @param  {}   context
      */
-    Group.prototype.eachChild = function (cb, context) {
+    Group.prototype.eachChild = function(cb, context) {
         var haveContext = !!context;
         for (var i = 0; i < this._children.length; i++) {
             var child = this._children[i];
@@ -9232,7 +9222,7 @@ define('zrender/Group',['require','./tool/guid','./tool/util','./mixin/Transform
      * @param  {Function} cb
      * @param  {}   context
      */
-    Group.prototype.traverse = function (cb, context) {
+    Group.prototype.traverse = function(cb, context) {
         var haveContext = !!context;
         for (var i = 0; i < this._children.length; i++) {
             var child = this._children[i];
@@ -9248,7 +9238,7 @@ define('zrender/Group',['require','./tool/guid','./tool/util','./mixin/Transform
         }
     };
 
-    Group.prototype.addChildrenToStorage = function (storage) {
+    Group.prototype.addChildrenToStorage = function(storage) {
         for (var i = 0; i < this._children.length; i++) {
             var child = this._children[i];
             storage.addToMap(child);
@@ -9258,7 +9248,7 @@ define('zrender/Group',['require','./tool/guid','./tool/util','./mixin/Transform
         }
     };
 
-    Group.prototype.delChildrenFromStorage = function (storage) {
+    Group.prototype.delChildrenFromStorage = function(storage) {
         for (var i = 0; i < this._children.length; i++) {
             var child = this._children[i];
             storage.delFromMap(child.id);
@@ -9268,9 +9258,9 @@ define('zrender/Group',['require','./tool/guid','./tool/util','./mixin/Transform
         }
     };
 
-    Group.prototype.modSelf = function () {
+    Group.prototype.modSelf = function() {
         this.__dirty = true;
-    }
+    };
 
     util.merge(Group.prototype, Transformable.prototype, true);
     util.merge(Group.prototype, Eventful.prototype, true);
@@ -11510,7 +11500,8 @@ define('echarts/layout/forceLayoutWorker',['require','zrender/tool/vector'],func
         this.width = 500;
         this.height = 500;
 
-        this.maxSpeedIncrease = 1.0;
+        this.maxSpeedIncrease = 1;
+        this.enableAcceleration = true;
 
         this.nodes = [];
         this.edges = [];
@@ -11605,7 +11596,9 @@ define('echarts/layout/forceLayoutWorker',['require','zrender/tool/vector'],func
                 mass += node.mass;
                 vec2.scaleAndAdd(centerOfMass, centerOfMass, node.position, node.mass);
             }
-            vec2.scale(centerOfMass, centerOfMass, 1 / mass);
+            if (mass > 0) {
+                vec2.scale(centerOfMass, centerOfMass, 1 / mass);
+            }
         }
 
         // Reset forces
@@ -11658,9 +11651,12 @@ define('echarts/layout/forceLayoutWorker',['require','zrender/tool/vector'],func
             var scale = Math.min(df, 500.0) / df;
             vec2.scale(node.force, node.force, scale);
 
-            vec2.add(speed, speed, node.force);
-
-            vec2.scale(speed, speed, this.temperature);
+            if (this.enableAcceleration) {
+                vec2.add(speed, speed, node.force);
+                vec2.scale(speed, speed, this.temperature);
+            } else {
+                vec2.copy(speed, node.force);
+            }
 
             // Prevent swinging
             // Limited the increase of speed up to 100% each step
@@ -11692,6 +11688,10 @@ define('echarts/layout/forceLayoutWorker',['require','zrender/tool/vector'],func
                 this.applyNodeToNodeRepulsion(region.node, node, true);
             }
             else {
+                // Static region and node
+                if (region.mass === 0 && node.mass === 0) {
+                    return;
+                }
                 vec2.sub(v, node.position, region.centerOfMass);
                 var d2 = v[0] * v[0] + v[1] * v[1];
                 if (d2 > this.barnesHutTheta * region.size * region.size) {
@@ -11710,9 +11710,14 @@ define('echarts/layout/forceLayoutWorker',['require','zrender/tool/vector'],func
     ForceLayout.prototype.applyNodeToNodeRepulsion = (function() {
         var v = vec2.create();
         return function applyNodeToNodeRepulsion(na, nb, oneWay) {
-            if (na == nb) {
+            if (na === nb) {
                 return;
             }
+            // Two static node
+            if (na.mass === 0 && nb.mass === 0) {
+                return;
+            }
+            
             vec2.sub(v, na.position, nb.position);
             var d2 = v[0] * v[0] + v[1] * v[1];
 
@@ -11836,11 +11841,11 @@ define('echarts/layout/forceLayoutWorker',['require','zrender/tool/vector'],func
 
     ForceLayout.prototype.setToken = function(token) {
         this._token = token;
-    }
+    };
 
     ForceLayout.prototype.tokenMatch = function(token) {
         return token === this._token;
-    }
+    };
 
     /****************************
      * Main process
@@ -11975,6 +11980,10 @@ define('echarts/layout/Force',['require','./forceLayoutWorker','zrender/tool/vec
         this.gravity = typeof(opts.gravity) !== 'undefined'
                         ? opts.gravity : 1;
         this.large = opts.large || false;
+        this.preventOverlap = opts.preventOverlap || false;
+        this.maxSpeedIncrease = opts.maxSpeedIncrease || 1;
+        this.enableAcceleration = typeof(opts.enableAcceleration) === 'undefined'
+            ? true : opts.enableAcceleration;
 
         this.onupdate = opts.onupdate || function () {};
         this.temperature = opts.temperature || 1;
@@ -11989,8 +11998,8 @@ define('echarts/layout/Force',['require','./forceLayoutWorker','zrender/tool/vec
         var _$onupdate = this._$onupdate;
         this._$onupdate = function(e) {
             _$onupdate.call(self, e);
-        }
-    }
+        };
+    };
 
     ForceLayout.prototype.updateConfig = function () {
         var width = this.width;
@@ -12003,7 +12012,11 @@ define('echarts/layout/Force',['require','./forceLayoutWorker','zrender/tool/vec
             height: this.ratioScaling ? height : size,
             scaling: this.scaling || 1.0,
             gravity: this.gravity || 1.0,
-            barnesHutOptimize: this.large
+            barnesHutOptimize: this.large,
+            preventOverlap: this.preventOverlap,
+
+            enableAcceleration: this.enableAcceleration,
+            maxSpeedIncrease: this.maxSpeedIncrease
         };
 
         if (this._layoutWorker) {
@@ -12017,9 +12030,9 @@ define('echarts/layout/Force',['require','./forceLayoutWorker','zrender/tool/vec
                 this._layout[name] = config[name];
             }
         }
-    }
+    };
 
-    ForceLayout.prototype.init = function(graph, useWorker) {
+    ForceLayout.prototype.init = function (graph, useWorker) {
         if (workerUrl && useWorker) {
             try {
                 if (!this._layoutWorker) {
@@ -12059,8 +12072,10 @@ define('echarts/layout/Force',['require','./forceLayoutWorker','zrender/tool/vec
             var n = graph.nodes[i];
             positionArr[i * 2] = n.layout.position[0];
             positionArr[i * 2 + 1] = n.layout.position[1];
-            massArr[i] = n.layout.mass;
-            radiusArr[i] = n.layout.radius;
+            massArr[i] = typeof(n.layout.mass) === 'undefined'
+                ? 1 : n.layout.mass;
+            radiusArr[i] = typeof(n.layout.radius) === 'undefined'
+                ? 1 : n.layout.radius;
 
             n.layout.__index = i;
         }
@@ -12096,7 +12111,7 @@ define('echarts/layout/Force',['require','./forceLayoutWorker','zrender/tool/vec
         }
 
         this.updateConfig();
-    }
+    };
 
     ForceLayout.prototype.step = function (steps) {
         var nodes = this.graph.nodes;
@@ -12134,7 +12149,7 @@ define('echarts/layout/Force',['require','./forceLayoutWorker','zrender/tool/vec
                 this.temperature *= this.coolDown;
             }
         }
-    }
+    };
 
     ForceLayout.prototype._$onupdate = function (e) {
         if (this._layoutWorker) {
@@ -12159,7 +12174,7 @@ define('echarts/layout/Force',['require','./forceLayoutWorker','zrender/tool/vec
                 this.onupdate && this.onupdate();
             }
         }
-    }
+    };
 
     ForceLayout.prototype.dispose = function() {
         if (this._layoutWorker) {
@@ -12168,7 +12183,7 @@ define('echarts/layout/Force',['require','./forceLayoutWorker','zrender/tool/vec
         this._layoutWorker = null;
         this._layout = null;
         this._token = 0;
-    }
+    };
 
     return ForceLayout;
 });
@@ -12197,7 +12212,6 @@ define('echarts/data/Graph',['require','zrender/tool/util'],function(require) {
         this._directed = directed || false;
 
         /**
-         * [nodes description]
          * @type {Array}
          */
         this.nodes = [];
@@ -12205,33 +12219,34 @@ define('echarts/data/Graph',['require','zrender/tool/util'],function(require) {
 
         this._nodesMap = {};
         this._edgesMap = {};
-    }
+    };
 
     /**
      * 添加一个新的节点
-     * @param {string} name 节点名称
+     * @param {string} id 节点名称
      * @param {*} [data] 存储的数据
      */
-    Graph.prototype.addNode = function(name, data) {
-        if (this._nodesMap[name]) {
-            return this._nodesMap[name];
+    Graph.prototype.addNode = function (id, data) {
+        if (this._nodesMap[id]) {
+            return this._nodesMap[id];
         }
 
-        var node = new Graph.Node(name, data);
+        var node = new Graph.Node(id, data);
 
         this.nodes.push(node);
 
-        this._nodesMap[name] = node;
+        this._nodesMap[id] = node;
         return node;
-    }
+    };
+    
     /**
      * 获取节点
-     * @param  {string} name
+     * @param  {string} id
      * @return {module:echarts/data/Graph~Node}
      */
-    Graph.prototype.getNodeByName = function(name) {
-        return this._nodesMap[name];
-    }
+    Graph.prototype.getNodeById = function (id) {
+        return this._nodesMap[id];
+    };
 
     /**
      * 添加边
@@ -12240,7 +12255,7 @@ define('echarts/data/Graph',['require','zrender/tool/util'],function(require) {
      * @param {*} data
      * @return {module:echarts/data/Graph~Edge}
      */
-    Graph.prototype.addEdge = function(n1, n2, data) {
+    Graph.prototype.addEdge = function (n1, n2, data) {
         if (typeof(n1) == 'string') {
             n1 = this._nodesMap[n1];
         }
@@ -12251,7 +12266,7 @@ define('echarts/data/Graph',['require','zrender/tool/util'],function(require) {
             return;
         }
 
-        var key = n1.name + '-' + n2.name;
+        var key = n1.id + '-' + n2.id;
         if (this._edgesMap[key]) {
             return this._edgesMap[key];
         }
@@ -12269,16 +12284,16 @@ define('echarts/data/Graph',['require','zrender/tool/util'],function(require) {
         this._edgesMap[key] = edge;
 
         return edge;
-    }
+    };
 
     /**
      * 移除边
      * @param  {module:echarts/data/Graph~Edge} edge
      */
-    Graph.prototype.removeEdge = function(edge) {
+    Graph.prototype.removeEdge = function (edge) {
         var n1 = edge.node1;
         var n2 = edge.node2;
-        var key = n1.name + '-' + n2.name;
+        var key = n1.id + '-' + n2.id;
         if (this._directed) {
             n1.outEdges.splice(util.indexOf(n1.outEdges, edge), 1);
             n2.inEdges.splice(util.indexOf(n2.inEdges, edge), 1);   
@@ -12288,13 +12303,35 @@ define('echarts/data/Graph',['require','zrender/tool/util'],function(require) {
 
         delete this._edgesMap[key];
         this.edges.splice(util.indexOf(this.edges, edge), 1);
+    };
+
+    /**
+     * 获取边
+     * @param  {module:echarts/data/Graph~Node|string} n1
+     * @param  {module:echarts/data/Graph~Node|string} n2
+     * @return {module:echarts/data/Graph~Edge}
+     */
+    Graph.prototype.getEdge = function (n1, n2) {
+        if (typeof(n1) !== 'string') {
+            n1 = n1.id;
+        }
+        if (typeof(n2) !== 'string') {
+            n2 = n2.id;
+        }
+
+        if (this._directed) {
+            return this._edgesMap[n1 + '-' + n2]
+                || this._edgesMap[n2 + '-' + n1];
+        } else {
+            return this._edgesMap[n1 + '-' + n2];
+        }
     }
 
     /**
      * 移除节点（及其邻接边）
      * @param  {module:echarts/data/Graph~Node|string} node
      */
-    Graph.prototype.removeNode = function(node) {
+    Graph.prototype.removeNode = function (node) {
         if (typeof(node) === 'string') {
             node = this._nodesMap[node];
             if (!node) {
@@ -12302,7 +12339,7 @@ define('echarts/data/Graph',['require','zrender/tool/util'],function(require) {
             }
         }
 
-        delete this._nodesMap[node.name];
+        delete this._nodesMap[node.id];
         this.nodes.splice(util.indexOf(this.nodes, node), 1);
 
         for (var i = 0; i < this.edges.length;) {
@@ -12313,28 +12350,30 @@ define('echarts/data/Graph',['require','zrender/tool/util'],function(require) {
                 i++;
             }
         }
-    }
+    };
 
     /**
      * 线性遍历所有节点
      * @param  {Function} cb
      * @param  {*}   context
      */
-    Graph.prototype.eachNode = function(cb, context) {
+    Graph.prototype.eachNode = function (cb, context) {
         for (var i = 0; i < this.nodes.length; i++) {
             cb.call(context, this.nodes[i]);
         }
-    }
+    };
+    
     /**
      * 线性遍历所有边
      * @param  {Function} cb
      * @param  {*}   context
      */
-    Graph.prototype.eachEdge = function(cb, context) {
+    Graph.prototype.eachEdge = function (cb, context) {
         for (var i = 0; i < this.edges.length; i++) {
             cb.call(context, this.edges[i]);
         }
-    }
+    };
+    
     /**
      * 清空图
      */
@@ -12344,19 +12383,84 @@ define('echarts/data/Graph',['require','zrender/tool/util'],function(require) {
 
         this._nodesMap = {};
         this._edgesMap = {};
+    };
+    
+    /**
+     * 广度优先遍历
+     */
+    Graph.prototype.breadthFirstTraverse = function (
+        cb, startNode, direction, context
+    ) {
+        if (typeof(startNode) === 'string') {
+            startNode = this._nodesMap[startNode];
+        }
+        if (!startNode) {
+            return;
+        }
+
+        var edgeType = 'edges';
+        if (direction === 'out') {
+            edgeType = 'outEdges';
+        } else if (direction === 'in') {
+            edgeType = 'inEdges';
+        }
+        
+        for (var i = 0; i < this.nodes.length; i++) {
+            this.nodes[i].__visited = false;
+        }
+
+        if (cb.call(context, startNode, null)) {
+            return;
+        }
+
+        var queue = [startNode];
+        while (queue.length) {
+            var currentNode = queue.shift();
+            var edges = currentNode[edgeType];
+
+            for (var i = 0; i < edges.length; i++) {
+                var e = edges[i];
+                var otherNode = e.node1 === currentNode 
+                    ? e.node2 : e.node1;
+                if (!otherNode.__visited) {
+                    if (cb.call(otherNode, otherNode, currentNode)) {
+                        // Stop traversing
+                        return;
+                    }
+                    queue.push(otherNode);
+                    otherNode.__visited = true;
+                }
+            }
+        }
+    };
+
+    /**
+     * 复制图
+     */
+    Graph.prototype.clone = function () {
+        var graph = new Graph(this._directed);
+        for (var i = 0; i < this.nodes.length; i++) {
+            graph.addNode(this.nodes[i].id, this.nodes[i].data);
+        }
+        for (var i = 0; i < this.edges.length; i++) {
+            var e = this.edges[i];
+            graph.addEdge(e.node1.id, e.node2.id, e.data);
+        }
+        return graph;
     }
+
     /**
      * 图节点
      * @alias module:echarts/data/Graph~Node
-     * @param {string} name
+     * @param {string} id
      * @param {*} [data]
      */
-    var Node = function(name, data) {
+    var Node = function(id, data) {
         /**
          * 节点名称
          * @type {string}
          */
-        this.name = name;
+        this.id = id;
         /**
          * 节点存储的数据
          * @type {*}
@@ -12377,28 +12481,31 @@ define('echarts/data/Graph',['require','zrender/tool/util'],function(require) {
          * @type {Array.<module:echarts/data/Graph~Edge>}
          */
         this.edges = [];
-    }
+    };
+    
     /**
      * 度
      * @return {number}
      */
     Node.prototype.degree = function() {
         return this.edges.length; 
-    }
+    };
+    
     /**
      * 入度，只在有向图上有效
      * @return {number}
      */
     Node.prototype.inDegree = function() {
         return this.inEdges.length;
-    }
+    };
+    
     /**
      * 出度，只在有向图上有效
      * @return {number}
      */
     Node.prototype.outDegree = function() {
         return this.outEdges.length;
-    }
+    };
 
     /**
      * 图边
@@ -12424,7 +12531,7 @@ define('echarts/data/Graph',['require','zrender/tool/util'],function(require) {
          * @type {*}
          */
         this.data = data || null;
-    }
+    };
 
     Graph.Node = Node;
     Graph.Edge = Edge;
@@ -12447,7 +12554,7 @@ define('echarts/data/Graph',['require','zrender/tool/util'],function(require) {
      * 如果是有向图被写到`edge.data.sourceWeight`和`edge.data.targetWeight`
      * 
      * @method module:echarts/data/Graph.fromMatrix
-     * @param {Array.<Object>} nodesData 节点信息，必须有`name`属性
+     * @param {Array.<Object>} nodesData 节点信息，必须有`id`属性
      * @param {Array} matrix 邻接矩阵
      * @param {boolean} directed 是否是有向图
      * @return {module:echarts/data/Graph}
@@ -12466,7 +12573,7 @@ define('echarts/data/Graph',['require','zrender/tool/util'],function(require) {
         var graph = new Graph(directed);
 
         for (var i = 0; i < size; i++) {
-            var node = graph.addNode(nodesData[i].name, {});
+            var node = graph.addNode(nodesData[i].id, {});
             node.data.value = 0;
             if (directed) {
                 node.data.outValue = node.data.inValue = 0;
@@ -12508,9 +12615,200 @@ define('echarts/data/Graph',['require','zrender/tool/util'],function(require) {
                 }
             }
         }
-    }
+    };
 
     return Graph;
+});
+define('echarts/data/Tree',['require'],function(require) {
+
+    function TreeNode(id) {
+        this.id = id;
+        this.level = 0;
+        this.height = 0;
+        this.children = [];
+
+        this.data = {};
+        this.layout = {};
+    };
+
+    TreeNode.prototype.traverse = function (cb, context) {
+        cb.call(context, this);
+
+        for (var i = 0; i < this.children.length; i++) {
+            this.children[i].traverse(cb, context);
+        }
+    };
+
+    TreeNode.prototype.updateLevelAndHeight = function (level) {
+        var height = 0;
+        this.level = level;
+        for (var i = 0; i < this.children.length; i++) {
+            var child = this.children[i];
+            child.updateLevelAndHeight(level + 1);
+            if (child.height > height) {
+                height = child.height;
+            }
+        }
+        this.height = height + 1;
+    };
+
+    TreeNode.prototype.getNodeById = function (id) {
+        if (this.id === id) {
+            return this;
+        }
+        for (var i = 0; i < this.children.length; i++) {
+            var res = this.children[i].getNodeById(id);
+            if (res) {
+                return res;
+            }
+        }
+    };
+
+    function Tree(id) {
+        this.root = new TreeNode(id);
+    }
+
+    Tree.prototype.traverse = function(cb, context) {
+        this.root.traverse(cb, context);
+    };
+
+    Tree.prototype.getSubTree = function(id) {
+        var root = this.getNodeById(id);
+        if (root) {
+            var tree = new Tree(root.id);
+            tree.root = root;
+            return tree;
+        }
+    };
+
+    Tree.prototype.getNodeById = function (id) {
+        return this.root.getNodeById(id);
+    };
+
+    // TODO
+    Tree.fromGraph = function (graph) {
+
+        function buildHierarch(root) {
+            var graphNode = graph.getNodeById(root.id);
+            for (var i = 0; i < graphNode.outEdges.length; i++) {
+                var edge = graphNode.outEdges[i];
+                var childTreeNode = treeNodesMap[edge.node2.id]
+                root.children.push(childTreeNode);
+                buildHierarch(childTreeNode);
+            }
+        }
+
+        var treeMap = {};
+        var treeNodesMap = {};
+        for (var i = 0; i < graph.nodes.length; i++) {
+            var node = graph.nodes[i];
+            var treeNode;
+            if (node.inDegree() == 0) {
+                treeMap[node.id] = new Tree(node.id);
+                treeNode = treeMap[node.id].root;
+            } else {
+                treeNode = new TreeNode(node.id);
+            }
+
+            treeNode.data = node.data;
+
+            treeNodesMap[node.id] = treeNode;
+        }
+        var treeList = [];
+        for (var id in treeMap) {
+            buildHierarch(treeMap[id].root);
+            treeMap[id].root.updateLevelAndHeight(0);
+            treeList.push(treeMap[id]);
+        }
+        return treeList;
+    }
+
+    return Tree;
+});
+define('echarts/layout/Tree',['require','zrender/tool/vector'],function (require) {
+
+    var vec2 = require('zrender/tool/vector');
+
+    function TreeLayout(tree) {
+        
+        this.tree = tree;
+        
+        this.nodePadding = 30;
+
+        this.layerPadding = 100;
+
+        this._layerOffsets = [];
+
+        this._layers = [];
+    };
+
+    TreeLayout.prototype.run = function () {
+        this._layerOffsets.length = 0;
+        for (var i = 0; i < this.tree.root.height + 1; i++) {
+            this._layerOffsets[i] = 0;
+            this._layers[i] = [];
+        }
+        this._updateNodeXPosition(this.tree.root);
+        var root = this.tree.root;
+        this._updateNodeYPosition(root, 0, root.layout.height);
+    };
+
+    TreeLayout.prototype._updateNodeXPosition = function (node) {
+        var minX = Infinity;
+        var maxX = -Infinity;
+        node.layout.position = node.layout.position || vec2.create();
+        for (var i = 0; i < node.children.length; i++) {
+            var child = node.children[i];
+            this._updateNodeXPosition(child);
+            var x = child.layout.position[0];
+            if (x < minX) {
+                minX = x;
+            }
+            if (x > maxX) {
+                maxX = x;
+            }
+        }
+        if (node.children.length > 0) {
+            node.layout.position[0] = (minX + maxX) / 2;
+        } else {
+            node.layout.position[0] = 0;
+        }
+        var off = this._layerOffsets[node.level] || 0;
+        if (off > node.layout.position[0]) {
+            var shift = off - node.layout.position[0];
+            this._shiftSubtree(node, shift);
+            for (var i = node.level + 1; i < node.height + node.level; i++) {
+                this._layerOffsets[i] += shift;
+            }
+        }
+        this._layerOffsets[node.level] = node.layout.position[0] + node.layout.width + this.nodePadding;
+
+        this._layers[node.level].push(node);
+    };
+
+    TreeLayout.prototype._shiftSubtree = function (root, offset) {
+        root.layout.position[0] += offset;
+        for (var i = 0; i < root.children.length; i++) {
+            this._shiftSubtree(root.children[i], offset);
+        }
+    };
+
+    TreeLayout.prototype._updateNodeYPosition = function (node, y, prevLayerHeight) {
+        node.layout.position[1] = y;
+        var layerHeight = 0;
+        for (var i = 0; i < node.children.length; i++) {
+            layerHeight = Math.max(node.children[i].layout.height, layerHeight);
+        }
+        var layerPadding = this.layerPadding;
+        if (typeof(layerPadding) === 'function') {
+            layerPadding = layerPadding(node.level);
+        }
+        for (var i = 0; i < node.children.length; i++) {
+            this._updateNodeYPosition(node.children[i], y + layerPadding + prevLayerHeight, layerHeight);
+        }
+    };
+
+    return TreeLayout;
 });
 define('bkgraph/component/Component',['require'],function (require) {
 
@@ -12664,12 +12962,17 @@ define(
     }
 );
 
-define('bkgraph/entity/Node',['require','./Entity','zrender/Group','zrender/shape/Circle','zrender/tool/util'],function (require) {
+define('bkgraph/entity/Node',['require','./Entity','zrender/Group','zrender/shape/Circle','zrender/shape/Image','zrender/shape/Rectangle','zrender/tool/util','zrender/tool/color'],function (require) {
 
     var Entity = require('./Entity');
     var Group = require('zrender/Group');
     var CircleShape = require('zrender/shape/Circle');
+    var ImageShape = require('zrender/shape/Image');
+    var RectShape = require('zrender/shape/Rectangle');
     var zrUtil = require('zrender/tool/util');
+    var zrColor = require('zrender/tool/color');
+
+    var baseRadius = 50;
 
     var NodeEntity = function (opts) {
 
@@ -12682,23 +12985,133 @@ define('bkgraph/entity/Node',['require','./Entity','zrender/Group','zrender/shap
 
         this.radius = opts.radius || 20;
 
-        this.color = opts.color || 'black';
+        this.label = opts.label || '';
 
-        this.title = opts.title || '';
+        this.image = opts.image || '';
+
+        this.style = {
+            color: '#0e90fe',
+            lineWidth: 3,
+            labelColor: 'white'
+        };
+        this.highlightStyle = {
+            color: '#f9dd05',
+            lineWidth: 5,
+            labelColor: '#27408a'
+        };
+        if (opts.style) {
+            zrUtil.merge(this.style, opts.style)
+        }
+        if (opts.highlightStyle) {
+            zrUtil.merge(this.highlightStyle, opts.highlightStyle)
+        }
     }
 
     NodeEntity.prototype.initialize = function (zr) {
+        var self = this;
+        var r = this.radius;
 
-        var circle = new CircleShape({
+        var dragging = false;
+        var outlineShape = new CircleShape({
             style: {
+                strokeColor: this.style.color,
+                brushType: 'stroke',
+                r: baseRadius,
                 x: 0,
                 y: 0,
-                r: this.radius,
-                color: this.color
+                lineWidth: this.style.lineWidth
+            },
+            highlightStyle: {
+                opacity: 0
+            },
+            zlevel: 1,
+            clickable: true,
+            onmouseover: function () {
+                self.dispatch('mouseover');
+            },
+            onmouseout: function () {
+                self.dispatch('mouseout');
+            },
+            onclick: function () {
+                self.dispatch('click');
             }
         });
+        
+        var contentGroup = new Group();
+        var clipShape = new CircleShape({
+            style: {
+                r: baseRadius,
+                x: 0,
+                y: 0
+            }
+        });
+        contentGroup.clipShape = clipShape;
 
-        this.el.addChild(circle);
+        var imageShape = new ImageShape({
+            style: {
+                image: this.image,
+                x: -baseRadius,
+                y: -baseRadius,
+                width: baseRadius * 2,
+                height: baseRadius * 2
+            },
+            hoverable: false,
+            zlevel: 1
+        });
+
+        if (this.label) {
+            var labelShape = new RectShape({
+                style: {
+                    width: baseRadius * 2,
+                    height: 20,
+                    x: -baseRadius,
+                    y: baseRadius - 20,
+                    color: zrColor.alpha(this.style.color, 0.8),
+                    brushType: 'fill',
+                    text: this.label,
+                    textPosition: 'inside',
+                    textAlign: 'center',
+                    brushType: 'both',
+                    textColor: this.style.labelColor,
+                    textFont: '12px 微软雅黑'
+                },
+                hoverable: false,
+                zlevel: 1
+            });
+        }
+
+        contentGroup.addChild(imageShape);
+
+        if (labelShape) {
+            contentGroup.addChild(labelShape);
+        }
+
+        this.el.addChild(contentGroup);
+        this.el.addChild(outlineShape);
+
+        this._imageShape = imageShape;
+        this._labelShape = labelShape;
+        this._outlineShape = outlineShape;
+        this._clipShape = clipShape;
+
+        this.el.scale[0] = this.el.scale[1] = this.radius / baseRadius;
+    }
+
+    NodeEntity.prototype.highlight = function (zr) {
+        this._outlineShape.style.strokeColor = this.highlightStyle.color;
+        this._outlineShape.style.lineWidth = this.highlightStyle.lineWidth;
+        this._labelShape.style.color = zrColor.alpha(this.highlightStyle.color, 0.8);
+        this._labelShape.style.textColor = this.highlightStyle.labelColor;
+        zr.modGroup(this.el.id);
+    }
+
+    NodeEntity.prototype.lowlight = function (zr) {
+        this._outlineShape.style.strokeColor = this.style.color;
+        this._outlineShape.style.lineWidth = this.style.lineWidth;
+        this._labelShape.style.color = zrColor.alpha(this.style.color, 0.8);
+        this._labelShape.style.textColor = this.style.labelColor;
+
+        zr.modGroup(this.el.id);
     }
 
     zrUtil.inherits(NodeEntity, Entity);
@@ -12882,10 +13295,12 @@ define(
     }
 );
 
-define('bkgraph/entity/Edge',['require','./Entity','zrender/shape/Line','zrender/tool/util','zrender/tool/vector'],function (require) {
+define('bkgraph/entity/Edge',['require','./Entity','zrender/shape/Line','zrender/Group','zrender/shape/Rectangle','zrender/tool/util','zrender/tool/vector'],function (require) {
 
     var Entity = require('./Entity');
     var LineShape = require('zrender/shape/Line');
+    var Group = require('zrender/Group');
+    var RectShape = require('zrender/shape/Rectangle');
     var zrUtil = require('zrender/tool/util');
 
     var vec2 = require('zrender/tool/vector');
@@ -12897,16 +13312,7 @@ define('bkgraph/entity/Edge',['require','./Entity','zrender/shape/Line','zrender
         
         Entity.call(this);
 
-        this.el = new LineShape({
-            style: {
-                xStart: 0,
-                yStart: 0,
-                xEnd: 0,
-                yEnd: 0,
-                lineWidth: 2,
-                strokeColor: 'black'
-            }
-        });
+        this.el = new Group();
 
         // Configs
         opts = opts || {};
@@ -12914,11 +13320,70 @@ define('bkgraph/entity/Edge',['require','./Entity','zrender/shape/Line','zrender
         this.sourceEntity = opts.sourceEntity || null;
 
         this.targetEntity = opts.targetEntity || null;
-    }
+
+        this.label = opts.label || '';
+
+        this.style = {
+            color: '#0e90fe',
+            labelColor: 'white'
+        };
+        this.highlightStyle = {
+            color: '#f9dd05',
+            labelColor: '#27408a'
+        };
+        if (opts.style) {
+            zrUtil.merge(this.style, opts.style)
+        }
+        if (opts.highlightStyle) {
+            zrUtil.merge(this.highlightStyle, opts.highlightStyle)
+        }
+    };
 
     EdgeEntity.prototype.initialize = function (zr) {
+        this._lineShape = new LineShape({
+            style: {
+                xStart: 0,
+                yStart: 0,
+                xEnd: 0,
+                yEnd: 0,
+                lineWidth: 1,
+                opacity: 1,
+                strokeColor: this.style.color
+            },
+            highlightStyle: {
+                opacity: 0
+            },
+            z: 0,
+            zlevel: 0
+        });
+
+        var width = zrUtil.getContext().measureText(this.label).width + 20;
+        this._labelShape = new RectShape({
+            style: {
+                width: width,
+                height: 20,
+                text: this.label,
+                textPosition: 'inside',
+                textAlign: 'center',
+                textFont: '12px 微软雅黑',
+                textColor: this.style.labelColor,
+                color: this.style.color,
+                brushType: 'fill',
+                x: -width / 2,
+                y: -10,
+                radius: 10
+            },
+            highlightStyle: {
+                opacity: 0
+            },
+            z: 1
+        });
+
+        this.el.addChild(this._lineShape);
+        this.el.addChild(this._labelShape);
+
         this.update(zr);
-    }
+    };
 
     EdgeEntity.prototype.update = function (zr) {
         if (this.sourceEntity && this.targetEntity) {
@@ -12934,44 +13399,388 @@ define('bkgraph/entity/Edge',['require','./Entity','zrender/shape/Line','zrender
             vec2.scaleAndAdd(v1, p1, v, -sourceEntity.radius);
             vec2.scaleAndAdd(v2, p2, v, targetEntity.radius);
 
-            var line = this.el;
+            var line = this._lineShape;
             line.style.xStart = v1[0];
             line.style.yStart = v1[1];
             line.style.xEnd = v2[0];
             line.style.yEnd = v2[1];
 
-            zr.modShape(line.id);
+            if (this._labelShape) {
+                var labelShape = this._labelShape;
+
+                if (v[0] > 0) {
+                    vec2.negate(v, v);
+                }
+                var angle = Math.PI - Math.atan2(v[1], v[0]);
+                labelShape.rotation[0] = angle;
+                labelShape.position[0] = (v1[0] + v2[0]) / 2;
+                labelShape.position[1] = (v1[1] + v2[1]) / 2;
+            }
         }
+        zr.modGroup(this.el.id);
+    };
+
+    EdgeEntity.prototype.highlight = function (zr) {
+        this._lineShape.style.strokeColor = this.highlightStyle.color;
+        if (this._labelShape) {
+            this._labelShape.style.color = this.highlightStyle.color
+            this._labelShape.style.textColor = this.highlightStyle.labelColor;   
+        }
+        zr.modGroup(this.el.id);
+    };
+
+    EdgeEntity.prototype.lowlight = function (zr) {
+        this._lineShape.style.strokeColor = this.style.color;
+        if (this._labelShape) {
+            this._labelShape.style.color = this.style.color;
+            this._labelShape.style.textColor = this.style.labelColor;   
+        }
+        zr.modGroup(this.el.id);
+    };
+
+    EdgeEntity.prototype.getRect = function () {
+        return this._lineShape.getRect(this._lineShape.style);
     }
 
     zrUtil.inherits(EdgeEntity, Entity);
 
     return EdgeEntity;
 });
-define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force','echarts/data/Graph','zrender/tool/util','./Component','zrender/tool/vector','../entity/Node','../entity/Edge'],function (require) {
+/**
+ * 贝塞尔曲线
+ * @module zrender/shape/BezierCurve
+ * @author Neil (杨骥, yangji01@baidu.com)
+ * @example
+ *     var BezierCurve = require('zrender/shape/BezierCurve');
+ *     var shape = new BezierCurve({
+ *         style: {
+ *             xStart: 0,
+ *             yStart: 0,
+ *             cpX1: 100,
+ *             cpY1: 0,
+ *             cpX2: 0,
+ *             cpY2: 100,
+ *             xEnd: 100,
+ *             yEnd: 100,
+ *             strokeColor: 'red'
+ *         }
+ *     });
+ *     zr.addShape(shape);
+ */
+
+/**
+ * @typedef {Object} IBezierCurveStyle
+ * @property {number} xStart 起点x坐标
+ * @property {number} yStart 起点y坐标
+ * @property {number} cpX1 第一个控制点x坐标
+ * @property {number} cpY1 第一个控制点y坐标
+ * @property {number} [cpX2] 第二个控制点x坐标，如果不给则为二次贝塞尔曲线
+ * @property {number} [cpY2] 第二个控制点y坐标，如果不给则为二次贝塞尔曲线
+ * @property {number} xEnd 终止点x坐标
+ * @property {number} yEnd 终止点y坐标
+ * @property {string} [strokeColor='#000000'] 描边颜色
+ * @property {string} [lineCape='butt'] 线帽样式，可以是 butt, round, square
+ * @property {number} [lineWidth=1] 描边宽度
+ * @property {number} [opacity=1] 绘制透明度
+ * @property {number} [shadowBlur=0] 阴影模糊度，大于0有效
+ * @property {string} [shadowColor='#000000'] 阴影颜色
+ * @property {number} [shadowOffsetX=0] 阴影横向偏移
+ * @property {number} [shadowOffsetY=0] 阴影纵向偏移
+ * @property {string} [text] 图形中的附加文本
+ * @property {string} [textColor='#000000'] 文本颜色
+ * @property {string} [textFont] 附加文本样式，eg:'bold 18px verdana'
+ * @property {string} [textPosition='end'] 附加文本位置, 可以是 inside, left, right, top, bottom
+ * @property {string} [textAlign] 默认根据textPosition自动设置，附加文本水平对齐。
+ *                                可以是start, end, left, right, center
+ * @property {string} [textBaseline] 默认根据textPosition自动设置，附加文本垂直对齐。
+ *                                可以是top, bottom, middle, alphabetic, hanging, ideographic
+ */
+
+define(
+    'zrender/shape/BezierCurve',['require','./Base','../tool/util'],function (require) {
+        
+
+        var Base = require('./Base');
+        
+        /**
+         * @alias module:zrender/shape/BezierCurve
+         * @constructor
+         * @extends module:zrender/shape/Base
+         * @param {Object} options
+         */
+        var BezierCurve = function(options) {
+            this.brushTypeOnly = 'stroke';  // 线条只能描边，填充后果自负
+            this.textPosition = 'end';
+            Base.call(this, options);
+            /**
+             * 贝赛尔曲线绘制样式
+             * @name module:zrender/shape/BezierCurve#style
+             * @type {module:zrender/shape/BezierCurve~IBezierCurveStyle}
+             */
+            /**
+             * 贝赛尔曲线高亮绘制样式
+             * @name module:zrender/shape/BezierCurve#highlightStyle
+             * @type {module:zrender/shape/BezierCurve~IBezierCurveStyle}
+             */
+        };
+
+        BezierCurve.prototype = {
+            type: 'bezier-curve',
+
+            /**
+             * 创建贝塞尔曲线路径
+             * @param {CanvasRenderingContext2D} ctx
+             * @param {module:zrender/shape/BezierCurve~IBezierCurveStyle} style
+             */
+            buildPath : function(ctx, style) {
+                ctx.moveTo(style.xStart, style.yStart);
+                if (typeof style.cpX2 != 'undefined'
+                    && typeof style.cpY2 != 'undefined'
+                ) {
+                    ctx.bezierCurveTo(
+                        style.cpX1, style.cpY1,
+                        style.cpX2, style.cpY2,
+                        style.xEnd, style.yEnd
+                    );
+                }
+                else {
+                    ctx.quadraticCurveTo(
+                        style.cpX1, style.cpY1,
+                        style.xEnd, style.yEnd
+                    );
+                }
+            },
+
+            /**
+             * 计算返回贝赛尔曲线包围盒矩形。
+             * 该包围盒是直接从四个控制点计算，并非最小包围盒。
+             * @param {module:zrender/shape/BezierCurve~IBezierCurveStyle} style
+             * @return {module:zrender/shape/Base~IBoundingRect}
+             */
+            getRect : function(style) {
+                if (style.__rect) {
+                    return style.__rect;
+                }
+                
+                var _minX = Math.min(style.xStart, style.xEnd, style.cpX1);
+                var _minY = Math.min(style.yStart, style.yEnd, style.cpY1);
+                var _maxX = Math.max(style.xStart, style.xEnd, style.cpX1);
+                var _maxY = Math.max(style.yStart, style.yEnd, style.cpY1);
+                var _x2 = style.cpX2;
+                var _y2 = style.cpY2;
+
+                if (typeof _x2 != 'undefined'
+                    && typeof _y2 != 'undefined'
+                ) {
+                    _minX = Math.min(_minX, _x2);
+                    _minY = Math.min(_minY, _y2);
+                    _maxX = Math.max(_maxX, _x2);
+                    _maxY = Math.max(_maxY, _y2);
+                }
+
+                var lineWidth = style.lineWidth || 1;
+                style.__rect = {
+                    x : _minX - lineWidth,
+                    y : _minY - lineWidth,
+                    width : _maxX - _minX + lineWidth,
+                    height : _maxY - _minY + lineWidth
+                };
+                
+                return style.__rect;
+            }
+        };
+
+        require('../tool/util').inherits(BezierCurve, Base);
+        return BezierCurve;
+    }
+);
+
+define('bkgraph/entity/ExtraEdge',['require','./Entity','zrender/shape/BezierCurve','zrender/Group','zrender/shape/Circle','zrender/tool/util','zrender/tool/curve','zrender/tool/vector'],function (require) {
+
+    var Entity = require('./Entity');
+    var BezierCurveShape = require('zrender/shape/BezierCurve');
+    var Group = require('zrender/Group');
+    var CircleShape = require('zrender/shape/Circle');
+    var zrUtil = require('zrender/tool/util');
+    var curveTool = require('zrender/tool/curve');
+
+    var vec2 = require('zrender/tool/vector');
+
+    var ExtraEdgeEntity = function (opts) {
+        
+        Entity.call(this);
+
+        this.el = new Group();
+
+        // Configs
+        opts = opts || {};
+
+        this.sourceEntity = opts.sourceEntity || null;
+
+        this.targetEntity = opts.targetEntity || null;
+
+        this.label = opts.label || '';
+
+        this.style = {
+            color: '#0e90fe',
+            opacity: 0.3,
+            labelColor: 'white'
+        };
+        this.highlightStyle = {
+            color: '#f9dd05',
+            opacity: 1,
+            labelColor: '#f9dd05'
+        };
+        if (opts.style) {
+            zrUtil.merge(this.style, opts.style)
+        }
+        if (opts.highlightStyle) {
+            zrUtil.merge(this.highlightStyle, opts.highlightStyle)
+        }
+    };
+
+    ExtraEdgeEntity.prototype.initialize = function (zr) {
+        this._curveShape = new BezierCurveShape({
+            style: {
+                xStart: 0,
+                yStart: 0,
+                xEnd: 0,
+                yEnd: 0,
+                cpX1: 0,
+                cpY1: 0,
+                lineWidth: 1,
+                opacity: this.style.opacity,
+                strokeColor: this.style.color
+            },
+            highlightStyle: {
+                opacity: 0
+            },
+            z: 0,
+            zlevel: 0
+        });
+
+        this._labelShape = new CircleShape({
+            style: {
+                text: this.label,
+                textPosition: 'right',
+                textFont: '12px 微软雅黑',
+                textColor: this.style.labelColor,
+                color: this.style.color,
+                x: 0,
+                y: 0,
+                r: 10
+            },
+            highlightStyle: {
+                opacity: 0
+            },
+            z: 1,
+            zlevel: 0
+        });
+
+        this.el.addChild(this._curveShape);
+        this.el.addChild(this._labelShape);
+
+        this.update(zr);
+    };
+
+    ExtraEdgeEntity.prototype.update = function (zr) {
+        if (this.sourceEntity && this.targetEntity) {
+            var sourceEntity = this.sourceEntity;
+            var targetEntity = this.targetEntity;
+
+            var p1 = sourceEntity.el.position;
+            var p2 = targetEntity.el.position;
+
+            var curve = this._curveShape;
+            curve.style.xStart = p1[0];
+            curve.style.yStart = p1[1];
+            curve.style.xEnd = p2[0];
+            curve.style.yEnd = p2[1];
+
+            curve.style.cpX1 = (p1[0] + p2[0]) / 2 - (p2[1] - p1[1]) / 4;
+            curve.style.cpY1 = (p1[1] + p2[1]) / 2 - (p1[0] - p2[0]) / 4;
+
+            if (this._labelShape) {
+                var labelShape = this._labelShape;
+                labelShape.position[0] = curveTool.quadraticAt(
+                    curve.style.xStart, curve.style.cpX1, curve.style.xEnd, 0.5
+                );
+                labelShape.position[1] = curveTool.quadraticAt(
+                    curve.style.yStart, curve.style.cpY1, curve.style.yEnd, 0.5
+                );
+            }
+        }
+        zr.modGroup(this.el.id);
+    };
+
+    ExtraEdgeEntity.prototype.highlight = function (zr) {
+        this._curveShape.style.strokeColor = this.highlightStyle.color;
+        this._curveShape.style.opacity = this.highlightStyle.opacity;
+        if (this._labelShape) {
+            this._labelShape.style.color = this.highlightStyle.labelColor
+            this._labelShape.style.textColor = this.highlightStyle.labelColor;
+            this._labelShape.style.opacity = this.highlightStyle.opacity;
+        }
+        zr.modGroup(this.el.id);
+    };
+
+    ExtraEdgeEntity.prototype.lowlight = function (zr) {
+        this._curveShape.style.strokeColor = this.style.color;
+        this._curveShape.style.opacity = this.style.opacity;
+        if (this._labelShape) {
+            this._labelShape.style.opacity = this.style.opacity;
+            this._labelShape.style.color = this.style.color;
+            this._labelShape.style.textColor = this.style.labelColor;
+            this._labelShape.style.opacity = this.style.opacity;
+        }
+        zr.modGroup(this.el.id);
+    };
+
+    ExtraEdgeEntity.prototype.getRect = function () {
+        return this._curveShape.getRect(this._curveShape.style);
+    }
+
+    zrUtil.inherits(ExtraEdgeEntity, Entity);
+
+    return ExtraEdgeEntity;
+});
+define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force','echarts/data/Graph','echarts/data/Tree','echarts/layout/Tree','zrender/tool/util','./Component','zrender/tool/vector','../entity/Node','../entity/Edge','../entity/ExtraEdge'],function (require) {
 
     var zrender = require('zrender');
     var ForceLayout = require('echarts/layout/Force');
     var Graph = require('echarts/data/Graph');
+    var Tree = require('echarts/data/Tree');
+    var TreeLayout = require('echarts/layout/Tree');
     var zrUtil = require('zrender/tool/util');
     var Component = require('./Component');
     var vec2 = require('zrender/tool/vector');
 
     var NodeEntity = require('../entity/Node');
     var EdgeEntity = require('../entity/Edge');
+    var ExtraEdgeEntity = require('../entity/ExtraEdge');
 
     var GraphMain = function () {
 
         Component.call(this);
 
+        this.minRadius = 30;
+        this.maxRadius = 40;
+
+        this.minRelationWeight = 30;
+        this.maxRelationWeight = 40;
+
         this._kgraph = null;
         
         this._zr = null;
 
-        this._graph = null;
+        // Graph for rendering
+        this._graphRendering = null;
 
-        this._layout = null;
-    }
+        // Graph for layouting
+        this._graph = null
+
+        this._layouting = false;
+    };
 
     GraphMain.prototype.type = 'GRAPH';
 
@@ -12979,12 +13788,20 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
         this._kgraph = kg;
 
         var el = this.el;
+        this.el.className = 'bkg-graph';
 
         el.style.width = kg.getWidth() + 'px';
         el.style.height = kg.getHeight() + 'px';
 
         this._zr = zrender.init(el);
-    }
+
+        var zrRefresh = this._zr.painter.refresh;
+        var self = this;
+        this._zr.painter.refresh = function () {
+            self._culling();
+            zrRefresh.call(this);
+        }
+    };
 
     GraphMain.prototype.resize = function (w, h) {
 
@@ -12992,95 +13809,506 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
         this.el.style.height = h + 'px';
 
         this._zr.resize();
-    }
+    };
 
     GraphMain.prototype.setData = function (data) {
-        var graph = new Graph();
+        var graph = new Graph(true);
         this._graph = graph;
+        var zr = this._zr;
 
         var cx = this._kgraph.getWidth() / 2;
         var cy = this._kgraph.getHeight() / 2;
+        var mainNode;
 
-        for (var i = 0; i < data.nodes.length; i++) {
-            var n = graph.addNode(data.nodes[i].name, data.nodes[i]);
+        // 映射数据
+        var max = -Infinity;
+        var min = Infinity;
+        for (var i = 0; i < data.entities.length; i++) {
+            var entity = data.entities[i];
+            min = Math.min(min, entity.hotValue);
+            max = Math.max(max, entity.hotValue);
+        }
+        var diff = max - min;
+
+        for (var i = 0; i < data.entities.length; i++) {
+            var entity = data.entities[i];
+            // 数据修正
+            entity.layerCounter = +entity.layerCounter;
+            var n = graph.addNode(entity.ID, entity);
+            var r = diff > 0 ?
+                (entity.hotValue - min) * (this.maxRadius - this.minRadius) / diff + this.minRadius
+                : (this.maxRadius + this.minRadius) / 2;
+            if (entity.layerCounter === 0) {
+                r = 70;
+                mainNode = n;
+            }
             n.layout = {
-                position: _randomInSquare(cx, cy, 800),
-                // TODO
+                position: entity.position,
                 mass: 1,
-                radius: data.nodes[i].radius
+                radius: r
             };
-            if (data.nodes[i].position) {
-                n.layout.position = data.nodes[i].position;
+            if (entity.layerCounter === 0) {
+                n.layout.fixed = true;
+                n.layout.position = [
+                    zr.getWidth() / 2,
+                    zr.getHeight() / 2
+                ];
+                n.position = Array.prototype.slice.call(n.layout.position);
             }
         }
 
-        for (var i = 0; i < data.links.length; i++) {
-            var e = graph.addEdge(data.links[i].source, data.links[i].target, data.links[i]);
+        max = -Infinity;
+        min = Infinity;
+        for (var i = 0; i < data.relations.length; i++) {
+            var relation = data.relations[i];
+            min = Math.min(min, relation.relationWeight);
+            max = Math.max(max, relation.relationWeight);
+        }
+        diff = max - min;
+        for (var i = 0; i < data.relations.length; i++) {
+            var relation = data.relations[i];
+            if (relation.isExtra) {
+                continue;
+            }
+            var w = diff > 0 ? 
+                (relation.relationWeight - min) / diff * (this.maxRelationWeight - this.minRelationWeight) + this.minRelationWeight
+                : (this.maxRelationWeight + this.minRelationWeight) / 2;
+            var e = graph.addEdge(relation.fromID, relation.toID, relation);
             e.layout = {
-                weight: e.weight
-            }
+                // 边权重
+                weight: w * 8 / Math.pow(e.node1.data.layerCounter + 1, 2)
+                // weight: e.node1.data.layerCounter === 0 ? 200 : w
+            };
         }
 
-        this.runLayout(graph, function () {
-            this.render(graph);
-        });
-    }
+        this.radialTreeLayout(zr.getWidth() / 2, zr.getHeight() / 2);
 
-    GraphMain.prototype.render = function (graph) {
+        // 加入补边
+        this._graphRendering = this._graph.clone();
+        this._graphRendering.eachNode(function (n) {
+            // 共用布局
+            n.layout = this._graph.getNodeById(n.id).layout;
+        }, this);
+        for (var i = 0; i < data.relations.length; i++) {
+            var relation = data.relations[i];
+            if (!relation.isExtra) {
+                continue;
+            }
+            var e = this._graphRendering.addEdge(relation.fromID, relation.toID, relation);
+            e.isExtra = true;
+        }
+
+        this.render();
+    };
+
+    GraphMain.prototype.render = function () {
         var zr = this._zr;
+        var graph = this._graphRendering;
+
+        // 所有实体都在 zlevel-1 层
         graph.eachNode(function (n) {
-            var nodeEntity = new NodeEntity({
-                radius: n.data.radius
-            });
-            nodeEntity.initialize(zr);
+            if (n.data.layerCounter > 2) {
+                return;
+            }
+            if (this._createNodeEntity(n)) {
+                zr.addGroup(n.entity.el);
+            }
+        }, this);
 
-            nodeEntity.el.position = n.layout.position;
-            zr.addGroup(nodeEntity.el);
-            n.entity = nodeEntity;
-        });
-
+        // 所有边都在 zlevel-0 层
         graph.eachEdge(function (e) {
-            var edgeEntity = new EdgeEntity({
-                sourceEntity: e.node1.entity,
-                targetEntity: e.node2.entity
-            });
-            edgeEntity.initialize(zr);
-            e.entity = edgeEntity;
-
-            zr.addShape(edgeEntity.el);
-        });
+            if (
+                e.node1.data.layerCounter > 2 ||
+                e.node2.data.layerCounter > 2
+            ) {
+                return;
+            }
+            if (this._createEdgeEntity(e)) {
+                zr.addGroup(e.entity.el);
+            }
+        }, this);
 
         zr.render();
+
+        zr.modLayer(0, {
+            panable: true,
+            zoomable: true
+        });
+        zr.modLayer(1, {
+            panable: true,
+            zoomable: true
+        });
+    };
+
+    GraphMain.prototype.naiveLayout = function (mainNode) {
+        graph.breadthFirstTraverse(function (n2, n1) {
+            if (n1) {
+                if (!n2.layout.position) {
+                    var cx = n1.layout.position[0];
+                    var cy = n1.layout.position[1];
+                    var r = 1000 / Math.pow(n1.data.layerCounter + 1, 2);
+                    n1.__count = n1.__count || 0;
+                    var angle = Math.PI * 2 * n1.__count / n1.outDegree();
+                    n1.__count ++;
+                    if (n1.__count === n1.outDegree()) {
+                        // 置零
+                        n1.__count = 0;
+                    }
+                    n2.layout.position = [
+                        Math.cos(angle) * r + cx,
+                        Math.sin(angle) * r + cy
+                    ];
+                }
+            }
+        }, mainNode, 'out');
+    };
+
+    GraphMain.prototype.radialTreeLayout = function (cx, cy) {
+        var tree = Tree.fromGraph(this._graph)[0];
+        tree.traverse(function (treeNode) {
+            var graphNode = this._graph.getNodeById(treeNode.id);
+            treeNode.layout = {
+                width: graphNode.layout.radius * 2,
+                height: graphNode.layout.radius * 2
+            };
+        }, this);
+        var layout = new TreeLayout(tree);
+        var layerPadding = [100, 400, 200, 200, 200, 200, 200];
+        layout.layerPadding = function (level) {
+            return layerPadding[level] || 200;
+        };
+        layout.run();
+
+        var min = [Infinity, Infinity];
+        var max = [-Infinity, -Infinity];
+        tree.traverse(function (treeNode) {
+            vec2.min(min, min, treeNode.layout.position);
+            vec2.max(max, max, treeNode.layout.position);
+        });
+        var width = max[0] - min[0];
+        var height = max[1] - min[1];
+        tree.traverse(function (treeNode) {
+            var graphNode = this._graph.getNodeById(treeNode.id);
+            var x = treeNode.layout.position[0];
+            var y = treeNode.layout.position[1];
+            var r = y;
+            var rad = x / width * Math.PI * 2;
+
+            graphNode.layout.position = [
+                // 以中心节点为圆心
+                r * Math.cos(rad) + cx,
+                r * Math.sin(rad) + cy
+            ];
+        }, this);
     }
 
-    GraphMain.prototype.runLayout = function (graph, cb) {
+    GraphMain.prototype.startForceLayout = function (cb) {
+        var graph = this._graph;
         var forceLayout = new ForceLayout();
         forceLayout.center = [
             this._kgraph.getWidth() / 2,
             this._kgraph.getHeight() / 2
         ];
-        forceLayout.gravity = 0.3;
-        forceLayout.scaling = 2;
+        // forceLayout.gravity = 0.8;
+        forceLayout.scaling = 12;
+        forceLayout.coolDown = 0.99;
+        // forceLayout.enableAcceleration = false;
+        forceLayout.maxSpeedIncrease = 1;
+        // 这个真是不好使
+        // forceLayout.preventOverlap = true;
 
-        forceLayout.init(graph, true);
-        this._layout = forceLayout;
+        graph.eachNode(function(n) {
+            n.layout.mass = n.degree() * 3;
+        });
+
+        forceLayout.init(graph, false);
         var self = this;
+
+        this._layouting = true;
         forceLayout.onupdate = function () {
+            for (var i = 0; i < graph.nodes.length; i++) {
+                if (graph.nodes[i].layout.fixed) {
+                    vec2.copy(graph.nodes[i].layout.position, graph.nodes[i].position);
+                }
+            }
+            self._updateNodePositions();   
+
             if (forceLayout.temperature < 0.01) {
                 cb && cb.call(self);
-            } else {
-                forceLayout.step(10);
+            }
+            else {
+                if (self._layouting) {
+                    forceLayout.step(10);
+                }
             }
         }
-        this._layout.step(10);
+       forceLayout.step(10);
+    };
+
+    GraphMain.prototype.stopForceLayout = function () {
+        this._layouting = false;
+    }
+
+    GraphMain.prototype.lowlightAll = function () {
+        var zr = this._zr;
+
+        this._graphRendering.eachNode(function (n) {
+            if (n.entity) {
+                n.entity.lowlight(zr);
+            }
+        });
+        this._graphRendering.eachEdge(function (e) {
+            if (e.entity) {
+                e.entity.lowlight(zr);
+            }
+        });
+
+        zr.refreshNextFrame();
+    }
+
+    GraphMain.prototype.highlightNodeAndAdjeceny = function (node) {
+        if (typeof(node) === 'string') {
+            node = this._graphRendering.getNodeById(node);
+        }
+        var zr = this._zr;
+
+        this.lowlightAll();
+
+        node.entity.highlight(zr);
+        for (var i = 0; i < node.edges.length; i++) {
+            var e = node.edges[i];
+            var other = e.node1 === node ? e.node2 : e.node1;
+            if (!other.entity) {
+                // 动态添加
+                this._createNodeEntity(other);
+                zr.addGroup(other.entity.el);
+            }
+            other.entity.highlight(zr);
+
+            if (!e.entity) {
+                // 动态添加
+                this._createEdgeEntity(e);
+                zr.addGroup(e.entity.el);
+            }
+            e.entity.highlight(zr);
+        }
+
+        zr.refreshNextFrame();
+    };
+
+    GraphMain.prototype.highlightNodeToMain = function (node) {
+        if (typeof(node) === 'string') {
+            node = this._graph.getNodeById(node);
+        }
+
+        var graph = this._graph;
+        var graphRendering = this._graphRendering;
+        var zr = this._zr;
+        node = graph.getNodeById(node.id);
+
+        this.lowlightAll();
+
+        // 这里把图当做树来做了
+        var current = node;
+        var nodes = [current];
+        while (current) {
+            var n = graphRendering.getNodeById(current.id);
+            if (!n.entity) {
+                this._createNodeEntity(n);
+                zr.addGroup(n.entity.el);
+            }
+            n.entity.highlight(zr);
+
+            var inEdge = current.inEdges[0];
+            if (!inEdge) {
+                break;
+            }
+            current = inEdge.node1;
+
+            nodes.push(current);
+        }
+
+        for (var i = 0; i < nodes.length - 1; i++) {
+            var n2 = nodes[i];
+            var n1 = nodes[i + 1];
+            var e = graphRendering.getEdge(n1.id, n2.id);
+
+            if (!e.entity) {
+                this._createEdgeEntity(e);
+                zr.addGroup(e.entity.el);
+            }
+            e.entity.highlight(zr);
+        }
+
+        zr.refreshNextFrame();
+    }
+
+    /**
+     * 移动视图到指定的实体位置
+     */
+    GraphMain.prototype.moveToEntity = function (id) {
+        var zr = this._zr;
+        var graph = this._graphRendering;
+        var n = graph.getNodeById(id);
+        if (!n) {
+            return;
+        }
+        var entity = n.entity;
+        var layer = zr.painter.getLayer(0);
+        var pos = Array.prototype.slice.call(entity.el.position);
+        vec2.mul(pos, pos, layer.scale);
+        vec2.sub(pos, [zr.getWidth() / 2, zr.getHeight() / 2], pos);
+
+        this.moveTo(pos[0], pos[1]);
+    };
+
+    /**
+     * 移动视图到指定的位置
+     */
+    GraphMain.prototype.moveTo = function (x, y, cb) {
+        var zr = this._zr;
+        var layers = zr.painter.getLayers();
+        zr.animation.animate(layers[0])
+            .when(800, {
+                position: [x, y]
+            })
+            .during(function () {
+                for (var z in layers) {
+                    if (z !== 'hover') {
+                        vec2.copy(layers[z].position, layers[0].position);
+                        layers[z].dirty = true;   
+                    }
+                }
+                zr.refreshNextFrame();
+            })
+            .start('CubicInOut');
+    };
+
+    GraphMain.prototype.showAll = function () {
+        this._graphRendering.eachNode(function (n) {
+            if (!n.entity) {
+                this._createNodeEntity(n);
+                this._zr.addGroup(n.entity.el);
+            }
+        }, this);
+        this._graphRendering.eachEdge(function (e) {
+            if (!e.entity) {
+                this._createEdgeEntity(e);
+                this._zr.addGroup(e.entity.el);
+            }
+        }, this);
+    };
+
+    GraphMain.prototype._createNodeEntity = function (n) {
+        var nodeEntity = new NodeEntity({
+            radius: n.layout.radius,
+            label: n.data.name,
+            // image: n.data.image
+            image: '../mock/avatar.jpg'
+        });
+        nodeEntity.initialize(this._zr);
+
+        nodeEntity.el.position = n.layout.position;
+        var self = this;
+        nodeEntity.bind('mouseover', function () {
+            self.highlightNodeAndAdjeceny(n);
+        });
+
+        n.entity = nodeEntity;
+        return nodeEntity;
+    };
+
+    GraphMain.prototype._createEdgeEntity = function (e) {
+        var edgeEntity;
+        if (e.node1.entity && e.node2.entity) {
+            if (e.isExtra) {
+                edgeEntity = new ExtraEdgeEntity({
+                    sourceEntity: e.node1.entity,
+                    targetEntity: e.node2.entity,
+                    label: e.data.relationName
+                });
+            } else {
+                edgeEntity = new EdgeEntity({
+                    sourceEntity: e.node1.entity,
+                    targetEntity: e.node2.entity,
+                    label: e.data.relationName
+                });
+            }
+            edgeEntity.initialize(this._zr);
+
+            e.entity = edgeEntity;
+            return edgeEntity;
+        }
+    };
+
+    GraphMain.prototype._updateNodePositions = function () {
+        var zr = this._zr;
+        // PENDING
+        var graph = this._graphRendering;
+        for (var i = 0; i < graph.nodes.length; i++) {
+            var n = graph.nodes[i];
+            if (n.entity) {
+                if (n.layout.fixed) {
+                    vec2.copy(n.layout.position, n.entity.el.position);
+                } else {
+                    vec2.copy(n.entity.el.position, n.layout.position);
+                }
+                zr.modGroup(n.entity.el.id);
+            }
+        }
+        for (var i = 0; i < graph.edges.length; i++) {
+            var e = graph.edges[i];
+            if (e.entity) {
+                e.entity.update(zr);
+            }
+        }
+
+        zr.refreshNextFrame();
+    };
+
+    GraphMain.prototype._culling = function () {
+        var graph = this._graphRendering;
+        if (!graph) {
+            return;
+        }
+        var edgeLayer = this._zr.painter.getLayer(0);
+        var nodeLayer = this._zr.painter.getLayer(1, edgeLayer);
+        var width = this._zr.getWidth();
+        var height = this._zr.getHeight();
+        var min = [0, 0];
+        var max = [0, 0];
+        for (var i = 0; i < graph.nodes.length; i++) {
+            var n = graph.nodes[i];
+            if (n.entity) {
+                var r = n.entity.radius + n.entity.style.lineWidth;
+                min[0] = n.entity.el.position[0] - r;
+                min[1] = n.entity.el.position[1] - r;
+                max[0] = n.entity.el.position[0] + r;
+                max[1] = n.entity.el.position[1] + r;
+                nodeLayer.updateTransform();
+                if (nodeLayer.transform) {
+                    vec2.applyTransform(min, min, nodeLayer.transform);
+                    vec2.applyTransform(max, max, nodeLayer.transform);
+                }
+                var ignore = min[0] > width || min[1] > height || max[0] < 0 || max[1] < 0;
+                n.entity.el.ignore = ignore;
+            }
+        }
+        for (var i = 0; i < graph.edges.length; i++) {
+            var e = graph.edges[i];
+            if (e.entity) {
+                e.entity.el.ignore = e.node1.entity.el.ignore && e.node2.entity.el.ignore;
+            }
+        }
     }
 
     zrUtil.inherits(GraphMain, Component);
 
-    function _randomInSquare(x, y, size) {
+    function _randomInCircle(x, y, radius) {
         var v = vec2.create();
-        v[0] = (Math.random() - 0.5) * size + x;
-        v[1] = (Math.random() - 0.5) * size + y;
+        var angle = Math.random() * Math.PI * 2;
+        v[0] = Math.cos(angle) * radius + x;
+        v[1] = Math.sin(angle) * radius + y;
         return v;
     }
 
@@ -14846,32 +16074,2185 @@ define('bkgraph/config/style',{
         backgroundColor: 'black'
     }
 });
-define('text',{load: function(id){throw new Error("Dynamic load not allowed: " + id);}});
-define('text!bkgraph/html/searchbar.html',[],function () { return '<div>\n    <h3>SEARCHBAR</h3>\n</div>';});
+define('bkgraph/util/util',['require'],function (require) {
 
-define('bkgraph/component/SearchBar',['require','./Component','zrender/tool/util','etpl','../config/style','text!../html/searchbar.html'],function (require) {
+    var util = {
+        indexOf: function (array, value) {
+            if (array.indexOf) {
+                return array.indexOf(value);
+            }
+            for (var i = 0, len = array.length; i < len; i++) {
+                if (array[i] === value) {
+                    return i;
+                }
+            }
+            return -1;
+        },
+
+        bind: function (func, context) {
+            if (func.bind) {
+                return func.bind(context);
+            }
+            else {
+                return function () {
+                    func.apply(context, arguments);
+                }
+            }
+        },
+
+        addEventListener: function (el, name, func, useCapture) {
+            if (window.addEventListener) {
+                el.addEventListener(name, func, useCapture);
+            }
+            else {
+                el.attachEvent(name, func);
+            }
+        },
+
+        getStyle: function (el, name) {
+            var style;
+            if (window.getComputedStyle) {
+                style = window.getComputedStyle(el, null);
+            }
+            else if (docment.documentElement.currentStyle) {
+                style = el.currentStyle;
+            }
+            if (name) {
+                return style[name];
+            }
+            else {
+                return style;
+            }
+        },
+
+        addClass: function (el, className) {
+            if (el.classList) {
+                el.classList.add(className);
+            }
+            else {
+                if (el.className.indexOf(className) < 0) {
+                    el.className += ' ' + className;
+                }
+            }
+        },
+
+        removeClass: function (el, className) {
+            if (el.classList) {
+                el.classList.remove(className);
+            }
+            else {
+                el.className.replace(className, '');
+            }
+        },
+
+        hasClass: function (el, className) {
+            if (el.classList) {
+                return el.classList.contains(className);
+            }
+            else {
+                return el.className.indexOf(className) >= 0;
+            }
+        },
+
+        debounce: function (func, wait) {
+            var timeout;
+
+            return function () {
+                var context = this, args = arguments;
+                var later = function () {
+                    timeout = null;
+                    func.apply(context, args);
+                }
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            }
+        }
+    }
+
+    return util;
+});
+/*!
+ * Sizzle CSS Selector Engine v@VERSION
+ * http://sizzlejs.com/
+ *
+ * Copyright 2008, 2014 jQuery Foundation, Inc. and other contributors
+ * Released under the MIT license
+ * http://jquery.org/license
+ *
+ * Date: @DATE
+ */
+(function( window ) {
+
+var i,
+    support,
+    Expr,
+    getText,
+    isXML,
+    tokenize,
+    compile,
+    select,
+    outermostContext,
+    sortInput,
+    hasDuplicate,
+
+    // Local document vars
+    setDocument,
+    document,
+    docElem,
+    documentIsHTML,
+    rbuggyQSA,
+    rbuggyMatches,
+    matches,
+    contains,
+
+    // Instance-specific data
+    expando = "sizzle" + 1 * new Date(),
+    preferredDoc = window.document,
+    dirruns = 0,
+    done = 0,
+    classCache = createCache(),
+    tokenCache = createCache(),
+    compilerCache = createCache(),
+    sortOrder = function( a, b ) {
+        if ( a === b ) {
+            hasDuplicate = true;
+        }
+        return 0;
+    },
+
+    // General-purpose constants
+    MAX_NEGATIVE = 1 << 31,
+
+    // Instance methods
+    hasOwn = ({}).hasOwnProperty,
+    arr = [],
+    pop = arr.pop,
+    push_native = arr.push,
+    push = arr.push,
+    slice = arr.slice,
+    // Use a stripped-down indexOf as it's faster than native
+    // http://jsperf.com/thor-indexof-vs-for/5
+    indexOf = function( list, elem ) {
+        var i = 0,
+            len = list.length;
+        for ( ; i < len; i++ ) {
+            if ( list[i] === elem ) {
+                return i;
+            }
+        }
+        return -1;
+    },
+
+    booleans = "checked|selected|async|autofocus|autoplay|controls|defer|disabled|hidden|ismap|loop|multiple|open|readonly|required|scoped",
+
+    // Regular expressions
+
+    // http://www.w3.org/TR/css3-selectors/#whitespace
+    whitespace = "[\\x20\\t\\r\\n\\f]",
+
+    // http://www.w3.org/TR/CSS21/syndata.html#value-def-identifier
+    identifier = "(?:\\\\.|[\\w-]|[^\\x00-\\xa0])+",
+
+    // Attribute selectors: http://www.w3.org/TR/selectors/#attribute-selectors
+    attributes = "\\[" + whitespace + "*(" + identifier + ")(?:" + whitespace +
+        // Operator (capture 2)
+        "*([*^$|!~]?=)" + whitespace +
+        // "Attribute values must be CSS identifiers [capture 5] or strings [capture 3 or capture 4]"
+        "*(?:'((?:\\\\.|[^\\\\'])*)'|\"((?:\\\\.|[^\\\\\"])*)\"|(" + identifier + "))|)" + whitespace +
+        "*\\]",
+
+    pseudos = ":(" + identifier + ")(?:\\((" +
+        // To reduce the number of selectors needing tokenize in the preFilter, prefer arguments:
+        // 1. quoted (capture 3; capture 4 or capture 5)
+        "('((?:\\\\.|[^\\\\'])*)'|\"((?:\\\\.|[^\\\\\"])*)\")|" +
+        // 2. simple (capture 6)
+        "((?:\\\\.|[^\\\\()[\\]]|" + attributes + ")*)|" +
+        // 3. anything else (capture 2)
+        ".*" +
+        ")\\)|)",
+
+    // Leading and non-escaped trailing whitespace, capturing some non-whitespace characters preceding the latter
+    rwhitespace = new RegExp( whitespace + "+", "g" ),
+    rtrim = new RegExp( "^" + whitespace + "+|((?:^|[^\\\\])(?:\\\\.)*)" + whitespace + "+$", "g" ),
+
+    rcomma = new RegExp( "^" + whitespace + "*," + whitespace + "*" ),
+    rcombinators = new RegExp( "^" + whitespace + "*([>+~]|" + whitespace + ")" + whitespace + "*" ),
+
+    rattributeQuotes = new RegExp( "=" + whitespace + "*([^\\]'\"]*?)" + whitespace + "*\\]", "g" ),
+
+    rpseudo = new RegExp( pseudos ),
+    ridentifier = new RegExp( "^" + identifier + "$" ),
+
+    matchExpr = {
+        "ID": new RegExp( "^#(" + identifier + ")" ),
+        "CLASS": new RegExp( "^\\.(" + identifier + ")" ),
+        "TAG": new RegExp( "^(" + identifier + "|[*])" ),
+        "ATTR": new RegExp( "^" + attributes ),
+        "PSEUDO": new RegExp( "^" + pseudos ),
+        "CHILD": new RegExp( "^:(only|first|last|nth|nth-last)-(child|of-type)(?:\\(" + whitespace +
+            "*(even|odd|(([+-]|)(\\d*)n|)" + whitespace + "*(?:([+-]|)" + whitespace +
+            "*(\\d+)|))" + whitespace + "*\\)|)", "i" ),
+        "bool": new RegExp( "^(?:" + booleans + ")$", "i" ),
+        // For use in libraries implementing .is()
+        // We use this for POS matching in `select`
+        "needsContext": new RegExp( "^" + whitespace + "*[>+~]|:(even|odd|eq|gt|lt|nth|first|last)(?:\\(" +
+            whitespace + "*((?:-\\d)?\\d*)" + whitespace + "*\\)|)(?=[^-]|$)", "i" )
+    },
+
+    rinputs = /^(?:input|select|textarea|button)$/i,
+    rheader = /^h\d$/i,
+
+    rnative = /^[^{]+\{\s*\[native \w/,
+
+    // Easily-parseable/retrievable ID or TAG or CLASS selectors
+    rquickExpr = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/,
+
+    rsibling = /[+~]/,
+    rescape = /'|\\/g,
+
+    // CSS escapes http://www.w3.org/TR/CSS21/syndata.html#escaped-characters
+    runescape = new RegExp( "\\\\([\\da-f]{1,6}" + whitespace + "?|(" + whitespace + ")|.)", "ig" ),
+    funescape = function( _, escaped, escapedWhitespace ) {
+        var high = "0x" + escaped - 0x10000;
+        // NaN means non-codepoint
+        // Support: Firefox<24
+        // Workaround erroneous numeric interpretation of +"0x"
+        return high !== high || escapedWhitespace ?
+            escaped :
+            high < 0 ?
+                // BMP codepoint
+                String.fromCharCode( high + 0x10000 ) :
+                // Supplemental Plane codepoint (surrogate pair)
+                String.fromCharCode( high >> 10 | 0xD800, high & 0x3FF | 0xDC00 );
+    };
+
+// Optimize for push.apply( _, NodeList )
+try {
+    push.apply(
+        (arr = slice.call( preferredDoc.childNodes )),
+        preferredDoc.childNodes
+    );
+    // Support: Android<4.0
+    // Detect silently failing push.apply
+    arr[ preferredDoc.childNodes.length ].nodeType;
+} catch ( e ) {
+    push = { apply: arr.length ?
+
+        // Leverage slice if possible
+        function( target, els ) {
+            push_native.apply( target, slice.call(els) );
+        } :
+
+        // Support: IE<9
+        // Otherwise append directly
+        function( target, els ) {
+            var j = target.length,
+                i = 0;
+            // Can't trust NodeList.length
+            while ( (target[j++] = els[i++]) ) {}
+            target.length = j - 1;
+        }
+    };
+}
+
+function Sizzle( selector, context, results, seed ) {
+    var match, elem, m, nodeType,
+        // QSA vars
+        i, groups, old, nid, newContext, newSelector;
+
+    if ( ( context ? context.ownerDocument || context : preferredDoc ) !== document ) {
+        setDocument( context );
+    }
+
+    context = context || document;
+    results = results || [];
+    nodeType = context.nodeType;
+
+    if ( typeof selector !== "string" || !selector ||
+        nodeType !== 1 && nodeType !== 9 && nodeType !== 11 ) {
+
+        return results;
+    }
+
+    if ( !seed && documentIsHTML ) {
+
+        // Try to shortcut find operations when possible (e.g., not under DocumentFragment)
+        if ( nodeType !== 11 && (match = rquickExpr.exec( selector )) ) {
+            // Speed-up: Sizzle("#ID")
+            if ( (m = match[1]) ) {
+                if ( nodeType === 9 ) {
+                    elem = context.getElementById( m );
+                    // Check parentNode to catch when Blackberry 4.6 returns
+                    // nodes that are no longer in the document (jQuery #6963)
+                    if ( elem && elem.parentNode ) {
+                        // Handle the case where IE, Opera, and Webkit return items
+                        // by name instead of ID
+                        if ( elem.id === m ) {
+                            results.push( elem );
+                            return results;
+                        }
+                    } else {
+                        return results;
+                    }
+                } else {
+                    // Context is not a document
+                    if ( context.ownerDocument && (elem = context.ownerDocument.getElementById( m )) &&
+                        contains( context, elem ) && elem.id === m ) {
+                        results.push( elem );
+                        return results;
+                    }
+                }
+
+            // Speed-up: Sizzle("TAG")
+            } else if ( match[2] ) {
+                push.apply( results, context.getElementsByTagName( selector ) );
+                return results;
+
+            // Speed-up: Sizzle(".CLASS")
+            } else if ( (m = match[3]) && support.getElementsByClassName ) {
+                push.apply( results, context.getElementsByClassName( m ) );
+                return results;
+            }
+        }
+
+        // QSA path
+        if ( support.qsa && (!rbuggyQSA || !rbuggyQSA.test( selector )) ) {
+            nid = old = expando;
+            newContext = context;
+            newSelector = nodeType !== 1 && selector;
+
+            // qSA works strangely on Element-rooted queries
+            // We can work around this by specifying an extra ID on the root
+            // and working up from there (Thanks to Andrew Dupont for the technique)
+            // IE 8 doesn't work on object elements
+            if ( nodeType === 1 && context.nodeName.toLowerCase() !== "object" ) {
+                groups = tokenize( selector );
+
+                if ( (old = context.getAttribute("id")) ) {
+                    nid = old.replace( rescape, "\\$&" );
+                } else {
+                    context.setAttribute( "id", nid );
+                }
+                nid = "[id='" + nid + "'] ";
+
+                i = groups.length;
+                while ( i-- ) {
+                    groups[i] = nid + toSelector( groups[i] );
+                }
+                newContext = rsibling.test( selector ) && testContext( context.parentNode ) || context;
+                newSelector = groups.join(",");
+            }
+
+            if ( newSelector ) {
+                try {
+                    push.apply( results,
+                        newContext.querySelectorAll( newSelector )
+                    );
+                    return results;
+                } catch(qsaError) {
+                } finally {
+                    if ( !old ) {
+                        context.removeAttribute("id");
+                    }
+                }
+            }
+        }
+    }
+
+    // All others
+    return select( selector.replace( rtrim, "$1" ), context, results, seed );
+}
+
+/**
+ * Create key-value caches of limited size
+ * @returns {Function(string, Object)} Returns the Object data after storing it on itself with
+ *  property name the (space-suffixed) string and (if the cache is larger than Expr.cacheLength)
+ *  deleting the oldest entry
+ */
+function createCache() {
+    var keys = [];
+
+    function cache( key, value ) {
+        // Use (key + " ") to avoid collision with native prototype properties (see Issue #157)
+        if ( keys.push( key + " " ) > Expr.cacheLength ) {
+            // Only keep the most recent entries
+            delete cache[ keys.shift() ];
+        }
+        return (cache[ key + " " ] = value);
+    }
+    return cache;
+}
+
+/**
+ * Mark a function for special use by Sizzle
+ * @param {Function} fn The function to mark
+ */
+function markFunction( fn ) {
+    fn[ expando ] = true;
+    return fn;
+}
+
+/**
+ * Support testing using an element
+ * @param {Function} fn Passed the created div and expects a boolean result
+ */
+function assert( fn ) {
+    var div = document.createElement("div");
+
+    try {
+        return !!fn( div );
+    } catch (e) {
+        return false;
+    } finally {
+        // Remove from its parent by default
+        if ( div.parentNode ) {
+            div.parentNode.removeChild( div );
+        }
+        // release memory in IE
+        div = null;
+    }
+}
+
+/**
+ * Adds the same handler for all of the specified attrs
+ * @param {String} attrs Pipe-separated list of attributes
+ * @param {Function} handler The method that will be applied
+ */
+function addHandle( attrs, handler ) {
+    var arr = attrs.split("|"),
+        i = attrs.length;
+
+    while ( i-- ) {
+        Expr.attrHandle[ arr[i] ] = handler;
+    }
+}
+
+/**
+ * Checks document order of two siblings
+ * @param {Element} a
+ * @param {Element} b
+ * @returns {Number} Returns less than 0 if a precedes b, greater than 0 if a follows b
+ */
+function siblingCheck( a, b ) {
+    var cur = b && a,
+        diff = cur && a.nodeType === 1 && b.nodeType === 1 &&
+            ( ~b.sourceIndex || MAX_NEGATIVE ) -
+            ( ~a.sourceIndex || MAX_NEGATIVE );
+
+    // Use IE sourceIndex if available on both nodes
+    if ( diff ) {
+        return diff;
+    }
+
+    // Check if b follows a
+    if ( cur ) {
+        while ( (cur = cur.nextSibling) ) {
+            if ( cur === b ) {
+                return -1;
+            }
+        }
+    }
+
+    return a ? 1 : -1;
+}
+
+/**
+ * Returns a function to use in pseudos for input types
+ * @param {String} type
+ */
+function createInputPseudo( type ) {
+    return function( elem ) {
+        var name = elem.nodeName.toLowerCase();
+        return name === "input" && elem.type === type;
+    };
+}
+
+/**
+ * Returns a function to use in pseudos for buttons
+ * @param {String} type
+ */
+function createButtonPseudo( type ) {
+    return function( elem ) {
+        var name = elem.nodeName.toLowerCase();
+        return (name === "input" || name === "button") && elem.type === type;
+    };
+}
+
+/**
+ * Returns a function to use in pseudos for positionals
+ * @param {Function} fn
+ */
+function createPositionalPseudo( fn ) {
+    return markFunction(function( argument ) {
+        argument = +argument;
+        return markFunction(function( seed, matches ) {
+            var j,
+                matchIndexes = fn( [], seed.length, argument ),
+                i = matchIndexes.length;
+
+            // Match elements found at the specified indexes
+            while ( i-- ) {
+                if ( seed[ (j = matchIndexes[i]) ] ) {
+                    seed[j] = !(matches[j] = seed[j]);
+                }
+            }
+        });
+    });
+}
+
+/**
+ * Checks a node for validity as a Sizzle context
+ * @param {Element|Object=} context
+ * @returns {Element|Object|Boolean} The input node if acceptable, otherwise a falsy value
+ */
+function testContext( context ) {
+    return context && typeof context.getElementsByTagName !== "undefined" && context;
+}
+
+// Expose support vars for convenience
+support = Sizzle.support = {};
+
+/**
+ * Detects XML nodes
+ * @param {Element|Object} elem An element or a document
+ * @returns {Boolean} True iff elem is a non-HTML XML node
+ */
+isXML = Sizzle.isXML = function( elem ) {
+    // documentElement is verified for cases where it doesn't yet exist
+    // (such as loading iframes in IE - #4833)
+    var documentElement = elem && (elem.ownerDocument || elem).documentElement;
+    return documentElement ? documentElement.nodeName !== "HTML" : false;
+};
+
+/**
+ * Sets document-related variables once based on the current document
+ * @param {Element|Object} [doc] An element or document object to use to set the document
+ * @returns {Object} Returns the current document
+ */
+setDocument = Sizzle.setDocument = function( node ) {
+    var hasCompare,
+        doc = node ? node.ownerDocument || node : preferredDoc,
+        parent = doc.defaultView;
+
+    // If no document and documentElement is available, return
+    if ( doc === document || doc.nodeType !== 9 || !doc.documentElement ) {
+        return document;
+    }
+
+    // Set our document
+    document = doc;
+    docElem = doc.documentElement;
+
+    // Support tests
+    documentIsHTML = !isXML( doc );
+
+    // Support: IE>8
+    // If iframe document is assigned to "document" variable and if iframe has been reloaded,
+    // IE will throw "permission denied" error when accessing "document" variable, see jQuery #13936
+    // IE6-8 do not support the defaultView property so parent will be undefined
+    if ( parent && parent !== parent.top ) {
+        // IE11 does not have attachEvent, so all must suffer
+        if ( parent.addEventListener ) {
+            parent.addEventListener( "unload", function() {
+                setDocument();
+            }, false );
+        } else if ( parent.attachEvent ) {
+            parent.attachEvent( "onunload", function() {
+                setDocument();
+            });
+        }
+    }
+
+    /* Attributes
+    ---------------------------------------------------------------------- */
+
+    // Support: IE<8
+    // Verify that getAttribute really returns attributes and not properties (excepting IE8 booleans)
+    support.attributes = assert(function( div ) {
+        div.className = "i";
+        return !div.getAttribute("className");
+    });
+
+    /* getElement(s)By*
+    ---------------------------------------------------------------------- */
+
+    // Check if getElementsByTagName("*") returns only elements
+    support.getElementsByTagName = assert(function( div ) {
+        div.appendChild( doc.createComment("") );
+        return !div.getElementsByTagName("*").length;
+    });
+
+    // Support: IE<9
+    support.getElementsByClassName = rnative.test( doc.getElementsByClassName );
+
+    // Support: IE<10
+    // Check if getElementById returns elements by name
+    // The broken getElementById methods don't pick up programatically-set names,
+    // so use a roundabout getElementsByName test
+    support.getById = assert(function( div ) {
+        docElem.appendChild( div ).id = expando;
+        return !doc.getElementsByName || !doc.getElementsByName( expando ).length;
+    });
+
+    // ID find and filter
+    if ( support.getById ) {
+        Expr.find["ID"] = function( id, context ) {
+            if ( typeof context.getElementById !== "undefined" && documentIsHTML ) {
+                var m = context.getElementById( id );
+                // Check parentNode to catch when Blackberry 4.6 returns
+                // nodes that are no longer in the document #6963
+                return m && m.parentNode ? [ m ] : [];
+            }
+        };
+        Expr.filter["ID"] = function( id ) {
+            var attrId = id.replace( runescape, funescape );
+            return function( elem ) {
+                return elem.getAttribute("id") === attrId;
+            };
+        };
+    } else {
+        // Support: IE6/7
+        // getElementById is not reliable as a find shortcut
+        delete Expr.find["ID"];
+
+        Expr.filter["ID"] =  function( id ) {
+            var attrId = id.replace( runescape, funescape );
+            return function( elem ) {
+                var node = typeof elem.getAttributeNode !== "undefined" && elem.getAttributeNode("id");
+                return node && node.value === attrId;
+            };
+        };
+    }
+
+    // Tag
+    Expr.find["TAG"] = support.getElementsByTagName ?
+        function( tag, context ) {
+            if ( typeof context.getElementsByTagName !== "undefined" ) {
+                return context.getElementsByTagName( tag );
+
+            // DocumentFragment nodes don't have gEBTN
+            } else if ( support.qsa ) {
+                return context.querySelectorAll( tag );
+            }
+        } :
+
+        function( tag, context ) {
+            var elem,
+                tmp = [],
+                i = 0,
+                // By happy coincidence, a (broken) gEBTN appears on DocumentFragment nodes too
+                results = context.getElementsByTagName( tag );
+
+            // Filter out possible comments
+            if ( tag === "*" ) {
+                while ( (elem = results[i++]) ) {
+                    if ( elem.nodeType === 1 ) {
+                        tmp.push( elem );
+                    }
+                }
+
+                return tmp;
+            }
+            return results;
+        };
+
+    // Class
+    Expr.find["CLASS"] = support.getElementsByClassName && function( className, context ) {
+        if ( documentIsHTML ) {
+            return context.getElementsByClassName( className );
+        }
+    };
+
+    /* QSA/matchesSelector
+    ---------------------------------------------------------------------- */
+
+    // QSA and matchesSelector support
+
+    // matchesSelector(:active) reports false when true (IE9/Opera 11.5)
+    rbuggyMatches = [];
+
+    // qSa(:focus) reports false when true (Chrome 21)
+    // We allow this because of a bug in IE8/9 that throws an error
+    // whenever `document.activeElement` is accessed on an iframe
+    // So, we allow :focus to pass through QSA all the time to avoid the IE error
+    // See http://bugs.jquery.com/ticket/13378
+    rbuggyQSA = [];
+
+    if ( (support.qsa = rnative.test( doc.querySelectorAll )) ) {
+        // Build QSA regex
+        // Regex strategy adopted from Diego Perini
+        assert(function( div ) {
+            // Select is set to empty string on purpose
+            // This is to test IE's treatment of not explicitly
+            // setting a boolean content attribute,
+            // since its presence should be enough
+            // http://bugs.jquery.com/ticket/12359
+            div.innerHTML = "<select msallowcapture=''>" +
+                "<option id='d\f]' selected=''></option></select>";
+
+            // Support: IE8, Opera 11-12.16
+            // Nothing should be selected when empty strings follow ^= or $= or *=
+            // The test attribute must be unknown in Opera but "safe" for WinRT
+            // http://msdn.microsoft.com/en-us/library/ie/hh465388.aspx#attribute_section
+            if ( div.querySelectorAll("[msallowcapture^='']").length ) {
+                rbuggyQSA.push( "[*^$]=" + whitespace + "*(?:''|\"\")" );
+            }
+
+            // Support: IE8
+            // Boolean attributes and "value" are not treated correctly
+            if ( !div.querySelectorAll("[selected]").length ) {
+                rbuggyQSA.push( "\\[" + whitespace + "*(?:value|" + booleans + ")" );
+            }
+
+            // Support: Chrome<29, Android<4.2+, Safari<7.0+, iOS<7.0+, PhantomJS<1.9.7+
+            if ( !div.querySelectorAll("[id~=d]").length ) {
+                rbuggyQSA.push("~=");
+            }
+
+            // Webkit/Opera - :checked should return selected option elements
+            // http://www.w3.org/TR/2011/REC-css3-selectors-20110929/#checked
+            // IE8 throws error here and will not see later tests
+            if ( !div.querySelectorAll(":checked").length ) {
+                rbuggyQSA.push(":checked");
+            }
+        });
+
+        assert(function( div ) {
+            // Support: Windows 8 Native Apps
+            // The type and name attributes are restricted during .innerHTML assignment
+            var input = doc.createElement("input");
+            input.setAttribute( "type", "hidden" );
+            div.appendChild( input ).setAttribute( "name", "D" );
+
+            // Support: IE8
+            // Enforce case-sensitivity of name attribute
+            if ( div.querySelectorAll("[name=d]").length ) {
+                rbuggyQSA.push( "name" + whitespace + "*[*^$|!~]?=" );
+            }
+
+            // FF 3.5 - :enabled/:disabled and hidden elements (hidden elements are still enabled)
+            // IE8 throws error here and will not see later tests
+            if ( !div.querySelectorAll(":enabled").length ) {
+                rbuggyQSA.push( ":enabled", ":disabled" );
+            }
+
+            // Opera 10-11 does not throw on post-comma invalid pseudos
+            div.querySelectorAll("*,:x");
+            rbuggyQSA.push(",.*:");
+        });
+    }
+
+    if ( (support.matchesSelector = rnative.test( (matches = docElem.matches ||
+        docElem.webkitMatchesSelector ||
+        docElem.mozMatchesSelector ||
+        docElem.oMatchesSelector ||
+        docElem.msMatchesSelector) )) ) {
+
+        assert(function( div ) {
+            // Check to see if it's possible to do matchesSelector
+            // on a disconnected node (IE 9)
+            support.disconnectedMatch = matches.call( div, "div" );
+
+            // This should fail with an exception
+            // Gecko does not error, returns false instead
+            matches.call( div, "[s!='']:x" );
+            rbuggyMatches.push( "!=", pseudos );
+        });
+    }
+
+    rbuggyQSA = rbuggyQSA.length && new RegExp( rbuggyQSA.join("|") );
+    rbuggyMatches = rbuggyMatches.length && new RegExp( rbuggyMatches.join("|") );
+
+    /* Contains
+    ---------------------------------------------------------------------- */
+    hasCompare = rnative.test( docElem.compareDocumentPosition );
+
+    // Element contains another
+    // Purposefully does not implement inclusive descendent
+    // As in, an element does not contain itself
+    contains = hasCompare || rnative.test( docElem.contains ) ?
+        function( a, b ) {
+            var adown = a.nodeType === 9 ? a.documentElement : a,
+                bup = b && b.parentNode;
+            return a === bup || !!( bup && bup.nodeType === 1 && (
+                adown.contains ?
+                    adown.contains( bup ) :
+                    a.compareDocumentPosition && a.compareDocumentPosition( bup ) & 16
+            ));
+        } :
+        function( a, b ) {
+            if ( b ) {
+                while ( (b = b.parentNode) ) {
+                    if ( b === a ) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        };
+
+    /* Sorting
+    ---------------------------------------------------------------------- */
+
+    // Document order sorting
+    sortOrder = hasCompare ?
+    function( a, b ) {
+
+        // Flag for duplicate removal
+        if ( a === b ) {
+            hasDuplicate = true;
+            return 0;
+        }
+
+        // Sort on method existence if only one input has compareDocumentPosition
+        var compare = !a.compareDocumentPosition - !b.compareDocumentPosition;
+        if ( compare ) {
+            return compare;
+        }
+
+        // Calculate position if both inputs belong to the same document
+        compare = ( a.ownerDocument || a ) === ( b.ownerDocument || b ) ?
+            a.compareDocumentPosition( b ) :
+
+            // Otherwise we know they are disconnected
+            1;
+
+        // Disconnected nodes
+        if ( compare & 1 ||
+            (!support.sortDetached && b.compareDocumentPosition( a ) === compare) ) {
+
+            // Choose the first element that is related to our preferred document
+            if ( a === doc || a.ownerDocument === preferredDoc && contains(preferredDoc, a) ) {
+                return -1;
+            }
+            if ( b === doc || b.ownerDocument === preferredDoc && contains(preferredDoc, b) ) {
+                return 1;
+            }
+
+            // Maintain original order
+            return sortInput ?
+                ( indexOf( sortInput, a ) - indexOf( sortInput, b ) ) :
+                0;
+        }
+
+        return compare & 4 ? -1 : 1;
+    } :
+    function( a, b ) {
+        // Exit early if the nodes are identical
+        if ( a === b ) {
+            hasDuplicate = true;
+            return 0;
+        }
+
+        var cur,
+            i = 0,
+            aup = a.parentNode,
+            bup = b.parentNode,
+            ap = [ a ],
+            bp = [ b ];
+
+        // Parentless nodes are either documents or disconnected
+        if ( !aup || !bup ) {
+            return a === doc ? -1 :
+                b === doc ? 1 :
+                aup ? -1 :
+                bup ? 1 :
+                sortInput ?
+                ( indexOf( sortInput, a ) - indexOf( sortInput, b ) ) :
+                0;
+
+        // If the nodes are siblings, we can do a quick check
+        } else if ( aup === bup ) {
+            return siblingCheck( a, b );
+        }
+
+        // Otherwise we need full lists of their ancestors for comparison
+        cur = a;
+        while ( (cur = cur.parentNode) ) {
+            ap.unshift( cur );
+        }
+        cur = b;
+        while ( (cur = cur.parentNode) ) {
+            bp.unshift( cur );
+        }
+
+        // Walk down the tree looking for a discrepancy
+        while ( ap[i] === bp[i] ) {
+            i++;
+        }
+
+        return i ?
+            // Do a sibling check if the nodes have a common ancestor
+            siblingCheck( ap[i], bp[i] ) :
+
+            // Otherwise nodes in our document sort first
+            ap[i] === preferredDoc ? -1 :
+            bp[i] === preferredDoc ? 1 :
+            0;
+    };
+
+    return doc;
+};
+
+Sizzle.matches = function( expr, elements ) {
+    return Sizzle( expr, null, null, elements );
+};
+
+Sizzle.matchesSelector = function( elem, expr ) {
+    // Set document vars if needed
+    if ( ( elem.ownerDocument || elem ) !== document ) {
+        setDocument( elem );
+    }
+
+    // Make sure that attribute selectors are quoted
+    expr = expr.replace( rattributeQuotes, "='$1']" );
+
+    if ( support.matchesSelector && documentIsHTML &&
+        ( !rbuggyMatches || !rbuggyMatches.test( expr ) ) &&
+        ( !rbuggyQSA     || !rbuggyQSA.test( expr ) ) ) {
+
+        try {
+            var ret = matches.call( elem, expr );
+
+            // IE 9's matchesSelector returns false on disconnected nodes
+            if ( ret || support.disconnectedMatch ||
+                    // As well, disconnected nodes are said to be in a document
+                    // fragment in IE 9
+                    elem.document && elem.document.nodeType !== 11 ) {
+                return ret;
+            }
+        } catch(e) {}
+    }
+
+    return Sizzle( expr, document, null, [ elem ] ).length > 0;
+};
+
+Sizzle.contains = function( context, elem ) {
+    // Set document vars if needed
+    if ( ( context.ownerDocument || context ) !== document ) {
+        setDocument( context );
+    }
+    return contains( context, elem );
+};
+
+Sizzle.attr = function( elem, name ) {
+    // Set document vars if needed
+    if ( ( elem.ownerDocument || elem ) !== document ) {
+        setDocument( elem );
+    }
+
+    var fn = Expr.attrHandle[ name.toLowerCase() ],
+        // Don't get fooled by Object.prototype properties (jQuery #13807)
+        val = fn && hasOwn.call( Expr.attrHandle, name.toLowerCase() ) ?
+            fn( elem, name, !documentIsHTML ) :
+            undefined;
+
+    return val !== undefined ?
+        val :
+        support.attributes || !documentIsHTML ?
+            elem.getAttribute( name ) :
+            (val = elem.getAttributeNode(name)) && val.specified ?
+                val.value :
+                null;
+};
+
+Sizzle.error = function( msg ) {
+    throw new Error( "Syntax error, unrecognized expression: " + msg );
+};
+
+/**
+ * Document sorting and removing duplicates
+ * @param {ArrayLike} results
+ */
+Sizzle.uniqueSort = function( results ) {
+    var elem,
+        duplicates = [],
+        j = 0,
+        i = 0;
+
+    // Unless we *know* we can detect duplicates, assume their presence
+    hasDuplicate = !support.detectDuplicates;
+    sortInput = !support.sortStable && results.slice( 0 );
+    results.sort( sortOrder );
+
+    if ( hasDuplicate ) {
+        while ( (elem = results[i++]) ) {
+            if ( elem === results[ i ] ) {
+                j = duplicates.push( i );
+            }
+        }
+        while ( j-- ) {
+            results.splice( duplicates[ j ], 1 );
+        }
+    }
+
+    // Clear input after sorting to release objects
+    // See https://github.com/jquery/sizzle/pull/225
+    sortInput = null;
+
+    return results;
+};
+
+/**
+ * Utility function for retrieving the text value of an array of DOM nodes
+ * @param {Array|Element} elem
+ */
+getText = Sizzle.getText = function( elem ) {
+    var node,
+        ret = "",
+        i = 0,
+        nodeType = elem.nodeType;
+
+    if ( !nodeType ) {
+        // If no nodeType, this is expected to be an array
+        while ( (node = elem[i++]) ) {
+            // Do not traverse comment nodes
+            ret += getText( node );
+        }
+    } else if ( nodeType === 1 || nodeType === 9 || nodeType === 11 ) {
+        // Use textContent for elements
+        // innerText usage removed for consistency of new lines (jQuery #11153)
+        if ( typeof elem.textContent === "string" ) {
+            return elem.textContent;
+        } else {
+            // Traverse its children
+            for ( elem = elem.firstChild; elem; elem = elem.nextSibling ) {
+                ret += getText( elem );
+            }
+        }
+    } else if ( nodeType === 3 || nodeType === 4 ) {
+        return elem.nodeValue;
+    }
+    // Do not include comment or processing instruction nodes
+
+    return ret;
+};
+
+Expr = Sizzle.selectors = {
+
+    // Can be adjusted by the user
+    cacheLength: 50,
+
+    createPseudo: markFunction,
+
+    match: matchExpr,
+
+    attrHandle: {},
+
+    find: {},
+
+    relative: {
+        ">": { dir: "parentNode", first: true },
+        " ": { dir: "parentNode" },
+        "+": { dir: "previousSibling", first: true },
+        "~": { dir: "previousSibling" }
+    },
+
+    preFilter: {
+        "ATTR": function( match ) {
+            match[1] = match[1].replace( runescape, funescape );
+
+            // Move the given value to match[3] whether quoted or unquoted
+            match[3] = ( match[3] || match[4] || match[5] || "" ).replace( runescape, funescape );
+
+            if ( match[2] === "~=" ) {
+                match[3] = " " + match[3] + " ";
+            }
+
+            return match.slice( 0, 4 );
+        },
+
+        "CHILD": function( match ) {
+            /* matches from matchExpr["CHILD"]
+                1 type (only|nth|...)
+                2 what (child|of-type)
+                3 argument (even|odd|\d*|\d*n([+-]\d+)?|...)
+                4 xn-component of xn+y argument ([+-]?\d*n|)
+                5 sign of xn-component
+                6 x of xn-component
+                7 sign of y-component
+                8 y of y-component
+            */
+            match[1] = match[1].toLowerCase();
+
+            if ( match[1].slice( 0, 3 ) === "nth" ) {
+                // nth-* requires argument
+                if ( !match[3] ) {
+                    Sizzle.error( match[0] );
+                }
+
+                // numeric x and y parameters for Expr.filter.CHILD
+                // remember that false/true cast respectively to 0/1
+                match[4] = +( match[4] ? match[5] + (match[6] || 1) : 2 * ( match[3] === "even" || match[3] === "odd" ) );
+                match[5] = +( ( match[7] + match[8] ) || match[3] === "odd" );
+
+            // other types prohibit arguments
+            } else if ( match[3] ) {
+                Sizzle.error( match[0] );
+            }
+
+            return match;
+        },
+
+        "PSEUDO": function( match ) {
+            var excess,
+                unquoted = !match[6] && match[2];
+
+            if ( matchExpr["CHILD"].test( match[0] ) ) {
+                return null;
+            }
+
+            // Accept quoted arguments as-is
+            if ( match[3] ) {
+                match[2] = match[4] || match[5] || "";
+
+            // Strip excess characters from unquoted arguments
+            } else if ( unquoted && rpseudo.test( unquoted ) &&
+                // Get excess from tokenize (recursively)
+                (excess = tokenize( unquoted, true )) &&
+                // advance to the next closing parenthesis
+                (excess = unquoted.indexOf( ")", unquoted.length - excess ) - unquoted.length) ) {
+
+                // excess is a negative index
+                match[0] = match[0].slice( 0, excess );
+                match[2] = unquoted.slice( 0, excess );
+            }
+
+            // Return only captures needed by the pseudo filter method (type and argument)
+            return match.slice( 0, 3 );
+        }
+    },
+
+    filter: {
+
+        "TAG": function( nodeNameSelector ) {
+            var nodeName = nodeNameSelector.replace( runescape, funescape ).toLowerCase();
+            return nodeNameSelector === "*" ?
+                function() { return true; } :
+                function( elem ) {
+                    return elem.nodeName && elem.nodeName.toLowerCase() === nodeName;
+                };
+        },
+
+        "CLASS": function( className ) {
+            var pattern = classCache[ className + " " ];
+
+            return pattern ||
+                (pattern = new RegExp( "(^|" + whitespace + ")" + className + "(" + whitespace + "|$)" )) &&
+                classCache( className, function( elem ) {
+                    return pattern.test( typeof elem.className === "string" && elem.className || typeof elem.getAttribute !== "undefined" && elem.getAttribute("class") || "" );
+                });
+        },
+
+        "ATTR": function( name, operator, check ) {
+            return function( elem ) {
+                var result = Sizzle.attr( elem, name );
+
+                if ( result == null ) {
+                    return operator === "!=";
+                }
+                if ( !operator ) {
+                    return true;
+                }
+
+                result += "";
+
+                return operator === "=" ? result === check :
+                    operator === "!=" ? result !== check :
+                    operator === "^=" ? check && result.indexOf( check ) === 0 :
+                    operator === "*=" ? check && result.indexOf( check ) > -1 :
+                    operator === "$=" ? check && result.slice( -check.length ) === check :
+                    operator === "~=" ? ( " " + result.replace( rwhitespace, " " ) + " " ).indexOf( check ) > -1 :
+                    operator === "|=" ? result === check || result.slice( 0, check.length + 1 ) === check + "-" :
+                    false;
+            };
+        },
+
+        "CHILD": function( type, what, argument, first, last ) {
+            var simple = type.slice( 0, 3 ) !== "nth",
+                forward = type.slice( -4 ) !== "last",
+                ofType = what === "of-type";
+
+            return first === 1 && last === 0 ?
+
+                // Shortcut for :nth-*(n)
+                function( elem ) {
+                    return !!elem.parentNode;
+                } :
+
+                function( elem, context, xml ) {
+                    var cache, outerCache, node, diff, nodeIndex, start,
+                        dir = simple !== forward ? "nextSibling" : "previousSibling",
+                        parent = elem.parentNode,
+                        name = ofType && elem.nodeName.toLowerCase(),
+                        useCache = !xml && !ofType;
+
+                    if ( parent ) {
+
+                        // :(first|last|only)-(child|of-type)
+                        if ( simple ) {
+                            while ( dir ) {
+                                node = elem;
+                                while ( (node = node[ dir ]) ) {
+                                    if ( ofType ? node.nodeName.toLowerCase() === name : node.nodeType === 1 ) {
+                                        return false;
+                                    }
+                                }
+                                // Reverse direction for :only-* (if we haven't yet done so)
+                                start = dir = type === "only" && !start && "nextSibling";
+                            }
+                            return true;
+                        }
+
+                        start = [ forward ? parent.firstChild : parent.lastChild ];
+
+                        // non-xml :nth-child(...) stores cache data on `parent`
+                        if ( forward && useCache ) {
+                            // Seek `elem` from a previously-cached index
+                            outerCache = parent[ expando ] || (parent[ expando ] = {});
+                            cache = outerCache[ type ] || [];
+                            nodeIndex = cache[0] === dirruns && cache[1];
+                            diff = cache[0] === dirruns && cache[2];
+                            node = nodeIndex && parent.childNodes[ nodeIndex ];
+
+                            while ( (node = ++nodeIndex && node && node[ dir ] ||
+
+                                // Fallback to seeking `elem` from the start
+                                (diff = nodeIndex = 0) || start.pop()) ) {
+
+                                // When found, cache indexes on `parent` and break
+                                if ( node.nodeType === 1 && ++diff && node === elem ) {
+                                    outerCache[ type ] = [ dirruns, nodeIndex, diff ];
+                                    break;
+                                }
+                            }
+
+                        // Use previously-cached element index if available
+                        } else if ( useCache && (cache = (elem[ expando ] || (elem[ expando ] = {}))[ type ]) && cache[0] === dirruns ) {
+                            diff = cache[1];
+
+                        // xml :nth-child(...) or :nth-last-child(...) or :nth(-last)?-of-type(...)
+                        } else {
+                            // Use the same loop as above to seek `elem` from the start
+                            while ( (node = ++nodeIndex && node && node[ dir ] ||
+                                (diff = nodeIndex = 0) || start.pop()) ) {
+
+                                if ( ( ofType ? node.nodeName.toLowerCase() === name : node.nodeType === 1 ) && ++diff ) {
+                                    // Cache the index of each encountered element
+                                    if ( useCache ) {
+                                        (node[ expando ] || (node[ expando ] = {}))[ type ] = [ dirruns, diff ];
+                                    }
+
+                                    if ( node === elem ) {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        // Incorporate the offset, then check against cycle size
+                        diff -= last;
+                        return diff === first || ( diff % first === 0 && diff / first >= 0 );
+                    }
+                };
+        },
+
+        "PSEUDO": function( pseudo, argument ) {
+            // pseudo-class names are case-insensitive
+            // http://www.w3.org/TR/selectors/#pseudo-classes
+            // Prioritize by case sensitivity in case custom pseudos are added with uppercase letters
+            // Remember that setFilters inherits from pseudos
+            var args,
+                fn = Expr.pseudos[ pseudo ] || Expr.setFilters[ pseudo.toLowerCase() ] ||
+                    Sizzle.error( "unsupported pseudo: " + pseudo );
+
+            // The user may use createPseudo to indicate that
+            // arguments are needed to create the filter function
+            // just as Sizzle does
+            if ( fn[ expando ] ) {
+                return fn( argument );
+            }
+
+            // But maintain support for old signatures
+            if ( fn.length > 1 ) {
+                args = [ pseudo, pseudo, "", argument ];
+                return Expr.setFilters.hasOwnProperty( pseudo.toLowerCase() ) ?
+                    markFunction(function( seed, matches ) {
+                        var idx,
+                            matched = fn( seed, argument ),
+                            i = matched.length;
+                        while ( i-- ) {
+                            idx = indexOf( seed, matched[i] );
+                            seed[ idx ] = !( matches[ idx ] = matched[i] );
+                        }
+                    }) :
+                    function( elem ) {
+                        return fn( elem, 0, args );
+                    };
+            }
+
+            return fn;
+        }
+    },
+
+    pseudos: {
+        // Potentially complex pseudos
+        "not": markFunction(function( selector ) {
+            // Trim the selector passed to compile
+            // to avoid treating leading and trailing
+            // spaces as combinators
+            var input = [],
+                results = [],
+                matcher = compile( selector.replace( rtrim, "$1" ) );
+
+            return matcher[ expando ] ?
+                markFunction(function( seed, matches, context, xml ) {
+                    var elem,
+                        unmatched = matcher( seed, null, xml, [] ),
+                        i = seed.length;
+
+                    // Match elements unmatched by `matcher`
+                    while ( i-- ) {
+                        if ( (elem = unmatched[i]) ) {
+                            seed[i] = !(matches[i] = elem);
+                        }
+                    }
+                }) :
+                function( elem, context, xml ) {
+                    input[0] = elem;
+                    matcher( input, null, xml, results );
+                    return !results.pop();
+                };
+        }),
+
+        "has": markFunction(function( selector ) {
+            return function( elem ) {
+                return Sizzle( selector, elem ).length > 0;
+            };
+        }),
+
+        "contains": markFunction(function( text ) {
+            text = text.replace( runescape, funescape );
+            return function( elem ) {
+                return ( elem.textContent || elem.innerText || getText( elem ) ).indexOf( text ) > -1;
+            };
+        }),
+
+        // "Whether an element is represented by a :lang() selector
+        // is based solely on the element's language value
+        // being equal to the identifier C,
+        // or beginning with the identifier C immediately followed by "-".
+        // The matching of C against the element's language value is performed case-insensitively.
+        // The identifier C does not have to be a valid language name."
+        // http://www.w3.org/TR/selectors/#lang-pseudo
+        "lang": markFunction( function( lang ) {
+            // lang value must be a valid identifier
+            if ( !ridentifier.test(lang || "") ) {
+                Sizzle.error( "unsupported lang: " + lang );
+            }
+            lang = lang.replace( runescape, funescape ).toLowerCase();
+            return function( elem ) {
+                var elemLang;
+                do {
+                    if ( (elemLang = documentIsHTML ?
+                        elem.lang :
+                        elem.getAttribute("xml:lang") || elem.getAttribute("lang")) ) {
+
+                        elemLang = elemLang.toLowerCase();
+                        return elemLang === lang || elemLang.indexOf( lang + "-" ) === 0;
+                    }
+                } while ( (elem = elem.parentNode) && elem.nodeType === 1 );
+                return false;
+            };
+        }),
+
+        // Miscellaneous
+        "target": function( elem ) {
+            var hash = window.location && window.location.hash;
+            return hash && hash.slice( 1 ) === elem.id;
+        },
+
+        "root": function( elem ) {
+            return elem === docElem;
+        },
+
+        "focus": function( elem ) {
+            return elem === document.activeElement && (!document.hasFocus || document.hasFocus()) && !!(elem.type || elem.href || ~elem.tabIndex);
+        },
+
+        // Boolean properties
+        "enabled": function( elem ) {
+            return elem.disabled === false;
+        },
+
+        "disabled": function( elem ) {
+            return elem.disabled === true;
+        },
+
+        "checked": function( elem ) {
+            // In CSS3, :checked should return both checked and selected elements
+            // http://www.w3.org/TR/2011/REC-css3-selectors-20110929/#checked
+            var nodeName = elem.nodeName.toLowerCase();
+            return (nodeName === "input" && !!elem.checked) || (nodeName === "option" && !!elem.selected);
+        },
+
+        "selected": function( elem ) {
+            // Accessing this property makes selected-by-default
+            // options in Safari work properly
+            if ( elem.parentNode ) {
+                elem.parentNode.selectedIndex;
+            }
+
+            return elem.selected === true;
+        },
+
+        // Contents
+        "empty": function( elem ) {
+            // http://www.w3.org/TR/selectors/#empty-pseudo
+            // :empty is negated by element (1) or content nodes (text: 3; cdata: 4; entity ref: 5),
+            //   but not by others (comment: 8; processing instruction: 7; etc.)
+            // nodeType < 6 works because attributes (2) do not appear as children
+            for ( elem = elem.firstChild; elem; elem = elem.nextSibling ) {
+                if ( elem.nodeType < 6 ) {
+                    return false;
+                }
+            }
+            return true;
+        },
+
+        "parent": function( elem ) {
+            return !Expr.pseudos["empty"]( elem );
+        },
+
+        // Element/input types
+        "header": function( elem ) {
+            return rheader.test( elem.nodeName );
+        },
+
+        "input": function( elem ) {
+            return rinputs.test( elem.nodeName );
+        },
+
+        "button": function( elem ) {
+            var name = elem.nodeName.toLowerCase();
+            return name === "input" && elem.type === "button" || name === "button";
+        },
+
+        "text": function( elem ) {
+            var attr;
+            return elem.nodeName.toLowerCase() === "input" &&
+                elem.type === "text" &&
+
+                // Support: IE<8
+                // New HTML5 attribute values (e.g., "search") appear with elem.type === "text"
+                ( (attr = elem.getAttribute("type")) == null || attr.toLowerCase() === "text" );
+        },
+
+        // Position-in-collection
+        "first": createPositionalPseudo(function() {
+            return [ 0 ];
+        }),
+
+        "last": createPositionalPseudo(function( matchIndexes, length ) {
+            return [ length - 1 ];
+        }),
+
+        "eq": createPositionalPseudo(function( matchIndexes, length, argument ) {
+            return [ argument < 0 ? argument + length : argument ];
+        }),
+
+        "even": createPositionalPseudo(function( matchIndexes, length ) {
+            var i = 0;
+            for ( ; i < length; i += 2 ) {
+                matchIndexes.push( i );
+            }
+            return matchIndexes;
+        }),
+
+        "odd": createPositionalPseudo(function( matchIndexes, length ) {
+            var i = 1;
+            for ( ; i < length; i += 2 ) {
+                matchIndexes.push( i );
+            }
+            return matchIndexes;
+        }),
+
+        "lt": createPositionalPseudo(function( matchIndexes, length, argument ) {
+            var i = argument < 0 ? argument + length : argument;
+            for ( ; --i >= 0; ) {
+                matchIndexes.push( i );
+            }
+            return matchIndexes;
+        }),
+
+        "gt": createPositionalPseudo(function( matchIndexes, length, argument ) {
+            var i = argument < 0 ? argument + length : argument;
+            for ( ; ++i < length; ) {
+                matchIndexes.push( i );
+            }
+            return matchIndexes;
+        })
+    }
+};
+
+Expr.pseudos["nth"] = Expr.pseudos["eq"];
+
+// Add button/input type pseudos
+for ( i in { radio: true, checkbox: true, file: true, password: true, image: true } ) {
+    Expr.pseudos[ i ] = createInputPseudo( i );
+}
+for ( i in { submit: true, reset: true } ) {
+    Expr.pseudos[ i ] = createButtonPseudo( i );
+}
+
+// Easy API for creating new setFilters
+function setFilters() {}
+setFilters.prototype = Expr.filters = Expr.pseudos;
+Expr.setFilters = new setFilters();
+
+tokenize = Sizzle.tokenize = function( selector, parseOnly ) {
+    var matched, match, tokens, type,
+        soFar, groups, preFilters,
+        cached = tokenCache[ selector + " " ];
+
+    if ( cached ) {
+        return parseOnly ? 0 : cached.slice( 0 );
+    }
+
+    soFar = selector;
+    groups = [];
+    preFilters = Expr.preFilter;
+
+    while ( soFar ) {
+
+        // Comma and first run
+        if ( !matched || (match = rcomma.exec( soFar )) ) {
+            if ( match ) {
+                // Don't consume trailing commas as valid
+                soFar = soFar.slice( match[0].length ) || soFar;
+            }
+            groups.push( (tokens = []) );
+        }
+
+        matched = false;
+
+        // Combinators
+        if ( (match = rcombinators.exec( soFar )) ) {
+            matched = match.shift();
+            tokens.push({
+                value: matched,
+                // Cast descendant combinators to space
+                type: match[0].replace( rtrim, " " )
+            });
+            soFar = soFar.slice( matched.length );
+        }
+
+        // Filters
+        for ( type in Expr.filter ) {
+            if ( (match = matchExpr[ type ].exec( soFar )) && (!preFilters[ type ] ||
+                (match = preFilters[ type ]( match ))) ) {
+                matched = match.shift();
+                tokens.push({
+                    value: matched,
+                    type: type,
+                    matches: match
+                });
+                soFar = soFar.slice( matched.length );
+            }
+        }
+
+        if ( !matched ) {
+            break;
+        }
+    }
+
+    // Return the length of the invalid excess
+    // if we're just parsing
+    // Otherwise, throw an error or return tokens
+    return parseOnly ?
+        soFar.length :
+        soFar ?
+            Sizzle.error( selector ) :
+            // Cache the tokens
+            tokenCache( selector, groups ).slice( 0 );
+};
+
+function toSelector( tokens ) {
+    var i = 0,
+        len = tokens.length,
+        selector = "";
+    for ( ; i < len; i++ ) {
+        selector += tokens[i].value;
+    }
+    return selector;
+}
+
+function addCombinator( matcher, combinator, base ) {
+    var dir = combinator.dir,
+        checkNonElements = base && dir === "parentNode",
+        doneName = done++;
+
+    return combinator.first ?
+        // Check against closest ancestor/preceding element
+        function( elem, context, xml ) {
+            while ( (elem = elem[ dir ]) ) {
+                if ( elem.nodeType === 1 || checkNonElements ) {
+                    return matcher( elem, context, xml );
+                }
+            }
+        } :
+
+        // Check against all ancestor/preceding elements
+        function( elem, context, xml ) {
+            var oldCache, outerCache,
+                newCache = [ dirruns, doneName ];
+
+            // We can't set arbitrary data on XML nodes, so they don't benefit from dir caching
+            if ( xml ) {
+                while ( (elem = elem[ dir ]) ) {
+                    if ( elem.nodeType === 1 || checkNonElements ) {
+                        if ( matcher( elem, context, xml ) ) {
+                            return true;
+                        }
+                    }
+                }
+            } else {
+                while ( (elem = elem[ dir ]) ) {
+                    if ( elem.nodeType === 1 || checkNonElements ) {
+                        outerCache = elem[ expando ] || (elem[ expando ] = {});
+                        if ( (oldCache = outerCache[ dir ]) &&
+                            oldCache[ 0 ] === dirruns && oldCache[ 1 ] === doneName ) {
+
+                            // Assign to newCache so results back-propagate to previous elements
+                            return (newCache[ 2 ] = oldCache[ 2 ]);
+                        } else {
+                            // Reuse newcache so results back-propagate to previous elements
+                            outerCache[ dir ] = newCache;
+
+                            // A match means we're done; a fail means we have to keep checking
+                            if ( (newCache[ 2 ] = matcher( elem, context, xml )) ) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        };
+}
+
+function elementMatcher( matchers ) {
+    return matchers.length > 1 ?
+        function( elem, context, xml ) {
+            var i = matchers.length;
+            while ( i-- ) {
+                if ( !matchers[i]( elem, context, xml ) ) {
+                    return false;
+                }
+            }
+            return true;
+        } :
+        matchers[0];
+}
+
+function multipleContexts( selector, contexts, results ) {
+    var i = 0,
+        len = contexts.length;
+    for ( ; i < len; i++ ) {
+        Sizzle( selector, contexts[i], results );
+    }
+    return results;
+}
+
+function condense( unmatched, map, filter, context, xml ) {
+    var elem,
+        newUnmatched = [],
+        i = 0,
+        len = unmatched.length,
+        mapped = map != null;
+
+    for ( ; i < len; i++ ) {
+        if ( (elem = unmatched[i]) ) {
+            if ( !filter || filter( elem, context, xml ) ) {
+                newUnmatched.push( elem );
+                if ( mapped ) {
+                    map.push( i );
+                }
+            }
+        }
+    }
+
+    return newUnmatched;
+}
+
+function setMatcher( preFilter, selector, matcher, postFilter, postFinder, postSelector ) {
+    if ( postFilter && !postFilter[ expando ] ) {
+        postFilter = setMatcher( postFilter );
+    }
+    if ( postFinder && !postFinder[ expando ] ) {
+        postFinder = setMatcher( postFinder, postSelector );
+    }
+    return markFunction(function( seed, results, context, xml ) {
+        var temp, i, elem,
+            preMap = [],
+            postMap = [],
+            preexisting = results.length,
+
+            // Get initial elements from seed or context
+            elems = seed || multipleContexts( selector || "*", context.nodeType ? [ context ] : context, [] ),
+
+            // Prefilter to get matcher input, preserving a map for seed-results synchronization
+            matcherIn = preFilter && ( seed || !selector ) ?
+                condense( elems, preMap, preFilter, context, xml ) :
+                elems,
+
+            matcherOut = matcher ?
+                // If we have a postFinder, or filtered seed, or non-seed postFilter or preexisting results,
+                postFinder || ( seed ? preFilter : preexisting || postFilter ) ?
+
+                    // ...intermediate processing is necessary
+                    [] :
+
+                    // ...otherwise use results directly
+                    results :
+                matcherIn;
+
+        // Find primary matches
+        if ( matcher ) {
+            matcher( matcherIn, matcherOut, context, xml );
+        }
+
+        // Apply postFilter
+        if ( postFilter ) {
+            temp = condense( matcherOut, postMap );
+            postFilter( temp, [], context, xml );
+
+            // Un-match failing elements by moving them back to matcherIn
+            i = temp.length;
+            while ( i-- ) {
+                if ( (elem = temp[i]) ) {
+                    matcherOut[ postMap[i] ] = !(matcherIn[ postMap[i] ] = elem);
+                }
+            }
+        }
+
+        if ( seed ) {
+            if ( postFinder || preFilter ) {
+                if ( postFinder ) {
+                    // Get the final matcherOut by condensing this intermediate into postFinder contexts
+                    temp = [];
+                    i = matcherOut.length;
+                    while ( i-- ) {
+                        if ( (elem = matcherOut[i]) ) {
+                            // Restore matcherIn since elem is not yet a final match
+                            temp.push( (matcherIn[i] = elem) );
+                        }
+                    }
+                    postFinder( null, (matcherOut = []), temp, xml );
+                }
+
+                // Move matched elements from seed to results to keep them synchronized
+                i = matcherOut.length;
+                while ( i-- ) {
+                    if ( (elem = matcherOut[i]) &&
+                        (temp = postFinder ? indexOf( seed, elem ) : preMap[i]) > -1 ) {
+
+                        seed[temp] = !(results[temp] = elem);
+                    }
+                }
+            }
+
+        // Add elements to results, through postFinder if defined
+        } else {
+            matcherOut = condense(
+                matcherOut === results ?
+                    matcherOut.splice( preexisting, matcherOut.length ) :
+                    matcherOut
+            );
+            if ( postFinder ) {
+                postFinder( null, results, matcherOut, xml );
+            } else {
+                push.apply( results, matcherOut );
+            }
+        }
+    });
+}
+
+function matcherFromTokens( tokens ) {
+    var checkContext, matcher, j,
+        len = tokens.length,
+        leadingRelative = Expr.relative[ tokens[0].type ],
+        implicitRelative = leadingRelative || Expr.relative[" "],
+        i = leadingRelative ? 1 : 0,
+
+        // The foundational matcher ensures that elements are reachable from top-level context(s)
+        matchContext = addCombinator( function( elem ) {
+            return elem === checkContext;
+        }, implicitRelative, true ),
+        matchAnyContext = addCombinator( function( elem ) {
+            return indexOf( checkContext, elem ) > -1;
+        }, implicitRelative, true ),
+        matchers = [ function( elem, context, xml ) {
+            return ( !leadingRelative && ( xml || context !== outermostContext ) ) || (
+                (checkContext = context).nodeType ?
+                    matchContext( elem, context, xml ) :
+                    matchAnyContext( elem, context, xml ) );
+        } ];
+
+    for ( ; i < len; i++ ) {
+        if ( (matcher = Expr.relative[ tokens[i].type ]) ) {
+            matchers = [ addCombinator(elementMatcher( matchers ), matcher) ];
+        } else {
+            matcher = Expr.filter[ tokens[i].type ].apply( null, tokens[i].matches );
+
+            // Return special upon seeing a positional matcher
+            if ( matcher[ expando ] ) {
+                // Find the next relative operator (if any) for proper handling
+                j = ++i;
+                for ( ; j < len; j++ ) {
+                    if ( Expr.relative[ tokens[j].type ] ) {
+                        break;
+                    }
+                }
+                return setMatcher(
+                    i > 1 && elementMatcher( matchers ),
+                    i > 1 && toSelector(
+                        // If the preceding token was a descendant combinator, insert an implicit any-element `*`
+                        tokens.slice( 0, i - 1 ).concat({ value: tokens[ i - 2 ].type === " " ? "*" : "" })
+                    ).replace( rtrim, "$1" ),
+                    matcher,
+                    i < j && matcherFromTokens( tokens.slice( i, j ) ),
+                    j < len && matcherFromTokens( (tokens = tokens.slice( j )) ),
+                    j < len && toSelector( tokens )
+                );
+            }
+            matchers.push( matcher );
+        }
+    }
+
+    return elementMatcher( matchers );
+}
+
+function matcherFromGroupMatchers( elementMatchers, setMatchers ) {
+    var bySet = setMatchers.length > 0,
+        byElement = elementMatchers.length > 0,
+        superMatcher = function( seed, context, xml, results, outermost ) {
+            var elem, j, matcher,
+                matchedCount = 0,
+                i = "0",
+                unmatched = seed && [],
+                setMatched = [],
+                contextBackup = outermostContext,
+                // We must always have either seed elements or outermost context
+                elems = seed || byElement && Expr.find["TAG"]( "*", outermost ),
+                // Use integer dirruns iff this is the outermost matcher
+                dirrunsUnique = (dirruns += contextBackup == null ? 1 : Math.random() || 0.1),
+                len = elems.length;
+
+            if ( outermost ) {
+                outermostContext = context !== document && context;
+            }
+
+            // Add elements passing elementMatchers directly to results
+            // Keep `i` a string if there are no elements so `matchedCount` will be "00" below
+            // Support: IE<9, Safari
+            // Tolerate NodeList properties (IE: "length"; Safari: <number>) matching elements by id
+            for ( ; i !== len && (elem = elems[i]) != null; i++ ) {
+                if ( byElement && elem ) {
+                    j = 0;
+                    while ( (matcher = elementMatchers[j++]) ) {
+                        if ( matcher( elem, context, xml ) ) {
+                            results.push( elem );
+                            break;
+                        }
+                    }
+                    if ( outermost ) {
+                        dirruns = dirrunsUnique;
+                    }
+                }
+
+                // Track unmatched elements for set filters
+                if ( bySet ) {
+                    // They will have gone through all possible matchers
+                    if ( (elem = !matcher && elem) ) {
+                        matchedCount--;
+                    }
+
+                    // Lengthen the array for every element, matched or not
+                    if ( seed ) {
+                        unmatched.push( elem );
+                    }
+                }
+            }
+
+            // Apply set filters to unmatched elements
+            matchedCount += i;
+            if ( bySet && i !== matchedCount ) {
+                j = 0;
+                while ( (matcher = setMatchers[j++]) ) {
+                    matcher( unmatched, setMatched, context, xml );
+                }
+
+                if ( seed ) {
+                    // Reintegrate element matches to eliminate the need for sorting
+                    if ( matchedCount > 0 ) {
+                        while ( i-- ) {
+                            if ( !(unmatched[i] || setMatched[i]) ) {
+                                setMatched[i] = pop.call( results );
+                            }
+                        }
+                    }
+
+                    // Discard index placeholder values to get only actual matches
+                    setMatched = condense( setMatched );
+                }
+
+                // Add matches to results
+                push.apply( results, setMatched );
+
+                // Seedless set matches succeeding multiple successful matchers stipulate sorting
+                if ( outermost && !seed && setMatched.length > 0 &&
+                    ( matchedCount + setMatchers.length ) > 1 ) {
+
+                    Sizzle.uniqueSort( results );
+                }
+            }
+
+            // Override manipulation of globals by nested matchers
+            if ( outermost ) {
+                dirruns = dirrunsUnique;
+                outermostContext = contextBackup;
+            }
+
+            return unmatched;
+        };
+
+    return bySet ?
+        markFunction( superMatcher ) :
+        superMatcher;
+}
+
+compile = Sizzle.compile = function( selector, match /* Internal Use Only */ ) {
+    var i,
+        setMatchers = [],
+        elementMatchers = [],
+        cached = compilerCache[ selector + " " ];
+
+    if ( !cached ) {
+        // Generate a function of recursive functions that can be used to check each element
+        if ( !match ) {
+            match = tokenize( selector );
+        }
+        i = match.length;
+        while ( i-- ) {
+            cached = matcherFromTokens( match[i] );
+            if ( cached[ expando ] ) {
+                setMatchers.push( cached );
+            } else {
+                elementMatchers.push( cached );
+            }
+        }
+
+        // Cache the compiled function
+        cached = compilerCache( selector, matcherFromGroupMatchers( elementMatchers, setMatchers ) );
+
+        // Save selector and tokenization
+        cached.selector = selector;
+    }
+    return cached;
+};
+
+/**
+ * A low-level selection function that works with Sizzle's compiled
+ *  selector functions
+ * @param {String|Function} selector A selector or a pre-compiled
+ *  selector function built with Sizzle.compile
+ * @param {Element} context
+ * @param {Array} [results]
+ * @param {Array} [seed] A set of elements to match against
+ */
+select = Sizzle.select = function( selector, context, results, seed ) {
+    var i, tokens, token, type, find,
+        compiled = typeof selector === "function" && selector,
+        match = !seed && tokenize( (selector = compiled.selector || selector) );
+
+    results = results || [];
+
+    // Try to minimize operations if there is no seed and only one group
+    if ( match.length === 1 ) {
+
+        // Take a shortcut and set the context if the root selector is an ID
+        tokens = match[0] = match[0].slice( 0 );
+        if ( tokens.length > 2 && (token = tokens[0]).type === "ID" &&
+                support.getById && context.nodeType === 9 && documentIsHTML &&
+                Expr.relative[ tokens[1].type ] ) {
+
+            context = ( Expr.find["ID"]( token.matches[0].replace(runescape, funescape), context ) || [] )[0];
+            if ( !context ) {
+                return results;
+
+            // Precompiled matchers will still verify ancestry, so step up a level
+            } else if ( compiled ) {
+                context = context.parentNode;
+            }
+
+            selector = selector.slice( tokens.shift().value.length );
+        }
+
+        // Fetch a seed set for right-to-left matching
+        i = matchExpr["needsContext"].test( selector ) ? 0 : tokens.length;
+        while ( i-- ) {
+            token = tokens[i];
+
+            // Abort if we hit a combinator
+            if ( Expr.relative[ (type = token.type) ] ) {
+                break;
+            }
+            if ( (find = Expr.find[ type ]) ) {
+                // Search, expanding context for leading sibling combinators
+                if ( (seed = find(
+                    token.matches[0].replace( runescape, funescape ),
+                    rsibling.test( tokens[0].type ) && testContext( context.parentNode ) || context
+                )) ) {
+
+                    // If seed is empty or no tokens remain, we can return early
+                    tokens.splice( i, 1 );
+                    selector = seed.length && toSelector( tokens );
+                    if ( !selector ) {
+                        push.apply( results, seed );
+                        return results;
+                    }
+
+                    break;
+                }
+            }
+        }
+    }
+
+    // Compile and execute a filtering function if one is not provided
+    // Provide `match` to avoid retokenization if we modified the selector above
+    ( compiled || compile( selector, match ) )(
+        seed,
+        context,
+        !documentIsHTML,
+        results,
+        rsibling.test( selector ) && testContext( context.parentNode ) || context
+    );
+    return results;
+};
+
+// One-time assignments
+
+// Sort stability
+support.sortStable = expando.split("").sort( sortOrder ).join("") === expando;
+
+// Support: Chrome 14-35+
+// Always assume duplicates if they aren't passed to the comparison function
+support.detectDuplicates = !!hasDuplicate;
+
+// Initialize against the default document
+setDocument();
+
+// Support: Webkit<537.32 - Safari 6.0.3/Chrome 25 (fixed in Chrome 27)
+// Detached nodes confoundingly follow *each other*
+support.sortDetached = assert(function( div1 ) {
+    // Should return 1, but returns 4 (following)
+    return div1.compareDocumentPosition( document.createElement("div") ) & 1;
+});
+
+// Support: IE<8
+// Prevent attribute/property "interpolation"
+// http://msdn.microsoft.com/en-us/library/ms536429%28VS.85%29.aspx
+if ( !assert(function( div ) {
+    div.innerHTML = "<a href='#'></a>";
+    return div.firstChild.getAttribute("href") === "#" ;
+}) ) {
+    addHandle( "type|href|height|width", function( elem, name, isXML ) {
+        if ( !isXML ) {
+            return elem.getAttribute( name, name.toLowerCase() === "type" ? 1 : 2 );
+        }
+    });
+}
+
+// Support: IE<9
+// Use defaultValue in place of getAttribute("value")
+if ( !support.attributes || !assert(function( div ) {
+    div.innerHTML = "<input/>";
+    div.firstChild.setAttribute( "value", "" );
+    return div.firstChild.getAttribute( "value" ) === "";
+}) ) {
+    addHandle( "value", function( elem, name, isXML ) {
+        if ( !isXML && elem.nodeName.toLowerCase() === "input" ) {
+            return elem.defaultValue;
+        }
+    });
+}
+
+// Support: IE<9
+// Use getAttributeNode to fetch booleans when getAttribute lies
+if ( !assert(function( div ) {
+    return div.getAttribute("disabled") == null;
+}) ) {
+    addHandle( booleans, function( elem, name, isXML ) {
+        var val;
+        if ( !isXML ) {
+            return elem[ name ] === true ? name.toLowerCase() :
+                    (val = elem.getAttributeNode( name )) && val.specified ?
+                    val.value :
+                null;
+        }
+    });
+}
+
+// EXPOSE
+if ( typeof define === "function" && define.amd ) {
+    define('Sizzle',[],function() { return Sizzle; });
+// Sizzle requires that there be a global window in Common-JS like environments
+} else if ( typeof module !== "undefined" && module.exports ) {
+    module.exports = Sizzle;
+} else {
+    window.Sizzle = Sizzle;
+}
+// EXPOSE
+
+})( window );
+define('text',{load: function(id){throw new Error("Dynamic load not allowed: " + id);}});
+define('text!bkgraph/html/personlist.html',[],function () { return '<!-- target: personlist -->\n<ul>\n    <!-- for: ${entities} as ${entity}-->\n    <li class="bkg-person" data-bkg-entity-id="${entity.ID}">\n        <img src="${entity.image}" alt="">\n        <h5>${entity.name}</h5>\n    </li>\n    <!-- /for -->\n</ul>';});
+
+define('text!bkgraph/html/searchbar.html',[],function () { return '<div class="bkg-search">\n    <h3>人物搜索</h3>\n    <div class="bkg-search-input">\n        <input type="text" placeholder="输入您要查找的人物">\n        <div class="bkg-search-btn"></div>\n    </div>\n</div>\n<div class="bkg-person-list">\n    <div class="bkg-prev-page disable"></div>\n    <div class="bkg-person-list-viewport">\n    <!-- import: personlist-->\n    </div>\n    <div class="bkg-next-page"></div>\n</div>\n<div class="bkg-toggle">隐 藏</div>';});
+
+define('bkgraph/component/SearchBar',['require','./Component','zrender/tool/util','etpl','../config/style','../util/util','Sizzle','text!../html/personlist.html','text!../html/searchbar.html'],function (require) {
     
     var Component = require('./Component');
     var zrUtil = require('zrender/tool/util');
     var etpl = require('etpl');
     var style = require('../config/style');
+    var util = require('../util/util');
+    var Sizzle = require('Sizzle');
 
+    var renderPersonList = etpl.compile(require('text!../html/personlist.html'));
     var renderSearchbar = etpl.compile(require('text!../html/searchbar.html'));
 
     var SearchBar = function () {
 
         Component.call(this);
+
+        var self = this;
+        util.addEventListener(this.el, 'click', function (e) {
+            self._dispatchClick(e);
+        });
     }
 
     SearchBar.prototype.type = 'SEARCHBAR';
 
-    SearchBar.prototype.initialize = function (kg) {
+    SearchBar.prototype.initialize = function (kg, data) {
         
+        this._kgraph = kg;
+
         var el = this.el;
         el.className = 'bkg-searchbar';
 
         // 使用空数据
-        this.render({});
+        this.render(data);
     }
 
     SearchBar.prototype.setData = function (data) {
@@ -14880,18 +18261,153 @@ define('bkgraph/component/SearchBar',['require','./Component','zrender/tool/util
 
     SearchBar.prototype.render = function (data) {
         this.el.innerHTML = renderSearchbar(data);
+
+        this._isLastPage = false;
+        this._isFirstPage = true;
+
+        this._$viewport = Sizzle('.bkg-person-list-viewport', this.el)[0];
+        this._$list = Sizzle('ul', this._$viewport)[0];
+        this._$prevPageBtn = Sizzle('.bkg-prev-page', this.el)[0];
+        this._$nextPageBtn = Sizzle('.bkg-next-page', this.el)[0];
+        this._$input = Sizzle('.bkg-search-input input', this.el)[0];
+
+        this._width = this._$list.clientWidth;
+        this._viewportWidth = this._$viewport.clientWidth;
+        this._left = 0;
+
+        if (this._width < this._viewportWidth) {
+            this._isLastPage = true;
+            util.addClass(this._$nextPageBtn, 'disable');
+        }
+        var self = this;
+        util.addEventListener(this._$input, 'keydown', util.debounce(function () {
+            self.filter(self._$input.value);
+        }, 200));
     }
 
     SearchBar.prototype.resize = function (w, h) {
         // Do nothing
     }
 
+    /**
+     * 显示搜索栏
+     */
     SearchBar.prototype.show = function () {
-
+        util.addClass(this.el, 'hidden');
     }
 
+    /**
+     * 隐藏搜索栏
+     */
     SearchBar.prototype.hide = function () {
-        
+        util.removeClass(this.el, 'hidden');   
+    }
+
+    /**
+     * 切换搜索栏的显示隐藏
+     */
+    SearchBar.prototype.toggle = function () {
+        if (util.hasClass(this.el, 'hidden')) {
+            this.hide();
+        }
+        else {
+            this.show();
+        }
+    }
+
+    /**
+     * 人物列表翻到下一页
+     */
+    SearchBar.prototype.nextPage = function () {
+        if (this._isLastPage) {
+            return;
+        }
+
+        this._left += this._viewportWidth;
+        if (this._left + this._viewportWidth > this._width) {
+            this._left = this._width - this._viewportWidth;
+            this._isLastPage = true;
+
+            util.addClass(this._$nextPageBtn, 'disable');
+        }
+        this._$list.style.left = -this._left + 'px';
+
+        this._isFirstPage = false;
+        util.removeClass(this._$prevPageBtn, 'disable');
+    }
+    /**
+     * 人物列表翻到上一页
+     */
+    SearchBar.prototype.prevPage = function () {
+        if (this._isFirstPage) {
+            return;
+        }
+
+        this._left -= this._viewportWidth;
+        if (this._left < 0) {
+            this._left = 0;
+            this._isFirstPage = true;
+            util.addClass(this._$prevPageBtn, 'disable');
+        }
+
+        this._$list.style.left = -this._left + 'px';
+
+        this._isLastPage = false;
+        util.removeClass(this._$nextPageBtn, 'disable');
+    }
+
+    /**
+     * 过滤人物
+     */
+    SearchBar.prototype.filter = function (name) {
+        var data = this._kgraph.getRawData();
+        var entities = [];
+        if (!name) {
+            entities = data.entities;
+        } else {
+            for (var i = 0; i < data.entities.length; i++) {
+                if (data.entities[i].name.indexOf(name) >= 0) {
+                    entities.push(data.entities[i]);
+                }
+            }
+        }
+        this._$viewport.innerHTML = renderPersonList({
+            entities: entities
+        });
+    }
+
+    /**
+     * 点击人物
+     */
+    SearchBar.prototype.clickPerson = function (id) {
+        var graphMain = this._kgraph.getComponentByType('GRAPH');
+        if (graphMain) {
+            graphMain.highlightNodeToMain(id);
+            graphMain.moveToEntity(id);
+        }
+    }
+
+    SearchBar.prototype._dispatchClick= function (e) {
+        var target = e.target || e.srcElement;
+        if (Sizzle.matchesSelector(target, '.bkg-prev-page')) {
+            this.prevPage();
+        }
+        else if (Sizzle.matchesSelector(target, '.bkg-next-page')) {
+            this.nextPage();
+        }
+        else if (Sizzle.matchesSelector(target, '.bkg-toggle')) {
+            this.toggle();
+        }
+        else if (Sizzle.matchesSelector(target, '.bkg-person *')) {
+            var parent = target;
+            while (parent) {
+                if (parent.className.indexOf('bkg-person') >= 0) {
+                    break;
+                }
+                parent = target.parentNode;
+            }
+            this.clickPerson(parent.getAttribute('data-bkg-entity-id'));
+        }
     }
 
     zrUtil.inherits(SearchBar, Component);
@@ -14900,11 +18416,12 @@ define('bkgraph/component/SearchBar',['require','./Component','zrender/tool/util
 });
 define('text!bkgraph/html/sidebar.html',[],function () { return '<div>\n    <h3>SIDEBAR</h3>\n</div>';});
 
-define('bkgraph/component/SideBar',['require','./Component','zrender/tool/util','etpl','text!../html/sidebar.html'],function (require) {
+define('bkgraph/component/SideBar',['require','./Component','zrender/tool/util','etpl','../util/util','text!../html/sidebar.html'],function (require) {
     
     var Component = require('./Component');
     var zrUtil = require('zrender/tool/util');
     var etpl = require('etpl');
+    var util = require('../util/util');
 
     var renderSidebar = etpl.compile(require('text!../html/sidebar.html'));
 
@@ -14918,6 +18435,8 @@ define('bkgraph/component/SideBar',['require','./Component','zrender/tool/util',
         
         var el = this.el;
         el.className = 'bkg-sidebar';
+
+        this._kgraph = kg;
 
         // 使用空数据
         this.render({});
@@ -14933,12 +18452,40 @@ define('bkgraph/component/SideBar',['require','./Component','zrender/tool/util',
         this.el.innerHTML = renderSidebar(data);
     }
 
+    /**
+     * 显示边栏
+     */
     SideBar.prototype.show = function () {
+        util.addClass(this.el, 'hidden');
 
+        var graphMain = this._kgraph.getComponent('GRAPH');
+        if (graphMain) {
+            graphMain.style.right = this.el.clientWidth + 'px';
+        }
     }
 
+    /**
+     * 隐藏边栏
+     */
     SideBar.prototype.hide = function () {
+        util.removeClass(this.el, 'hidden');
 
+        var graphMain = this._kgraph.getComponent('GRAPH');
+        if (graphMain) {
+            graphMain.style.right = '0px';
+        }
+    }
+
+    /**
+     * 切换边栏的显示隐藏
+     */
+    SideBar.prototype.toggle = function () {
+        if (util.hasClass(this.el, 'hidden')) {
+            this.hide();
+        }
+        else {
+            this.show();
+        }
     }
 
     zrUtil.inherits(SideBar, Component);
@@ -14972,7 +18519,13 @@ define('bkgraph/bkgraph',['require','./component/GraphMain','./component/PanCont
 
         this._root = null;
 
+        this._rawData = data;
+
         this.initialize(data);
+    }
+
+    BKGraph.prototype.getRawData = function () {
+        return this._rawData;
     }
 
     BKGraph.prototype.initialize = function (data) {
@@ -15002,7 +18555,7 @@ define('bkgraph/bkgraph',['require','./component/GraphMain','./component/PanCont
             this._root.appendChild(component.el);
         }
         
-        component.initialize(this);
+        component.initialize(this, this._rawData);
     }
 
     BKGraph.prototype.getComponentsAllByType = function (type) {

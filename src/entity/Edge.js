@@ -26,8 +26,21 @@ define(function (require) {
 
         this.label = opts.label || '';
 
-        this.color = opts.color || '#0e90fe';
-    }
+        this.style = {
+            color: '#0e90fe',
+            labelColor: 'white'
+        };
+        this.highlightStyle = {
+            color: '#f9dd05',
+            labelColor: '#27408a'
+        };
+        if (opts.style) {
+            zrUtil.merge(this.style, opts.style)
+        }
+        if (opts.highlightStyle) {
+            zrUtil.merge(this.highlightStyle, opts.highlightStyle)
+        }
+    };
 
     EdgeEntity.prototype.initialize = function (zr) {
         this._lineShape = new LineShape({
@@ -38,7 +51,7 @@ define(function (require) {
                 yEnd: 0,
                 lineWidth: 1,
                 opacity: 1,
-                strokeColor: this.color
+                strokeColor: this.style.color
             },
             highlightStyle: {
                 opacity: 0
@@ -56,7 +69,8 @@ define(function (require) {
                 textPosition: 'inside',
                 textAlign: 'center',
                 textFont: '12px 微软雅黑',
-                color: this.color,
+                textColor: this.style.labelColor,
+                color: this.style.color,
                 brushType: 'fill',
                 x: -width / 2,
                 y: -10,
@@ -72,7 +86,7 @@ define(function (require) {
         this.el.addChild(this._labelShape);
 
         this.update(zr);
-    }
+    };
 
     EdgeEntity.prototype.update = function (zr) {
         if (this.sourceEntity && this.targetEntity) {
@@ -107,6 +121,28 @@ define(function (require) {
             }
         }
         zr.modGroup(this.el.id);
+    };
+
+    EdgeEntity.prototype.highlight = function (zr) {
+        this._lineShape.style.strokeColor = this.highlightStyle.color;
+        if (this._labelShape) {
+            this._labelShape.style.color = this.highlightStyle.color
+            this._labelShape.style.textColor = this.highlightStyle.labelColor;   
+        }
+        zr.modGroup(this.el.id);
+    };
+
+    EdgeEntity.prototype.lowlight = function (zr) {
+        this._lineShape.style.strokeColor = this.style.color;
+        if (this._labelShape) {
+            this._labelShape.style.color = this.style.color;
+            this._labelShape.style.textColor = this.style.labelColor;   
+        }
+        zr.modGroup(this.el.id);
+    };
+
+    EdgeEntity.prototype.getRect = function () {
+        return this._lineShape.getRect(this._lineShape.style);
     }
 
     zrUtil.inherits(EdgeEntity, Entity);

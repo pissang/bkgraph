@@ -1,0 +1,84 @@
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <script type="text/javascript" src="../dep/esl.js"></script>
+        <script type="text/javascript" src="../../echarts/build/echarts.js"></script>
+        <style>
+            body {
+            }
+            #main {
+                width: 1000px;
+                height: 600px;
+                border: 1px solid black;
+            }
+            #save {
+                position: fixed;
+                right: 10px;
+                top: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="main"></div>
+        <button id="save">Save</button>
+        <script type="text/javascript">
+            require.config({
+                paths: {
+                    mock: '../mock'
+                }
+            });
+            // Boot
+            require([
+                'echarts',
+                'echarts/chart/force',
+                'text!mock/200.json'
+            ], function(echarts, force, data) {
+                var chart = echarts.init(document.getElementById('main'));
+                data = JSON.parse(data);
+
+                var nodeIdxMap = {};
+                var nodes = data.entities.map(function(node, idx) {
+                    var n = {
+                        name: node.name,
+                        value: node.hotValue
+                    };
+                    nodeIdxMap[node.ID] = idx;
+                    return n;
+                });
+                var edges = data.relations.map(function(e, idx) {
+                    return {
+                        source: nodeIdxMap[e.fromID],
+                        target: nodeIdxMap[e.toID],
+                        weight: 1
+                    };
+                });
+
+                chart.setOption({
+                    series: [{
+                        type: 'force',
+                        itemStyle: {
+                            normal: {
+                                label: {
+                                    show: true,
+                                    textStyle: {
+                                        color: '#555',
+                                        fontSize: 10,
+                                        fontFamily: '微软雅黑'
+                                    }
+                                }
+                            }
+                        },
+                        minRadius: 10,
+                        maxRadius: 30,
+                        scaling: 10,
+                        gravity: 1,
+                        nodes: nodes,
+                        useWorker: true,
+                        large: true,
+                        links: edges
+                    }]
+                });
+            });
+        </script>
+    </body>
+</html>

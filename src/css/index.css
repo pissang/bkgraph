@@ -14,3 +14,27 @@ body {
     width: 100%;
     height: 100%;
 }
+
+button {
+    background-color: purple;
+    color: white;
+    border-radius: 5px;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #985598;
+}
+
+#show-all {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}
+#force-layout {
+    position: absolute;
+    right: 20px;
+    top: 60px;
+}

@@ -16,17 +16,19 @@ define(function (require) {
         bind: function (func, context) {
             if (func.bind) {
                 return func.bind(context);
-            } else {
+            }
+            else {
                 return function () {
                     func.apply(context, arguments);
                 }
             }
         },
 
-        addEventListener: function (el, name, func) {
+        addEventListener: function (el, name, func, useCapture) {
             if (window.addEventListener) {
-                el.addEventListener(name, func);
-            } else {
+                el.addEventListener(name, func, useCapture);
+            }
+            else {
                 el.attachEvent(name, func);
             }
         },
@@ -35,12 +37,14 @@ define(function (require) {
             var style;
             if (window.getComputedStyle) {
                 style = window.getComputedStyle(el, null);
-            } else if (docment.documentElement.currentStyle) {
+            }
+            else if (docment.documentElement.currentStyle) {
                 style = el.currentStyle;
             }
             if (name) {
                 return style[name];
-            } else {
+            }
+            else {
                 return style;
             }
         },
@@ -48,7 +52,8 @@ define(function (require) {
         addClass: function (el, className) {
             if (el.classList) {
                 el.classList.add(className);
-            } else {
+            }
+            else {
                 if (el.className.indexOf(className) < 0) {
                     el.className += ' ' + className;
                 }
@@ -58,8 +63,32 @@ define(function (require) {
         removeClass: function (el, className) {
             if (el.classList) {
                 el.classList.remove(className);
-            } else {
+            }
+            else {
                 el.className.replace(className, '');
+            }
+        },
+
+        hasClass: function (el, className) {
+            if (el.classList) {
+                return el.classList.contains(className);
+            }
+            else {
+                return el.className.indexOf(className) >= 0;
+            }
+        },
+
+        debounce: function (func, wait) {
+            var timeout;
+
+            return function () {
+                var context = this, args = arguments;
+                var later = function () {
+                    timeout = null;
+                    func.apply(context, args);
+                }
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
             }
         }
     }

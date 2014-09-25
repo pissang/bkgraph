@@ -1,3 +1,17 @@
+/** Graph Viewport */
+.bkg-viewport {
+  background-image: url(../img/bg.jpg);
+  position: relative;
+  font-family: "Microsoft YaHei";
+  overflow: hidden;
+}
+.bkg-graph {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+  transition: right 0.5s ease-in-out;
+}
 /** 搜索栏 */
 .bkg-searchbar {
   position: absolute;
@@ -5,10 +19,156 @@
   right: 0px;
   bottom: 0px;
   height: 100px;
-  background-color: black;
+  background-image: url(../img/searchbar/search-bg.png);
+  -webkit-transition: bottom 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  -moz-transition: bottom 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  -ms-transition: bottom 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  -o-transition: bottom 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  transition: bottom 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.bkg-searchbar.hidden {
+  bottom: -95px;
 }
 .bkg-searchbar h3 {
   color: white;
+  font-weight: normal;
+  font-size: 14px;
+  margin: 10px 0px 10px 40px;
+}
+.bkg-searchbar .bkg-search-input {
+  margin-left: 30px;
+}
+.bkg-searchbar .bkg-search-input input {
+  border: none;
+  height: 37px;
+  width: 250px;
+  border-radius: 15px;
+  outline: none;
+  font-size: 14px;
+  padding-left: 15px;
+  float: left;
+}
+.bkg-searchbar .bkg-search-input .bkg-search-btn {
+  margin-left: -63px;
+  width: 60px;
+  height: 33px;
+  background-color: #0E90FE;
+  border-radius: 15px;
+  float: left;
+  margin-top: 3px;
+  background-image: url(../img/searchbar/search-icon.png);
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+}
+.bkg-searchbar .bkg-toggle {
+  width: 143px;
+  height: 32px;
+  position: absolute;
+  right: 50px;
+  top: -32px;
+  color: white;
+  background-image: url(../img/searchbar/toggle-btn.png);
+  text-align: center;
+  font-size: 18px;
+  line-height: 34px;
+  cursor: pointer;
+}
+.bkg-searchbar .bkg-person-list {
+  position: absolute;
+  left: 320px;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+}
+.bkg-searchbar .bkg-person-list .bkg-person-list-viewport {
+  position: absolute;
+  overflow: hidden;
+  left: 50px;
+  top: 0px;
+  right: 50px;
+  bottom: 0px;
+}
+.bkg-searchbar .bkg-person-list .bkg-prev-page {
+  position: absolute;
+  left: 0px;
+  top: 30px;
+  width: 25px;
+  height: 43px;
+  background-image: url(../img/searchbar/prev.png);
+  cursor: pointer;
+}
+.bkg-searchbar .bkg-person-list .bkg-prev-page:hover {
+  background-image: url(../img/searchbar/prev-hover.png);
+}
+.bkg-searchbar .bkg-person-list .bkg-prev-page.disable {
+  cursor: default;
+  background-image: url(../img/searchbar/prev-disable.png);
+}
+.bkg-searchbar .bkg-person-list .bkg-prev-page.disable:hover {
+  background-image: url(../img/searchbar/prev-disable.png);
+}
+.bkg-searchbar .bkg-person-list .bkg-next-page {
+  position: absolute;
+  right: 10px;
+  top: 30px;
+  width: 25px;
+  height: 43px;
+  background-image: url(../img/searchbar/next.png);
+  cursor: pointer;
+}
+.bkg-searchbar .bkg-person-list .bkg-next-page:hover {
+  background-image: url(../img/searchbar/next-hover.png);
+}
+.bkg-searchbar .bkg-person-list .bkg-next-page.disable {
+  cursor: default;
+  background-image: url(../img/searchbar/next-disable.png);
+}
+.bkg-searchbar .bkg-person-list .bkg-next-page.disable:hover {
+  background-image: url(../img/searchbar/next-disable.png);
+}
+.bkg-searchbar .bkg-person-list ul {
+  margin: 7px 0px 0px 0px;
+  padding: 0px;
+  height: 85px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  /** 图片不换行 */
+
+  white-space: nowrap;
+  -webkit-transition: left 0.5s ease-in-out;
+  -moz-transition: left 0.5s ease-in-out;
+  -ms-transition: left 0.5s ease-in-out;
+  -o-transition: left 0.5s ease-in-out;
+  transition: left 0.5s ease-in-out;
+}
+.bkg-searchbar .bkg-person-list li.bkg-person {
+  list-style: none;
+  display: inline-block;
+  overflow: hidden;
+  position: relative;
+  width: 85px;
+  height: 85px;
+  margin-left: 1px;
+}
+.bkg-searchbar .bkg-person-list li.bkg-person img {
+  border-radius: 5px;
+  width: 85px;
+  cursor: pointer;
+}
+.bkg-searchbar .bkg-person-list li.bkg-person h5 {
+  margin: 0px;
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  height: 25px;
+  line-height: 25px;
+  color: white;
+  text-align: center;
+  background-color: black;
+  opacity: 0.8;
+  font-weight: normal;
 }
 /** 边栏 */
 .bkg-sidebar {
@@ -16,8 +176,16 @@
   left: 0px;
   top: 0px;
   bottom: 0px;
-  width: 100px;
-  background-color: black;
+  width: 320px;
+  background-color: #0d4075;
+  -webkit-transition: width 0.5s ease-in-out;
+  -moz-transition: width 0.5s ease-in-out;
+  -ms-transition: width 0.5s ease-in-out;
+  -o-transition: width 0.5s ease-in-out;
+  transition: width 0.5s ease-in-out;
+}
+.bkg-sidebar.hidden {
+  width: 0px;
 }
 .bkg-sidebar h3 {
   color: white;

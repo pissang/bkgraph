@@ -6,6 +6,7 @@ define(function (require) {
     var ImageShape = require('zrender/shape/Image');
     var RectShape = require('zrender/shape/Rectangle');
     var zrUtil = require('zrender/tool/util');
+    var zrColor = require('zrender/tool/color');
 
     var baseRadius = 50;
 
@@ -20,38 +21,57 @@ define(function (require) {
 
         this.radius = opts.radius || 20;
 
-        this.color = opts.color || '#0e90fe';
-
         this.label = opts.label || '';
-
-        this.labelColor = opts.labelColor || 'rgba(55, 145, 220, 0.5)';
 
         this.image = opts.image || '';
 
-        this.lineWidth = opts.lineWidth || 3;
+        this.style = {
+            color: '#0e90fe',
+            lineWidth: 3,
+            labelColor: 'white'
+        };
+        this.highlightStyle = {
+            color: '#f9dd05',
+            lineWidth: 5,
+            labelColor: '#27408a'
+        };
+        if (opts.style) {
+            zrUtil.merge(this.style, opts.style)
+        }
+        if (opts.highlightStyle) {
+            zrUtil.merge(this.highlightStyle, opts.highlightStyle)
+        }
     }
 
     NodeEntity.prototype.initialize = function (zr) {
         var self = this;
         var r = this.radius;
 
+        var dragging = false;
         var outlineShape = new CircleShape({
             style: {
-                strokeColor: this.color,
+                strokeColor: this.style.color,
                 brushType: 'stroke',
                 r: baseRadius,
                 x: 0,
                 y: 0,
-                lineWidth: this.lineWidth
+                lineWidth: this.style.lineWidth
             },
             highlightStyle: {
                 opacity: 0
             },
-            z: 2,
             zlevel: 1,
-            clickable: this.clickable
+            clickable: true,
+            onmouseover: function () {
+                self.dispatch('mouseover');
+            },
+            onmouseout: function () {
+                self.dispatch('mouseout');
+            },
+            onclick: function () {
+                self.dispatch('click');
+            }
         });
-        this.el.addChild(outlineShape);
         
         var contentGroup = new Group();
         var clipShape = new CircleShape({
@@ -72,7 +92,6 @@ define(function (require) {
                 height: baseRadius * 2
             },
             hoverable: false,
-            z: 1,
             zlevel: 1
         });
 
@@ -80,20 +99,19 @@ define(function (require) {
             var labelShape = new RectShape({
                 style: {
                     width: baseRadius * 2,
-                    height: 30,
+                    height: 20,
                     x: -baseRadius,
-                    y: baseRadius - 30,
-                    color: this.labelColor,
+                    y: baseRadius - 20,
+                    color: zrColor.alpha(this.style.color, 0.8),
                     brushType: 'fill',
                     text: this.label,
                     textPosition: 'inside',
                     textAlign: 'center',
                     brushType: 'both',
-                    textColor: 'white',
+                    textColor: this.style.labelColor,
                     textFont: '12px 微软雅黑'
                 },
                 hoverable: false,
-                z: 1,
                 zlevel: 1
             });
         }
@@ -105,6 +123,7 @@ define(function (require) {
         }
 
         this.el.addChild(contentGroup);
+        this.el.addChild(outlineShape);
 
         this._imageShape = imageShape;
         this._labelShape = labelShape;
@@ -112,6 +131,23 @@ define(function (require) {
         this._clipShape = clipShape;
 
         this.el.scale[0] = this.el.scale[1] = this.radius / baseRadius;
+    }
+
+    NodeEntity.prototype.highlight = function (zr) {
+        this._outlineShape.style.strokeColor = this.highlightStyle.color;
+        this._outlineShape.style.lineWidth = this.highlightStyle.lineWidth;
+        this._labelShape.style.color = zrColor.alpha(this.highlightStyle.color, 0.8);
+        this._labelShape.style.textColor = this.highlightStyle.labelColor;
+        zr.modGroup(this.el.id);
+    }
+
+    NodeEntity.prototype.lowlight = function (zr) {
+        this._outlineShape.style.strokeColor = this.style.color;
+        this._outlineShape.style.lineWidth = this.style.lineWidth;
+        this._labelShape.style.color = zrColor.alpha(this.style.color, 0.8);
+        this._labelShape.style.textColor = this.style.labelColor;
+
+        zr.modGroup(this.el.id);
     }
 
     zrUtil.inherits(NodeEntity, Entity);

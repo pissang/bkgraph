@@ -6,15 +6,18 @@
         <link rel="stylesheet" type="text/css" href="./css/index.css" />
         <link rel="stylesheet/less" type="text/css" href="./css/bkgraph.less" />
         <script src="//s1.bdstatic.com/r/www/cache/ecom/esl/1-8-4/esl.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/less.js/1.7.1/less.min.js"></script>
+        <script src="../dep/less.min.js"></script>
     </head>
     <body>
         <div id='viewport'></div>
+        <button id="force-layout">开始布局</button>
+        <button id="show-all">显示全部</button>
         <script>
             require.config({
                 paths: {
                     etpl: '../dep/etpl/src/main',
                     _: '../dep/lodash',
+                    Sizzle: '../dep/sizzle',
                     mock: '../mock'
                 },
                 packages: [
@@ -35,8 +38,23 @@
                 'text!mock/200.json'
             ], function (bkg, data) {
                 var g = bkg.init('viewport', JSON.parse(data));
-                // g.addComponent(new bkg.SideBar());
+                var graphMain = g.getComponentByType('GRAPH');
+                // graphMain.startForceLayout();
+                g.addComponent(new bkg.SideBar());
                 g.addComponent(new bkg.SearchBar());
+                //
+                var layouting = false; 
+                document.getElementById('show-all').onclick = function () {
+                    graphMain.showAll();
+                }
+                document.getElementById('force-layout').onclick = function () {
+                    layouting ? 
+                        graphMain.stopForceLayout()
+                        : graphMain.startForceLayout(function () {
+                            layouting = false;
+                        });
+                    layouting = !layouting;
+                }
             });
         </script>
     </body>

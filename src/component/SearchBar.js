@@ -5,35 +5,50 @@ define(function (require) {
     var etpl = require('etpl');
     var style = require('../config/style');
     var util = require('../util/util');
+    var Sizzle = require('Sizzle');
 
+    var renderPersonList = etpl.compile(require('text!../html/personlist.html'));
     var renderSearchbar = etpl.compile(require('text!../html/searchbar.html'));
 
     var SearchBar = function () {
 
         Component.call(this);
 
-        this._dispatchClick = util.bind(this._dispatchClick, this);
-
-        util.addEventListener(this.el, 'click', this._dispatchClick);
+        var self = this;
+        util.addEventListener(this.el, 'click', function (e) {
+            self._dispatchClick(e);
+        });
     }
 
     SearchBar.prototype.type = 'SEARCHBAR';
 
     SearchBar.prototype.initialize = function (kg, data) {
         
+        this._kgraph = kg;
+
         var el = this.el;
         el.className = 'bkg-searchbar';
 
         // 使用空数据
         this.render(data);
+    }
+
+    SearchBar.prototype.setData = function (data) {
+        this.render(data);
+    }
+
+    SearchBar.prototype.render = function (data) {
+        this.el.innerHTML = renderSearchbar(data);
 
         this._isLastPage = false;
         this._isFirstPage = true;
 
-        this._$viewport = this.el.querySelector('.bkg-person-list-viewport');
-        this._$list = this._$viewport.querySelector('ul');
-        this._$prevPageBtn = this.el.querySelector('.bkg-prev-page');
-        this._$nextPageBtn = this.el.querySelector('.bkg-next-page');
+        this._$viewport = Sizzle('.bkg-person-list-viewport', this.el)[0];
+        this._$list = Sizzle('ul', this._$viewport)[0];
+        this._$prevPageBtn = Sizzle('.bkg-prev-page', this.el)[0];
+        this._$nextPageBtn = Sizzle('.bkg-next-page', this.el)[0];
+        this._$input = Sizzle('.bkg-search-input input', this.el)[0];
+        this._$toggleBtn = Sizzle('.bkg-toggle', this.el)[0];
 
         this._width = this._$list.clientWidth;
         this._viewportWidth = this._$viewport.clientWidth;
@@ -43,14 +58,10 @@ define(function (require) {
             this._isLastPage = true;
             util.addClass(this._$nextPageBtn, 'disable');
         }
-    }
-
-    SearchBar.prototype.setData = function (data) {
-        this.render(data);
-    }
-
-    SearchBar.prototype.render = function (data) {
-        this.el.innerHTML = renderSearchbar(data);
+        var self = this;
+        util.addEventListener(this._$input, 'keydown', util.debounce(function () {
+            self.filter(self._$input.value);
+        }, 200));
     }
 
     SearchBar.prototype.resize = function (w, h) {
@@ -60,16 +71,31 @@ define(function (require) {
     /**
      * 显示搜索栏
      */
-    SearchBar.prototype.show = function () {
-
+    SearchBar.prototype.hide = function () {
+        util.addClass(this.el, 'hidden');
+        this._$toggleBtn.innerHTML = '显 示';
     }
 
     /**
      * 隐藏搜索栏
      */
-    SearchBar.prototype.hide = function () {
-        
+    SearchBar.prototype.show = function () {
+        util.removeClass(this.el, 'hidden');
+        this._$toggleBtn.innerHTML = '隐 藏';
     }
+
+    /**
+     * 切换搜索栏的显示隐藏
+     */
+    SearchBar.prototype.toggle = function () {
+        if (util.hasClass(this.el, 'hidden')) {
+            this.show();
+        }
+        else {
+            this.hide();
+        }
+    }
+
     /**
      * 人物列表翻到下一页
      */
@@ -78,15 +104,14 @@ define(function (require) {
             return;
         }
 
-        var left = this._left;
-        left += this._viewportWidth;
-        if (left + this._viewportWidth > this._width) {
-            left = this._width - this._viewportWidth;
+        this._left += this._viewportWidth;
+        if (this._left + this._viewportWidth > this._width) {
+            this._left = this._width - this._viewportWidth;
             this._isLastPage = true;
 
             util.addClass(this._$nextPageBtn, 'disable');
         }
-        this._$list.style.left = -left + 'px';
+        this._$list.style.left = -this._left + 'px';
 
         this._isFirstPage = false;
         util.removeClass(this._$prevPageBtn, 'disable');
@@ -99,26 +124,70 @@ define(function (require) {
             return;
         }
 
-        var left = this._left
-        left -= this._viewportWidth;
-        if (left < 0) {
-            left = 0;
+        this._left -= this._viewportWidth;
+        if (this._left < 0) {
+            this._left = 0;
             this._isFirstPage = true;
             util.addClass(this._$prevPageBtn, 'disable');
         }
 
-        this._$list.style.left = -left + 'px';
+        this._$list.style.left = -this._left + 'px';
 
         this._isLastPage = false;
         util.removeClass(this._$nextPageBtn, 'disable');
     }
 
+    /**
+     * 过滤人物
+     */
+    SearchBar.prototype.filter = function (name) {
+        var data = this._kgraph.getRawData();
+        var entities = [];
+        if (!name) {
+            entities = data.entities;
+        } else {
+            for (var i = 0; i < data.entities.length; i++) {
+                if (data.entities[i].name.indexOf(name) >= 0) {
+                    entities.push(data.entities[i]);
+                }
+            }
+        }
+        this._$viewport.innerHTML = renderPersonList({
+            entities: entities
+        });
+    }
+
+    /**
+     * 点击人物
+     */
+    SearchBar.prototype.clickPerson = function (id) {
+        var graphMain = this._kgraph.getComponentByType('GRAPH');
+        if (graphMain) {
+            graphMain.highlightNodeToMain(id);
+            graphMain.moveToEntity(id);
+        }
+    }
+
     SearchBar.prototype._dispatchClick= function (e) {
         var target = e.target || e.srcElement;
-        if (target.className.match(/bkg-prev-page/)) {
+        if (Sizzle.matchesSelector(target, '.bkg-prev-page')) {
             this.prevPage();
-        } else if (target.className.match(/bkg-next-page/)) {
+        }
+        else if (Sizzle.matchesSelector(target, '.bkg-next-page')) {
             this.nextPage();
+        }
+        else if (Sizzle.matchesSelector(target, '.bkg-toggle')) {
+            this.toggle();
+        }
+        else if (Sizzle.matchesSelector(target, '.bkg-person *')) {
+            var parent = target;
+            while (parent) {
+                if (parent.className.indexOf('bkg-person') >= 0) {
+                    break;
+                }
+                parent = target.parentNode;
+            }
+            this.clickPerson(parent.getAttribute('data-bkg-entity-id'));
         }
     }
 

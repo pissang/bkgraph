@@ -3,8 +3,8 @@
     baseUrl: '../src',
     optimize: 'none',
     paths: {
-        'glmatrix': '../qtek/thirdparty/gl-matrix',
         'etpl': '../dep/etpl/src/main',
+        'Sizzle': '../dep/sizzle',
         // 使用requirejs的text插件
         'text': '../build/text'
     },
