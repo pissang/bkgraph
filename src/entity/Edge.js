@@ -3,7 +3,7 @@ define(function (require) {
     var Entity = require('./Entity');
     var LineShape = require('zrender/shape/Line');
     var Group = require('zrender/Group');
-    var RectShape = require('zrender/shape/Rectangle');
+    var CircleShape = require('zrender/shape/Circle');
     var zrUtil = require('zrender/tool/util');
 
     var vec2 = require('zrender/tool/vector');
@@ -28,11 +28,11 @@ define(function (require) {
 
         this.style = {
             color: '#0e90fe',
-            labelColor: 'white'
+            labelColor: '#0e90fe'
         };
         this.highlightStyle = {
             color: '#f9dd05',
-            labelColor: '#27408a'
+            labelColor: '#f9dd05'
         };
         if (opts.style) {
             zrUtil.merge(this.style, opts.style)
@@ -60,26 +60,23 @@ define(function (require) {
             zlevel: 0
         });
 
-        var width = zrUtil.getContext().measureText(this.label).width + 20;
-        this._labelShape = new RectShape({
+        this._labelShape = new CircleShape({
             style: {
-                width: width,
-                height: 20,
                 text: this.label,
-                textPosition: 'inside',
-                textAlign: 'center',
-                textFont: '12px 微软雅黑',
+                textPosition: 'right',
+                textFont: '13px 微软雅黑',
                 textColor: this.style.labelColor,
                 color: this.style.color,
-                brushType: 'fill',
-                x: -width / 2,
-                y: -10,
-                radius: 10
+                opacity: this.style.opacity,
+                x: 0,
+                y: 0,
+                r: 5
             },
             highlightStyle: {
                 opacity: 0
             },
-            z: 1
+            z: 0,
+            zlevel: 0
         });
 
         this.el.addChild(this._lineShape);
@@ -88,58 +85,95 @@ define(function (require) {
         this.update(zr);
     };
 
-    EdgeEntity.prototype.update = function (zr) {
+    EdgeEntity.prototype.update = function () {
         if (this.sourceEntity && this.targetEntity) {
-            var sourceEntity = this.sourceEntity;
-            var targetEntity = this.targetEntity;
-
-            var p1 = sourceEntity.el.position;
-            var p2 = targetEntity.el.position;
-
-            vec2.sub(v, p1, p2);
-            vec2.normalize(v, v);
-
-            vec2.scaleAndAdd(v1, p1, v, -sourceEntity.radius);
-            vec2.scaleAndAdd(v2, p2, v, targetEntity.radius);
-
-            var line = this._lineShape;
-            line.style.xStart = v1[0];
-            line.style.yStart = v1[1];
-            line.style.xEnd = v2[0];
-            line.style.yEnd = v2[1];
-
-            if (this._labelShape) {
-                var labelShape = this._labelShape;
-
-                if (v[0] > 0) {
-                    vec2.negate(v, v);
-                }
-                var angle = Math.PI - Math.atan2(v[1], v[0]);
-                labelShape.rotation[0] = angle;
-                labelShape.position[0] = (v1[0] + v2[0]) / 2;
-                labelShape.position[1] = (v1[1] + v2[1]) / 2;
-            }
+            this._computeLinePoints(v1, v2);
+            this._setLinePoints(v1, v2);
         }
-        zr.modGroup(this.el.id);
+        this.el.modSelf();
     };
 
-    EdgeEntity.prototype.highlight = function (zr) {
+    EdgeEntity.prototype.highlight = function () {
         this._lineShape.style.strokeColor = this.highlightStyle.color;
+        this._lineShape.zlevel = 3;
         if (this._labelShape) {
             this._labelShape.style.color = this.highlightStyle.color
             this._labelShape.style.textColor = this.highlightStyle.labelColor;   
+            this._labelShape.zlevel = 3;
         }
-        zr.modGroup(this.el.id);
+        this.el.modSelf();
     };
 
-    EdgeEntity.prototype.lowlight = function (zr) {
+    EdgeEntity.prototype.lowlight = function () {
         this._lineShape.style.strokeColor = this.style.color;
+        this._lineShape.zlevel = 0;
         if (this._labelShape) {
             this._labelShape.style.color = this.style.color;
-            this._labelShape.style.textColor = this.style.labelColor;   
+            this._labelShape.style.textColor = this.style.labelColor;
+            this._labelShape.zlevel = 0;
         }
-        zr.modGroup(this.el.id);
+        this.el.modSelf();
     };
+
+    EdgeEntity.prototype.animateLength = function (zr, time, delay, fromEntity, cb) {
+        this._computeLinePoints(v1, v2);
+        var self = this;
+        zr.animation.animate(this._lineShape.style)
+            .when(0, {
+                xStart: v1[0],
+                yStart: v1[1],
+                xEnd: v1[0],
+                yEnd: v1[1]
+            })
+            .when(time || 1000, {
+                xStart: v1[0],
+                yStart: v1[1],
+                xEnd: v2[0],
+                yEnd: v2[1]
+            })
+            .during(function () {
+                self.el.modSelf();
+                zr.refreshNextFrame();
+            })
+            .done(function () {
+                cb && cb();
+            })
+            // .delay(delay || 0)
+            .start();
+    };
+
+    EdgeEntity.prototype._computeLinePoints = function (v1, v2) {
+        var sourceEntity = this.sourceEntity;
+        var targetEntity = this.targetEntity;
+
+        var p1 = sourceEntity.el.position;
+        var p2 = targetEntity.el.position;
+
+        vec2.sub(v, p1, p2);
+        vec2.normalize(v, v);
+
+        vec2.scaleAndAdd(v1, p1, v, -sourceEntity.radius);
+        vec2.scaleAndAdd(v2, p2, v, targetEntity.radius);
+
+        var line = this._lineShape;
+    }
+
+    EdgeEntity.prototype._setLinePoints = function (v1, v2) {
+        var line = this._lineShape;
+        line.style.xStart = v1[0];
+        line.style.yStart = v1[1];
+        line.style.xEnd = v2[0];
+        line.style.yEnd = v2[1];
+
+        if (this._labelShape) {
+            var labelShape = this._labelShape;
+            labelShape.position[0] = (v1[0] + v2[0]) / 2;
+            labelShape.position[1] = (v1[1] + v2[1]) / 2;
+            this._labelShape.style.r = (
+                this.sourceEntity.radius + this.targetEntity.radius
+            ) / 20 + 3;
+        }
+    }
 
     EdgeEntity.prototype.getRect = function () {
         return this._lineShape.getRect(this._lineShape.style);

@@ -4,6 +4,19 @@
     position: relative;
     font-family: "Microsoft YaHei";
     overflow: hidden;
+
+    a {
+        color: white;
+    }
+
+    ul {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    li {
+        list-style: none;
+    }
 }
 
 .bkg-graph {
@@ -157,7 +170,6 @@
 
         ul {
             margin: 7px 0px 0px 0px;
-            padding: 0px;
             height: 85px;
             position: absolute;
             left: 0px;
@@ -172,7 +184,6 @@
                     transition: left 0.5s ease-in-out;
         }
         li.bkg-person {
-            list-style: none;
             display: inline-block;
             overflow: hidden;
             position: relative;
@@ -212,18 +223,140 @@
     left: 0px;
     top: 0px;
     bottom: 0px;
-    width: 320px;
+    width: 340px;
     background-color: #0d4075;
     
-    -webkit-transition: width 0.5s ease-in-out;
-       -moz-transition: width 0.5s ease-in-out;
-        -ms-transition: width 0.5s ease-in-out;
-         -o-transition: width 0.5s ease-in-out;
-            transition: width 0.5s ease-in-out;
+    -webkit-transition: left 0.5s ease-in-out;
+       -moz-transition: left 0.5s ease-in-out;
+        -ms-transition: left 0.5s ease-in-out;
+         -o-transition: left 0.5s ease-in-out;
+            transition: left 0.5s ease-in-out;
+
+    font-size: 12px;
+    line-height: 19px;
+
+    a {
+        color: #0595ce;
+        text-decoration: none;
+        padding: 1px 3px;
+
+        &:hover {
+            background-color: #0595ce;
+            color: white;
+            border-radius: 3px;
+        }
+    }
+
+    p {
+        padding: 0px;
+        margin: 0px;
+    }
 
     &.hidden {
-        width: 0px;
+        left: -335px;
     }
+
+    .bkg-sidebar-module {
+
+        margin-top: 20px;
+
+        h4.bkg-title {
+            color: #9bd1fe;
+            margin: 8px 10px;
+            font-size: 16px;
+
+            padding-left: 28px;
+            background-repeat: no-repeat;
+            background-position: 0px 50%;
+            line-height: 30px;
+        }
+    }
+    
+    .bkg-entity-detail {
+        overflow-x: hidden;
+
+        height: 100%;
+
+        .bkg-person-pic {
+            width: 100px;
+            margin-left: 10px;
+            margin-top: 30px;
+
+            float: left;
+        }
+
+        .bkg-person-info {
+            
+            float: left;
+            margin-top: 30px;
+            margin-left: 10px;
+            width: 190px;
+
+            h4 {
+                color: #9bd1fe;
+                margin: 0px;
+            }
+
+            p {
+                color: white;
+                margin: 4px 0px;
+            }
+        }
+    
+        .bkg-person-news {
+        
+            h4 {
+                background-image: url(../img/sidebar/news.png);
+            }
+
+            li {
+                
+                color: white;
+
+                h5 {
+                    color: white;
+                    font-weight: normal;
+                    margin: 0px;
+                }
+
+                img.bkg-news-pic {
+                    float: left;
+                    width: 100px;
+                    margin-left: 10px;
+                }
+
+                .bkg-news-detail {
+                    float: left;
+                    margin-left: 10px;
+                    width: 190px;
+                }
+                .bkg-news-simple {
+                    margin-left: 15px;
+                    margin-top: 10px;
+                }
+            }
+        }
+
+        .bkg-person-weibo {
+            h4 {
+                background-image: url(../img/sidebar/weibo.png);
+            }
+
+            h5 {
+                color: white;
+            }
+
+            .bkg-weibo-info {
+                margin-left: 10px;
+            }
+
+            p {
+                font-size: 12px;
+                color: white;
+            }
+        }
+    }
+
 
     .bkg-toggle {
         width: 20px;

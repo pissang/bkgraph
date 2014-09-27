@@ -40,28 +40,20 @@ define(function (require) {
     SearchBar.prototype.render = function (data) {
         this.el.innerHTML = renderSearchbar(data);
 
-        this._isLastPage = false;
-        this._isFirstPage = true;
-
         this._$viewport = Sizzle('.bkg-person-list-viewport', this.el)[0];
-        this._$list = Sizzle('ul', this._$viewport)[0];
         this._$prevPageBtn = Sizzle('.bkg-prev-page', this.el)[0];
         this._$nextPageBtn = Sizzle('.bkg-next-page', this.el)[0];
         this._$input = Sizzle('.bkg-search-input input', this.el)[0];
         this._$toggleBtn = Sizzle('.bkg-toggle', this.el)[0];
 
-        this._width = this._$list.clientWidth;
         this._viewportWidth = this._$viewport.clientWidth;
-        this._left = 0;
 
-        if (this._width < this._viewportWidth) {
-            this._isLastPage = true;
-            util.addClass(this._$nextPageBtn, 'disable');
-        }
         var self = this;
         util.addEventListener(this._$input, 'keydown', util.debounce(function () {
             self.filter(self._$input.value);
         }, 200));
+
+        this._updateSlider();
     }
 
     SearchBar.prototype.resize = function (w, h) {
@@ -155,6 +147,8 @@ define(function (require) {
         this._$viewport.innerHTML = renderPersonList({
             entities: entities
         });
+
+        this._updateSlider();
     }
 
     /**
@@ -189,6 +183,26 @@ define(function (require) {
             }
             this.clickPerson(parent.getAttribute('data-bkg-entity-id'));
         }
+    }
+
+    SearchBar.prototype._updateSlider = function () {
+        this._$list = Sizzle('ul', this._$viewport)[0];
+        this._width = this._$list.clientWidth;
+        
+        this._isLastPage = false;
+        this._isFirstPage = true;
+
+        if (this._width < this._viewportWidth) {
+            this._isLastPage = true;
+        }
+        this._isLastPage ? 
+            util.addClass(this._$nextPageBtn, 'disable')
+            : util.removeClass(this._$nextPageBtn, 'disable');
+        this._isFirstPage ?
+            util.addClass(this._$prevPageBtn, 'disable')
+            : util.removeClass(this._$prevPageBtn, 'disable');
+
+        this._left = 0;
     }
 
     zrUtil.inherits(SearchBar, Component);

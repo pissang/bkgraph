@@ -5,11 +5,18 @@
   font-family: "Microsoft YaHei";
   overflow: hidden;
 }
+.bkg-viewport a {
+  color: white;
+}
 .bkg-graph {
   position: absolute;
   right: 0px;
   top: 0px;
   bottom: 0px;
+  -webkit-transition: right 0.5s ease-in-out;
+  -moz-transition: right 0.5s ease-in-out;
+  -ms-transition: right 0.5s ease-in-out;
+  -o-transition: right 0.5s ease-in-out;
   transition: right 0.5s ease-in-out;
 }
 /** 搜索栏 */
@@ -178,15 +185,52 @@
   bottom: 0px;
   width: 320px;
   background-color: #0d4075;
-  -webkit-transition: width 0.5s ease-in-out;
-  -moz-transition: width 0.5s ease-in-out;
-  -ms-transition: width 0.5s ease-in-out;
-  -o-transition: width 0.5s ease-in-out;
-  transition: width 0.5s ease-in-out;
+  -webkit-transition: left 0.5s ease-in-out;
+  -moz-transition: left 0.5s ease-in-out;
+  -ms-transition: left 0.5s ease-in-out;
+  -o-transition: left 0.5s ease-in-out;
+  transition: left 0.5s ease-in-out;
 }
 .bkg-sidebar.hidden {
-  width: 0px;
+  left: -315px;
 }
-.bkg-sidebar h3 {
+.bkg-sidebar .bkg-entity-detail {
+  overflow-x: hidden;
+}
+.bkg-sidebar .bkg-entity-detail .bkg-avatar {
+  width: 100px;
+  height: 135px;
+  margin-left: 10px;
+  margin-top: 30px;
+  float: left;
+}
+.bkg-sidebar .bkg-entity-detail .bkg-person-info {
+  float: left;
+  margin-top: 30px;
+  margin-left: 10px;
+  width: 190px;
+}
+.bkg-sidebar .bkg-entity-detail .bkg-person-info h4 {
+  color: #9bd1fe;
+  margin: 0px;
+}
+.bkg-sidebar .bkg-entity-detail .bkg-person-info p {
   color: white;
+  font-size: 12px;
+  margin: 4px 0px;
+}
+.bkg-sidebar .bkg-toggle {
+  width: 20px;
+  height: 84px;
+  position: absolute;
+  right: -19px;
+  top: 50%;
+  margin-top: -42px;
+  background-image: url(../img/sidebar/toggle-btn.png);
+  cursor: pointer;
+  color: white;
+  font-size: 12px;
+  padding-top: 20px;
+  text-align: center;
+  box-sizing: border-box;
 }

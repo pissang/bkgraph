@@ -33,21 +33,8 @@ button:hover {
     right: 20px;
     top: 20px;
 }
-
 #force-layout {
     position: absolute;
     right: 20px;
     top: 60px;
-}
-
-#show-all {
-    position: absolute;
-    right: 20px;
-    top: 20px;
-}
-
-#save {
-    position: absolute;
-    right: 20px;
-    top: 100px;
 }

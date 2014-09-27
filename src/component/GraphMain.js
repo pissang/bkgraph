@@ -6,12 +6,15 @@ define(function (require) {
     var Tree = require('echarts/data/Tree');
     var TreeLayout = require('echarts/layout/Tree');
     var zrUtil = require('zrender/tool/util');
+    var Group = require('zrender/Group');
     var Component = require('./Component');
     var vec2 = require('zrender/tool/vector');
 
     var NodeEntity = require('../entity/Node');
     var EdgeEntity = require('../entity/Edge');
     var ExtraEdgeEntity = require('../entity/ExtraEdge');
+
+    var CircleShape = require('zrender/shape/Circle');
 
     var GraphMain = function () {
 
@@ -34,6 +37,16 @@ define(function (require) {
         this._graph = null
 
         this._layouting = false;
+
+        this._animating = false;
+
+        this._root = null;
+
+        this._mainNode = null;
+
+        this._lastClickNode = null;
+
+        this._lastHoverNode = null;
     };
 
     GraphMain.prototype.type = 'GRAPH';
@@ -51,8 +64,30 @@ define(function (require) {
 
         var zrRefresh = this._zr.painter.refresh;
         var self = this;
-        this._zr.painter.refresh = function () {
+        var zr = this._zr;
+
+        this._min = [Infinity, Infinity];
+        this._max = [zr.getWidth() / 2, zr.getHeight() / 2];
+        zr.painter.refresh = function () {
             self._culling();
+            // 同步所有层的位置
+            var layers = zr.painter.getLayers();
+            var layer0 = layers[0];
+            if (layer0) {
+                var position = layer0.position;
+                var scale = layer0.scale;
+                position[0] = Math.max(-self._max[0] * scale[0] + zr.getWidth() - 100, position[0]);
+                position[1] = Math.max(-self._max[1] * scale[1] + zr.getHeight() - 100, position[1]);
+                position[0] = Math.min(-self._min[0] * scale[0] + 100, position[0]);
+                position[1] = Math.min(-self._min[1] * scale[1] + 100, position[1]);
+            }
+            for (var z in layers) {
+                if (z !== 'hover') {
+                    vec2.copy(layers[z].position, layers[0].position);
+                    vec2.copy(layers[z].scale, layers[0].scale);
+                    layers[z].dirty = true;   
+                }
+            }
             zrRefresh.call(this);
         }
     };
@@ -72,7 +107,6 @@ define(function (require) {
 
         var cx = this._kgraph.getWidth() / 2;
         var cy = this._kgraph.getHeight() / 2;
-        var mainNode;
 
         // 映射数据
         var max = -Infinity;
@@ -84,6 +118,7 @@ define(function (require) {
         }
         var diff = max - min;
 
+        var noPosition = false;
         for (var i = 0; i < data.entities.length; i++) {
             var entity = data.entities[i];
             // 数据修正
@@ -94,13 +129,16 @@ define(function (require) {
                 : (this.maxRadius + this.minRadius) / 2;
             if (entity.layerCounter === 0) {
                 r = 70;
-                mainNode = n;
+                this._mainNode = n;
             }
             n.layout = {
                 position: entity.position,
                 mass: 1,
                 radius: r
             };
+            if (!entity.position) {
+                noPosition = true;
+            }
             if (entity.layerCounter === 0) {
                 n.layout.fixed = true;
                 n.layout.position = [
@@ -130,12 +168,10 @@ define(function (require) {
             var e = graph.addEdge(relation.fromID, relation.toID, relation);
             e.layout = {
                 // 边权重
-                weight: w * 8 / Math.pow(e.node1.data.layerCounter + 1, 2)
+                weight: w * 14 / Math.pow(e.node1.data.layerCounter + 1, 2)
                 // weight: e.node1.data.layerCounter === 0 ? 200 : w
             };
         }
-
-        this.radialTreeLayout(zr.getWidth() / 2, zr.getHeight() / 2);
 
         // 加入补边
         this._graphRendering = this._graph.clone();
@@ -152,21 +188,37 @@ define(function (require) {
             e.isExtra = true;
         }
 
+        var layer0 = this._zr.painter.getLayer(0);
+        var layer1 = this._zr.painter.getLayer(1, layer0);
+        var layer2 = this._zr.painter.getLayer(2, layer1);
+        var layer3 = this._zr.painter.getLayer(3, layer2);
+
+        if (noPosition) {
+            this.radialTreeLayout();
+        }
+
         this.render();
+
+        // this._growOut();
+        // this.highlightNodeAndAdjeceny(mainNode);
     };
 
     GraphMain.prototype.render = function () {
         var zr = this._zr;
         var graph = this._graphRendering;
 
+        if (this._root) {
+            zr.delGroup(this._root);
+        }
+        this._root = new Group();
+        zr.addGroup(this._root);
+
         // 所有实体都在 zlevel-1 层
         graph.eachNode(function (n) {
             if (n.data.layerCounter > 2) {
                 return;
             }
-            if (this._createNodeEntity(n)) {
-                zr.addGroup(n.entity.el);
-            }
+            this._createNodeEntity(n);
         }, this);
 
         // 所有边都在 zlevel-0 层
@@ -177,18 +229,12 @@ define(function (require) {
             ) {
                 return;
             }
-            if (this._createEdgeEntity(e)) {
-                zr.addGroup(e.entity.el);
-            }
+            this._createEdgeEntity(e);
         }, this);
 
         zr.render();
 
         zr.modLayer(0, {
-            panable: true,
-            zoomable: true
-        });
-        zr.modLayer(1, {
             panable: true,
             zoomable: true
         });
@@ -217,7 +263,9 @@ define(function (require) {
         }, mainNode, 'out');
     };
 
-    GraphMain.prototype.radialTreeLayout = function (cx, cy) {
+    GraphMain.prototype.radialTreeLayout = function () {
+        var cx = this._zr.getWidth() / 2;
+        var cy = this._zr.getHeight() / 2;
         var tree = Tree.fromGraph(this._graph)[0];
         tree.traverse(function (treeNode) {
             var graphNode = this._graph.getNodeById(treeNode.id);
@@ -269,7 +317,7 @@ define(function (require) {
         // forceLayout.enableAcceleration = false;
         forceLayout.maxSpeedIncrease = 1;
         // 这个真是不好使
-        // forceLayout.preventOverlap = true;
+        forceLayout.preventOverlap = true;
 
         graph.eachNode(function(n) {
             n.layout.mass = n.degree() * 3;
@@ -308,12 +356,12 @@ define(function (require) {
 
         this._graphRendering.eachNode(function (n) {
             if (n.entity) {
-                n.entity.lowlight(zr);
+                n.entity.lowlight();
             }
         });
         this._graphRendering.eachEdge(function (e) {
             if (e.entity) {
-                e.entity.lowlight(zr);
+                e.entity.lowlight();
             }
         });
 
@@ -328,23 +376,28 @@ define(function (require) {
 
         this.lowlightAll();
 
-        node.entity.highlight(zr);
+        node.entity.highlight();
         for (var i = 0; i < node.edges.length; i++) {
             var e = node.edges[i];
             var other = e.node1 === node ? e.node2 : e.node1;
+
+            var newEntity = false;
             if (!other.entity) {
                 // 动态添加
                 this._createNodeEntity(other);
-                zr.addGroup(other.entity.el);
+                newEntity = true;
             }
-            other.entity.highlight(zr);
+            other.entity.highlight();
 
             if (!e.entity) {
                 // 动态添加
                 this._createEdgeEntity(e);
-                zr.addGroup(e.entity.el);
             }
-            e.entity.highlight(zr);
+
+            e.entity.highlight();
+            if (newEntity) {
+                this._growNodeEntity(other, node, Math.random() * 500);
+            }
         }
 
         zr.refreshNextFrame();
@@ -369,9 +422,8 @@ define(function (require) {
             var n = graphRendering.getNodeById(current.id);
             if (!n.entity) {
                 this._createNodeEntity(n);
-                zr.addGroup(n.entity.el);
             }
-            n.entity.highlight(zr);
+            n.entity.highlight();
 
             var inEdge = current.inEdges[0];
             if (!inEdge) {
@@ -389,21 +441,38 @@ define(function (require) {
 
             if (!e.entity) {
                 this._createEdgeEntity(e);
-                zr.addGroup(e.entity.el);
             }
-            e.entity.highlight(zr);
+            e.entity.highlight();
         }
 
         zr.refreshNextFrame();
     }
 
     /**
+     * 在边栏中显示实体详细信息
+     */
+    GraphMain.prototype.showEntityDetail = function (n) {
+        var graph = this._graph;
+        if (typeof(n) === 'string') {
+            n = graph.getNodeById(n);
+        }
+
+        var sideBar = this._kgraph.getComponentByType('SIDEBAR');
+        if (sideBar) {
+            sideBar.setData(n.data);
+            sideBar.show();
+        }
+    }
+
+    /**
      * 移动视图到指定的实体位置
      */
-    GraphMain.prototype.moveToEntity = function (id) {
-        var zr = this._zr;
+    GraphMain.prototype.moveToEntity = function (n) {
         var graph = this._graphRendering;
-        var n = graph.getNodeById(id);
+        if (typeof(n) === 'string') {
+            n = graph.getNodeById(n);
+        }
+        var zr = this._zr;
         if (!n) {
             return;
         }
@@ -427,12 +496,6 @@ define(function (require) {
                 position: [x, y]
             })
             .during(function () {
-                for (var z in layers) {
-                    if (z !== 'hover') {
-                        vec2.copy(layers[z].position, layers[0].position);
-                        layers[z].dirty = true;   
-                    }
-                }
                 zr.refreshNextFrame();
             })
             .start('CubicInOut');
@@ -442,33 +505,122 @@ define(function (require) {
         this._graphRendering.eachNode(function (n) {
             if (!n.entity) {
                 this._createNodeEntity(n);
-                this._zr.addGroup(n.entity.el);
             }
         }, this);
         this._graphRendering.eachEdge(function (e) {
             if (!e.entity) {
                 this._createEdgeEntity(e);
-                this._zr.addGroup(e.entity.el);
             }
         }, this);
     };
 
-    GraphMain.prototype._createNodeEntity = function (n) {
+    GraphMain.prototype.toJSON = function () {
+        var graph = this._graphRendering;
+        var res = {
+            entities: [],
+            relations: []
+        };
+        graph.eachNode(function (n) {
+            n.data.position = n.layout.position;
+            res.entities.push(n.data);
+        });
+        graph.eachEdge(function (e) {
+            res.relations.push(e.data);
+        });
+        return res;
+    };
+
+    GraphMain.prototype._growOut = function () {
+        var self = this;
+        this._animating = true;
+        var zr = this._zr;
+        var clipCircle = new CircleShape({
+            id: 'main',
+            style: {
+                x: zr.getWidth() / 2,
+                y: zr.getHeight() / 2,
+                r: 80
+            }
+        });
+        this._root.clipShape = clipCircle;
+        self._root.modSelf();
+        zr.refreshNextFrame();
+        zr.animation.animate(clipCircle.style)
+            .when(1000, {
+                r: zr.getWidth() * 1.7
+            })
+            .during(function () {
+                self._root.modSelf();
+                zr.refreshNextFrame();
+            })
+            .done(function () {
+                self._animating = false;
+                self._root.clipShape = null;
+            })
+            .delay(500)
+            .start();
+    }
+
+    GraphMain.prototype._growNodeEntity = function (toNode, fromNode, delay) {
+        var zr = this._zr;
+        var e = this._graphRendering.getEdge(fromNode.id, toNode.id);
+        var self = this;
+
+        var radius = toNode.entity.radius;
+        toNode.entity.setRadius(1);
+        this._animating = true;
+        zr.refreshNextFrame();
+        e.entity.animateLength(zr, 300, Math.random() * 300, fromNode.entity, function () {
+            toNode.entity.animateRadius(zr, radius, 500, function () {
+                self._animating = false;
+            })
+        });
+    };
+
+    GraphMain.prototype._createNodeEntity = function (node) {
         var nodeEntity = new NodeEntity({
-            radius: n.layout.radius,
-            label: n.data.name,
-            // image: n.data.image
-            image: '../mock/avatar.jpg'
+            radius: node.layout.radius,
+            label: node.data.name,
+            image: node.data.image
+            // image: '../mock/avatar.jpg'
         });
         nodeEntity.initialize(this._zr);
 
-        nodeEntity.el.position = n.layout.position;
+        vec2.min(this._min, this._min, node.layout.position);
+        vec2.max(this._max, this._max, node.layout.position);
+        
+        vec2.copy(nodeEntity.el.position, node.layout.position);
         var self = this;
         nodeEntity.bind('mouseover', function () {
-            self.highlightNodeAndAdjeceny(n);
+            if (self._animating) {
+                return;
+            }
+            if (self._lastClickNode && self._lastClickNode !== node) {
+                self._lastClickNode.entity.stopActiveAnimation(self._zr);
+            }
+            if (self._lastHoverNode !== node) {
+                if (self._lastHoverNode) {
+                    self._lastHoverNode.entity.animateRadius(
+                        self._zr, self._lastHoverNode.layout.radius, 500
+                    );   
+                }
+                // Hover 实体放大
+                node.entity.animateRadius(
+                    self._zr, node.layout.radius * 1.2, 500
+                );
+            }
+            self._lastHoverNode = node;
+            self.highlightNodeAndAdjeceny(node);
         });
 
-        n.entity = nodeEntity;
+        nodeEntity.bind('click', function () {
+            node.entity.startActiveAnimation(self._zr);
+            self.showEntityDetail(node);
+            self._lastClickNode = node;
+        })
+
+        node.entity = nodeEntity;
+        this._root.addChild(nodeEntity.el);
         return nodeEntity;
     };
 
@@ -491,6 +643,9 @@ define(function (require) {
             edgeEntity.initialize(this._zr);
 
             e.entity = edgeEntity;
+
+            this._root.addChild(edgeEntity.el);
+
             return edgeEntity;
         }
     };
@@ -525,8 +680,7 @@ define(function (require) {
         if (!graph) {
             return;
         }
-        var edgeLayer = this._zr.painter.getLayer(0);
-        var nodeLayer = this._zr.painter.getLayer(1, edgeLayer);
+        var nodeLayer = this._zr.painter.getLayer(1);
         var width = this._zr.getWidth();
         var height = this._zr.getHeight();
         var min = [0, 0];

@@ -22,7 +22,7 @@
                 var g = bkg.init('viewport', JSON.parse(data));
                 var graphMain = g.getComponentByType('GRAPH');
                 graphMain.startForceLayout();
-                // g.addComponent(new bkg.SideBar());
+                g.addComponent(new bkg.SideBar());
                 g.addComponent(new bkg.SearchBar());
             });
         </script>

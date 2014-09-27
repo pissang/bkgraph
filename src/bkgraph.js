@@ -1,6 +1,7 @@
 /**
  * @namespace bkgraph
  */
+// TODO Entity zlevel的管理
 define(function (require) {
 
     var GraphMain = require('./component/GraphMain');
@@ -8,7 +9,15 @@ define(function (require) {
     var ZoomControl = require('./component/ZoomControl');
     var SearchBar = require('./component/SearchBar');
     var SideBar = require('./component/SideBar');
+    var etpl = require('etpl');
 
+    // etpl truncate
+    etpl.addFilter('truncate', function (str, len) {
+        if (str.length > len) {
+            return str.substring(0, len) + '...';
+        }
+        return str;
+    });
     /**
      * @alias bkgraph~BKGraph
      * @param {HTMLElement} dom

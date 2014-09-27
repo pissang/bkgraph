@@ -10,6 +10,9 @@
     </head>
     <body>
         <div id='viewport'></div>
+        <button id="force-layout">开始布局</button>
+        <button id="show-all">显示全部</button>
+        <button id="save">保存</button>
         <script>
             require.config({
                 paths: {
@@ -33,17 +36,34 @@
             });
             require([
                 'bkgraph',
-                'text!mock/200_f.json'
+                'text!mock/200.json'
             ], function (bkg, data) {
                 var g = bkg.init('viewport', JSON.parse(data));
                 var graphMain = g.getComponentByType('GRAPH');
-                // g.addComponent(new bkg.SideBar());
-                // g.addComponent(new bkg.SearchBar());
-                // setTimeout(function () {
-                //     g.getComponentByType('SEARCHBAR').hide();
-                // }, 500);
+
+                g.addComponent(new bkg.SideBar());
+                g.addComponent(new bkg.SearchBar());
                 //
-                var layouting = false;
+                var layouting = false; 
+                document.getElementById('show-all').onclick = function () {
+                    graphMain.showAll();
+                }
+                document.getElementById('save').onclick = function () {
+                    var jsonStr = JSON.stringify(graphMain.toJSON(), null, 2);
+                    var blob = new Blob([jsonStr], {
+                        type: 'text/plain;charset=utf-8'
+                    });
+
+                    window.open(window.URL.createObjectURL(blob));
+                }
+                document.getElementById('force-layout').onclick = function () {
+                    layouting ? 
+                        graphMain.stopForceLayout()
+                        : graphMain.startForceLayout(function () {
+                            layouting = false;
+                        });
+                    layouting = !layouting;
+                }
             });
         </script>
     </body>

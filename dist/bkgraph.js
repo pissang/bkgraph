@@ -13666,6 +13666,7 @@ define('bkgraph/entity/ExtraEdge',['require','./Entity','zrender/shape/BezierCur
                 textFont: '12px 微软雅黑',
                 textColor: this.style.labelColor,
                 color: this.style.color,
+                opacity: this.style.opacity,
                 x: 0,
                 y: 0,
                 r: 10
@@ -14144,12 +14145,30 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
     }
 
     /**
+     * 在边栏中显示实体详细信息
+     */
+    GraphMain.prototype.showEntityDetail = function (n) {
+        var graph = this._graph;
+        if (typeof(n) === 'string') {
+            n = graph.getNodeById(n);
+        }
+
+        var sideBar = this._kgraph.getComponentByType('SIDEBAR');
+        if (sideBar) {
+            sideBar.setData(n.data);
+            sideBar.show();
+        }
+    }
+
+    /**
      * 移动视图到指定的实体位置
      */
-    GraphMain.prototype.moveToEntity = function (id) {
-        var zr = this._zr;
+    GraphMain.prototype.moveToEntity = function (n) {
         var graph = this._graphRendering;
-        var n = graph.getNodeById(id);
+        if (typeof(n) === 'string') {
+            n = graph.getNodeById(n);
+        }
+        var zr = this._zr;
         if (!n) {
             return;
         }
@@ -14213,6 +14232,9 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
         nodeEntity.bind('mouseover', function () {
             self.highlightNodeAndAdjeceny(n);
         });
+        nodeEntity.bind('click', function () {
+            self.showEntityDetail(n);
+        })
 
         n.entity = nodeEntity;
         return nodeEntity;
@@ -18218,7 +18240,7 @@ if ( typeof define === "function" && define.amd ) {
 define('text',{load: function(id){throw new Error("Dynamic load not allowed: " + id);}});
 define('text!bkgraph/html/personlist.html',[],function () { return '<!-- target: personlist -->\n<ul>\n    <!-- for: ${entities} as ${entity}-->\n    <li class="bkg-person" data-bkg-entity-id="${entity.ID}">\n        <img src="${entity.image}" alt="">\n        <h5>${entity.name}</h5>\n    </li>\n    <!-- /for -->\n</ul>';});
 
-define('text!bkgraph/html/searchbar.html',[],function () { return '<div class="bkg-search">\n    <h3>人物搜索</h3>\n    <div class="bkg-search-input">\n        <input type="text" placeholder="输入您要查找的人物">\n        <div class="bkg-search-btn"></div>\n    </div>\n</div>\n<div class="bkg-person-list">\n    <div class="bkg-prev-page disable"></div>\n    <div class="bkg-person-list-viewport">\n    <!-- import: personlist-->\n    </div>\n    <div class="bkg-next-page"></div>\n</div>\n<div class="bkg-toggle">隐 藏</div>';});
+define('text!bkgraph/html/searchbar.html',[],function () { return '<div class="bkg-search">\n    <h3>人物搜索</h3>\n    <div class="bkg-search-input">\n        <input type="text" placeholder="输入您要查找的人物">\n        <!-- <div class="bkg-search-btn"></div> -->\n    </div>\n</div>\n<div class="bkg-person-list">\n    <div class="bkg-prev-page disable"></div>\n    <div class="bkg-person-list-viewport">\n    <!-- import: personlist-->\n    </div>\n    <div class="bkg-next-page"></div>\n</div>\n<div class="bkg-toggle">隐 藏</div>';});
 
 define('bkgraph/component/SearchBar',['require','./Component','zrender/tool/util','etpl','../config/style','../util/util','Sizzle','text!../html/personlist.html','text!../html/searchbar.html'],function (require) {
     
@@ -18270,6 +18292,7 @@ define('bkgraph/component/SearchBar',['require','./Component','zrender/tool/util
         this._$prevPageBtn = Sizzle('.bkg-prev-page', this.el)[0];
         this._$nextPageBtn = Sizzle('.bkg-next-page', this.el)[0];
         this._$input = Sizzle('.bkg-search-input input', this.el)[0];
+        this._$toggleBtn = Sizzle('.bkg-toggle', this.el)[0];
 
         this._width = this._$list.clientWidth;
         this._viewportWidth = this._$viewport.clientWidth;
@@ -18292,15 +18315,17 @@ define('bkgraph/component/SearchBar',['require','./Component','zrender/tool/util
     /**
      * 显示搜索栏
      */
-    SearchBar.prototype.show = function () {
+    SearchBar.prototype.hide = function () {
         util.addClass(this.el, 'hidden');
+        this._$toggleBtn.innerHTML = '显 示';
     }
 
     /**
      * 隐藏搜索栏
      */
-    SearchBar.prototype.hide = function () {
-        util.removeClass(this.el, 'hidden');   
+    SearchBar.prototype.show = function () {
+        util.removeClass(this.el, 'hidden');
+        this._$toggleBtn.innerHTML = '隐 藏';
     }
 
     /**
@@ -18308,10 +18333,10 @@ define('bkgraph/component/SearchBar',['require','./Component','zrender/tool/util
      */
     SearchBar.prototype.toggle = function () {
         if (util.hasClass(this.el, 'hidden')) {
-            this.hide();
+            this.show();
         }
         else {
-            this.show();
+            this.hide();
         }
     }
 
@@ -18414,19 +18439,26 @@ define('bkgraph/component/SearchBar',['require','./Component','zrender/tool/util
 
     return SearchBar;
 });
-define('text!bkgraph/html/sidebar.html',[],function () { return '<div>\n    <h3>SIDEBAR</h3>\n</div>';});
+define('text!bkgraph/html/sidebar.html',[],function () { return '<div class="bkg-entity-detail">\n    <img class="bkg-avatar" src="${image}" />\n    <div class="bkg-person-info">\n        <h4>${name}</h4>\n        <p>出生: ${birthDate|raw}</p>\n        <p>简介: ${introduction.content|raw|truncate(100)}</p>\n    </div>\n</div>\n<div class="bkg-toggle">隐<br />藏<br /><</div>';});
 
-define('bkgraph/component/SideBar',['require','./Component','zrender/tool/util','etpl','../util/util','text!../html/sidebar.html'],function (require) {
+define('bkgraph/component/SideBar',['require','./Component','zrender/tool/util','etpl','Sizzle','../util/util','text!../html/sidebar.html'],function (require) {
     
     var Component = require('./Component');
     var zrUtil = require('zrender/tool/util');
     var etpl = require('etpl');
+    var Sizzle = require('Sizzle');
     var util = require('../util/util');
 
     var renderSidebar = etpl.compile(require('text!../html/sidebar.html'));
 
     var SideBar = function () {
+        
         Component.call(this);
+
+        var self = this;
+        util.addEventListener(this.el, 'click', function (e) {
+            self._dispatchClick(e);
+        });
     }
 
     SideBar.prototype.type = 'SIDEBAR';
@@ -18441,11 +18473,19 @@ define('bkgraph/component/SideBar',['require','./Component','zrender/tool/util',
         // 使用空数据
         this.render({});
 
+        this._$toggleBtn = Sizzle('.bkg-toggle', this.el)[0];
+
+        this.hide();
+        
         return el;
     }
 
     SideBar.prototype.resize = function (w, h) {
         // Do nothing
+    }
+
+    SideBar.prototype.setData = function (data) {
+        this.render(data);
     }
 
     SideBar.prototype.render = function (data) {
@@ -18456,24 +18496,28 @@ define('bkgraph/component/SideBar',['require','./Component','zrender/tool/util',
      * 显示边栏
      */
     SideBar.prototype.show = function () {
-        util.addClass(this.el, 'hidden');
+        util.removeClass(this.el, 'hidden');
 
-        var graphMain = this._kgraph.getComponent('GRAPH');
+        var graphMain = this._kgraph.getComponentByType('GRAPH');
         if (graphMain) {
-            graphMain.style.right = this.el.clientWidth + 'px';
+            graphMain.el.style.right = -this.el.clientWidth + 'px';
         }
+
+        this._$toggleBtn.innerHTML = '隐<br />藏<br /><';
     }
 
     /**
      * 隐藏边栏
      */
     SideBar.prototype.hide = function () {
-        util.removeClass(this.el, 'hidden');
+        util.addClass(this.el, 'hidden');
 
-        var graphMain = this._kgraph.getComponent('GRAPH');
+        var graphMain = this._kgraph.getComponentByType('GRAPH');
         if (graphMain) {
-            graphMain.style.right = '0px';
+            graphMain.el.style.right = '0px';
         }
+
+        this._$toggleBtn.innerHTML = '显<br />示<br />>';
     }
 
     /**
@@ -18481,13 +18525,19 @@ define('bkgraph/component/SideBar',['require','./Component','zrender/tool/util',
      */
     SideBar.prototype.toggle = function () {
         if (util.hasClass(this.el, 'hidden')) {
-            this.hide();
+            this.show();
         }
         else {
-            this.show();
+            this.hide();
         }
     }
 
+    SideBar.prototype._dispatchClick= function (e) {
+        var target = e.target || e.srcElement;
+        if (Sizzle.matchesSelector(target, '.bkg-toggle')) {
+            this.toggle();
+        }
+    }
     zrUtil.inherits(SideBar, Component);
 
     return SideBar;
@@ -18495,14 +18545,22 @@ define('bkgraph/component/SideBar',['require','./Component','zrender/tool/util',
 /**
  * @namespace bkgraph
  */
-define('bkgraph/bkgraph',['require','./component/GraphMain','./component/PanControl','./component/ZoomControl','./component/SearchBar','./component/SideBar'],function (require) {
+define('bkgraph/bkgraph',['require','./component/GraphMain','./component/PanControl','./component/ZoomControl','./component/SearchBar','./component/SideBar','etpl'],function (require) {
 
     var GraphMain = require('./component/GraphMain');
     var PanControl = require('./component/PanControl');
     var ZoomControl = require('./component/ZoomControl');
     var SearchBar = require('./component/SearchBar');
     var SideBar = require('./component/SideBar');
+    var etpl = require('etpl');
 
+    // etpl truncate
+    etpl.addFilter('truncate', function (str, len) {
+        if (str.length > len) {
+            return str.substring(0, len) + '...';
+        }
+        return str;
+    });
     /**
      * @alias bkgraph~BKGraph
      * @param {HTMLElement} dom

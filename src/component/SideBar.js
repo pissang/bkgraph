@@ -30,8 +30,6 @@ define(function (require) {
         // 使用空数据
         this.render({});
 
-        this._$toggleBtn = Sizzle('.bkg-toggle', this.el)[0];
-
         this.hide();
         
         return el;
@@ -47,6 +45,7 @@ define(function (require) {
 
     SideBar.prototype.render = function (data) {
         this.el.innerHTML = renderSidebar(data);
+        this._$toggleBtn = Sizzle('.bkg-toggle', this.el)[0];
     }
 
     /**
