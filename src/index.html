@@ -37,10 +37,11 @@
             ], function (bkg, data) {
                 var g = bkg.init('viewport', JSON.parse(data));
                 var graphMain = g.getComponentByType('GRAPH');
-                // g.addComponent(new bkg.SideBar());
+                g.addComponent(new bkg.SideBar());
+                g.addComponent(new bkg.HeaderBar());
                 // g.addComponent(new bkg.SearchBar());
                 // setTimeout(function () {
-                //     g.getComponentByType('SEARCHBAR').hide();
+                    // g.getComponentByType('SEARCHBAR').hide();
                 // }, 500);
                 //
                 var layouting = false;

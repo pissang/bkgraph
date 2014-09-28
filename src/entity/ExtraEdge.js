@@ -7,6 +7,8 @@ define(function (require) {
     var zrUtil = require('zrender/tool/util');
     var curveTool = require('zrender/tool/curve');
 
+    var intersect = require('../util/intersect');
+
     var vec2 = require('zrender/tool/vector');
     var v = vec2.create();
     var v1 = vec2.create();
@@ -80,6 +82,7 @@ define(function (require) {
             highlightStyle: {
                 opacity: 0
             },
+            ignore: true,
             z: 0,
             zlevel: 0
         });
@@ -109,6 +112,7 @@ define(function (require) {
             this._labelShape.style.textColor = this.highlightStyle.labelColor;
             this._labelShape.style.opacity = this.highlightStyle.opacity;
             this._labelShape.zlevel = 3;
+            this._labelShape.ignore = false;
         }
         this.el.modSelf();
     };
@@ -122,6 +126,7 @@ define(function (require) {
             this._labelShape.style.color = this.style.color;
             this._labelShape.style.textColor = this.style.labelColor;
             this._labelShape.zlevel = 0;
+            this._labelShape.ignore = true;
         }
         this.el.modSelf();
     };
@@ -146,7 +151,7 @@ define(function (require) {
         var y1 = curve.style.cpY1;
         var y2 = curve.style.yEnd;
         
-        zr.animation.animate(obj)
+        this.addAnimation('length', zr.animation.animate(obj)
             .when(time || 1000, {
                 t: 1
             })
@@ -164,7 +169,8 @@ define(function (require) {
             .done(function () {
                 cb && cb();
             })
-            .start();
+            .start()
+        );
     }
 
     ExtraEdgeEntity.prototype.getRect = function () {
@@ -193,6 +199,11 @@ define(function (require) {
                 curve.style.yStart, curve.style.cpY1, curve.style.yEnd, 0.5
             );
         }
+    }
+
+    ExtraEdgeEntity.prototype.intersectRect = function (rect, out) {
+
+        return intersect.lineRect(this._curveShape.style, rect, out);
     }
 
     zrUtil.inherits(ExtraEdgeEntity, Entity);

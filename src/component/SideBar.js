@@ -31,6 +31,11 @@ define(function (require) {
         this.render({});
 
         this.hide();
+
+        var headerBar = kg.getComponentByType('HEADERBAR');
+        if (headerBar) {
+            this.el.style.top = headerBar.el.clientHeight + 'px';
+        }
         
         return el;
     }

@@ -9,7 +9,11 @@ define(function (require) {
     var ZoomControl = require('./component/ZoomControl');
     var SearchBar = require('./component/SearchBar');
     var SideBar = require('./component/SideBar');
+    var HeaderBar = require('./component/HeaderBar');
     var etpl = require('etpl');
+    var jsonp = require('./util/jsonp');
+
+    var http = require('zrender/tool/http');
 
     // etpl truncate
     etpl.addFilter('truncate', function (str, len) {
@@ -18,11 +22,14 @@ define(function (require) {
         }
         return str;
     });
+
+    var TUPU_URL = 'http://nj02-wd-knowledge45-ssd1l.nj02.baidu.com:8866/api/tupu';
+
     /**
      * @alias bkgraph~BKGraph
      * @param {HTMLElement} dom
      */
-    var BKGraph = function (dom, data) {
+    var BKGraph = function (dom, data, onsuccess) {
 
         this._container = dom;
 
@@ -34,9 +41,29 @@ define(function (require) {
 
         this._root = null;
 
-        this._rawData = data;
 
-        this.initialize(data);
+        if (typeof(data) === 'string') {
+                
+            var self = this;
+
+            jsonp(TUPU_URL, {
+                query: data
+            }, 'callback', function (res) {
+                if (res.errorCode === 200) {             
+                    self._rawData = res.data;
+
+                    self.initialize(res.data);
+
+                    onsuccess && onsuccess(this);
+                }
+            });
+        } else {
+            this._rawData = data;
+
+            this.initialize(data);
+
+            onsuccess && onsuccess(this);
+        }
     }
 
     BKGraph.prototype.getRawData = function () {
@@ -123,14 +150,15 @@ define(function (require) {
      * 初始化图
      * @param {string|HTMLElement} dom
      * @param {Object} [data]
+     * @param {Function} onsuccess
      * @memberOf bkgraph
      * @return {bkgraph~BKGraph}
      */
-    function init(dom, data) {
+    function init(dom, data, onsuccess) {
         if (typeof(dom) === 'string') {
             dom = document.getElementById(dom);
         }
-        var graph = new BKGraph(dom, data);
+        var graph = new BKGraph(dom, data, onsuccess);
 
         return graph;
     }
@@ -141,6 +169,8 @@ define(function (require) {
         SideBar: SideBar,
         ZoomControl: ZoomControl,
         PanControl: PanControl,
+
+        HeaderBar: HeaderBar,
 
         init: init
     };

@@ -13,8 +13,19 @@ define(function (require) {
     var NodeEntity = require('../entity/Node');
     var EdgeEntity = require('../entity/Edge');
     var ExtraEdgeEntity = require('../entity/ExtraEdge');
+    var OutTipEntity = require('../entity/OutTip');
 
     var CircleShape = require('zrender/shape/Circle');
+
+    var intersect = require('../util/intersect');
+
+    var EPSILON = 1e-2;
+    var isAroundZero = function (val) {
+        return val > -EPSILON && val < EPSILON;
+    }
+    function isNotAroundZero(val) {
+        return val > EPSILON || val < -EPSILON;
+    }
 
     var GraphMain = function () {
 
@@ -31,10 +42,10 @@ define(function (require) {
         this._zr = null;
 
         // Graph for rendering
-        this._graphRendering = null;
+        this._graph = null;
 
         // Graph for layouting
-        this._graph = null
+        this._graphLayout = null;
 
         this._layouting = false;
 
@@ -47,6 +58,8 @@ define(function (require) {
         this._lastClickNode = null;
 
         this._lastHoverNode = null;
+
+        this._nodeEntityCount = 0;
     };
 
     GraphMain.prototype.type = 'GRAPH';
@@ -68,6 +81,7 @@ define(function (require) {
 
         this._min = [Infinity, Infinity];
         this._max = [zr.getWidth() / 2, zr.getHeight() / 2];
+        var x0 = 0, y0 = 0, sx0 = 0, sy0 = 0;
         zr.painter.refresh = function () {
             self._culling();
             // 同步所有层的位置
@@ -76,18 +90,31 @@ define(function (require) {
             if (layer0) {
                 var position = layer0.position;
                 var scale = layer0.scale;
-                position[0] = Math.max(-self._max[0] * scale[0] + zr.getWidth() - 100, position[0]);
-                position[1] = Math.max(-self._max[1] * scale[1] + zr.getHeight() - 100, position[1]);
-                position[0] = Math.min(-self._min[0] * scale[0] + 100, position[0]);
-                position[1] = Math.min(-self._min[1] * scale[1] + 100, position[1]);
-            }
-            for (var z in layers) {
-                if (z !== 'hover') {
-                    vec2.copy(layers[z].position, layers[0].position);
-                    vec2.copy(layers[z].scale, layers[0].scale);
-                    layers[z].dirty = true;   
+                position[0] = Math.max(-self._max[0] * scale[0] + zr.getWidth() - 500, position[0]);
+                position[1] = Math.max(-self._max[1] * scale[1] + zr.getHeight() - 300, position[1]);
+                position[0] = Math.min(-self._min[0] * scale[0] + 300, position[0]);
+                position[1] = Math.min(-self._min[1] * scale[1] + 300, position[1]);
+
+                if (
+                    isNotAroundZero(position[0] - x0) || isNotAroundZero(position[1] - y0)
+                    || isNotAroundZero(scale[0] - sx0) || isNotAroundZero(scale[1] - sy0)
+                ) {
+                    for (var z in layers) {
+                        if (z !== 'hover') {
+                            vec2.copy(layers[z].position, layers[0].position);
+                            vec2.copy(layers[z].scale, layers[0].scale);
+                            layers[z].dirty = true;   
+                        }
+                    }
+
+                    self._syncOutTipEntities();
                 }
+                x0 = position[0];
+                y0 = position[1];
+                sx0 = scale[0];
+                sy0 = scale[1];
             }
+
             zrRefresh.call(this);
         }
     };
@@ -102,11 +129,15 @@ define(function (require) {
 
     GraphMain.prototype.setData = function (data) {
         var graph = new Graph(true);
-        this._graph = graph;
+        this._graphLayout = graph;
         var zr = this._zr;
 
         var cx = this._kgraph.getWidth() / 2;
         var cy = this._kgraph.getHeight() / 2;
+
+        // var vWidth, vHeight;
+        var width = zr.getWidth();
+        var height = zr.getHeight();
 
         // 映射数据
         var max = -Infinity;
@@ -138,14 +169,14 @@ define(function (require) {
             };
             if (!entity.position) {
                 noPosition = true;
-            }
-            if (entity.layerCounter === 0) {
-                n.layout.fixed = true;
-                n.layout.position = [
-                    zr.getWidth() / 2,
-                    zr.getHeight() / 2
-                ];
-                n.position = Array.prototype.slice.call(n.layout.position);
+                if (entity.layerCounter === 0) {
+                    n.layout.fixed = true;
+                    n.layout.position = [
+                        width / 2,
+                        height / 2
+                    ];
+                    n.position = Array.prototype.slice.call(n.layout.position);
+                }
             }
         }
 
@@ -168,23 +199,23 @@ define(function (require) {
             var e = graph.addEdge(relation.fromID, relation.toID, relation);
             e.layout = {
                 // 边权重
-                weight: w * 14 / Math.pow(e.node1.data.layerCounter + 1, 2)
+                weight: w * 8 / Math.pow(e.node1.data.layerCounter + 1, 1)
                 // weight: e.node1.data.layerCounter === 0 ? 200 : w
             };
         }
 
         // 加入补边
-        this._graphRendering = this._graph.clone();
-        this._graphRendering.eachNode(function (n) {
+        this._graph = this._graphLayout.clone();
+        this._graph.eachNode(function (n) {
             // 共用布局
-            n.layout = this._graph.getNodeById(n.id).layout;
+            n.layout = this._graphLayout.getNodeById(n.id).layout;
         }, this);
         for (var i = 0; i < data.relations.length; i++) {
             var relation = data.relations[i];
             if (!relation.isExtra) {
                 continue;
             }
-            var e = this._graphRendering.addEdge(relation.fromID, relation.toID, relation);
+            var e = this._graph.addEdge(relation.fromID, relation.toID, relation);
             e.isExtra = true;
         }
 
@@ -195,17 +226,23 @@ define(function (require) {
 
         if (noPosition) {
             this.radialTreeLayout();
+        } else {
+            // 平移所有节点，使得中心节点能够在屏幕中心
+            var offsetX = width / 2 - this._mainNode.layout.position[0];
+            var offsetY = height / 2 - this._mainNode.layout.position[1];
+
+            this._graph.eachNode(function (n) {
+                n.layout.position[0] += offsetX;
+                n.layout.position[1] += offsetY;
+            })
         }
 
         this.render();
-
-        // this._growOut();
-        // this.highlightNodeAndAdjeceny(mainNode);
     };
 
     GraphMain.prototype.render = function () {
         var zr = this._zr;
-        var graph = this._graphRendering;
+        var graph = this._graph;
 
         if (this._root) {
             zr.delGroup(this._root);
@@ -238,8 +275,15 @@ define(function (require) {
             panable: true,
             zoomable: true
         });
+        zr.modLayer(2, {
+            panable: true,
+            zoomable: true
+        });
     };
 
+    /**
+     * 简单的摆放成放射状
+     */
     GraphMain.prototype.naiveLayout = function (mainNode) {
         graph.breadthFirstTraverse(function (n2, n1) {
             if (n1) {
@@ -263,12 +307,15 @@ define(function (require) {
         }, mainNode, 'out');
     };
 
+    /**
+     * 放射树状布局
+     */
     GraphMain.prototype.radialTreeLayout = function () {
         var cx = this._zr.getWidth() / 2;
         var cy = this._zr.getHeight() / 2;
-        var tree = Tree.fromGraph(this._graph)[0];
+        var tree = Tree.fromGraph(this._graphLayout)[0];
         tree.traverse(function (treeNode) {
-            var graphNode = this._graph.getNodeById(treeNode.id);
+            var graphNode = this._graphLayout.getNodeById(treeNode.id);
             treeNode.layout = {
                 width: graphNode.layout.radius * 2,
                 height: graphNode.layout.radius * 2
@@ -290,7 +337,7 @@ define(function (require) {
         var width = max[0] - min[0];
         var height = max[1] - min[1];
         tree.traverse(function (treeNode) {
-            var graphNode = this._graph.getNodeById(treeNode.id);
+            var graphNode = this._graphLayout.getNodeById(treeNode.id);
             var x = treeNode.layout.position[0];
             var y = treeNode.layout.position[1];
             var r = y;
@@ -304,8 +351,11 @@ define(function (require) {
         }, this);
     }
 
+    /**
+     * 开始力导向布局
+     */
     GraphMain.prototype.startForceLayout = function (cb) {
-        var graph = this._graph;
+        var graph = this._graphLayout;
         var forceLayout = new ForceLayout();
         forceLayout.center = [
             this._kgraph.getWidth() / 2,
@@ -315,27 +365,51 @@ define(function (require) {
         forceLayout.scaling = 12;
         forceLayout.coolDown = 0.99;
         // forceLayout.enableAcceleration = false;
-        forceLayout.maxSpeedIncrease = 1;
+        forceLayout.maxSpeedIncrease = 100;
         // 这个真是不好使
         forceLayout.preventOverlap = true;
 
-        graph.eachNode(function(n) {
+        graph.eachNode(function (n) {
             n.layout.mass = n.degree() * 3;
         });
 
+        // 在边上加入顶点防止重叠实体与边发生重叠
+        var edgeNodes = [];
+        // graph.eachEdge(function (e) {
+        //     var n = graph.addNode(e.id, e);
+        //     var p = vec2.create();
+        //     vec2.add(p, e.node1.layout.position, e.node2.layout.position);
+        //     vec2.scale(p, p, 0.5);
+        //     n.layout = {
+        //         position: p,
+        //         mass: 0,
+        //         radius: 10
+        //     };
+        //     edgeNodes.push(n);
+        //     n.isEdgeNode = true;
+        // });
+        
         forceLayout.init(graph, false);
+        this._layouting = true;
         var self = this;
 
-        this._layouting = true;
         forceLayout.onupdate = function () {
             for (var i = 0; i < graph.nodes.length; i++) {
                 if (graph.nodes[i].layout.fixed) {
                     vec2.copy(graph.nodes[i].layout.position, graph.nodes[i].position);
                 }
             }
+            for (var i = 0; i < edgeNodes.length; i++) {
+                var n = edgeNodes[i];
+                var e = n.data;
+                var p = n.layout.position;
+                vec2.add(p, e.node1.layout.position, e.node2.layout.position);
+                vec2.scale(p, p, 0.5);
+            }
             self._updateNodePositions();   
 
             if (forceLayout.temperature < 0.01) {
+                self.stopForceLayout();
                 cb && cb.call(self);
             }
             else {
@@ -347,19 +421,41 @@ define(function (require) {
        forceLayout.step(10);
     };
 
+    /**
+     * 停止力导向布局
+     */
     GraphMain.prototype.stopForceLayout = function () {
+        var graph = this._graphLayout;
+        var edgeNodes = [];
+        graph.eachNode(function (n) {
+            if (n.isEdgeNode) {
+                edgeNodes.push(n);
+            }
+        });
+        for (var i = 0; i < edgeNodes.length; i++) {
+            graph.removeNode(edgeNodes[i]);
+        }
+
         this._layouting = false;
     }
 
+    /**
+     * 低亮所有节点
+     */
     GraphMain.prototype.lowlightAll = function () {
         var zr = this._zr;
 
-        this._graphRendering.eachNode(function (n) {
+        this._graph.eachNode(function (n) {
             if (n.entity) {
                 n.entity.lowlight();
             }
-        });
-        this._graphRendering.eachEdge(function (e) {
+            // 移除屏外提示
+            if (n._outTipEntity) {
+                this._root.removeChild(n._outTipEntity.el);
+                n._outTipEntity = null;
+            }
+        }, this);
+        this._graph.eachEdge(function (e) {
             if (e.entity) {
                 e.entity.lowlight();
             }
@@ -368,18 +464,27 @@ define(function (require) {
         zr.refreshNextFrame();
     }
 
+    /**
+     * 高亮节点与邻接节点
+     */
     GraphMain.prototype.highlightNodeAndAdjeceny = function (node) {
         if (typeof(node) === 'string') {
-            node = this._graphRendering.getNodeById(node);
+            node = this._graph.getNodeById(node);
         }
         var zr = this._zr;
 
         this.lowlightAll();
 
         node.entity.highlight();
+
         for (var i = 0; i < node.edges.length; i++) {
             var e = node.edges[i];
             var other = e.node1 === node ? e.node2 : e.node1;
+
+            //中心节点不出补边
+            if (node.data.layerCounter === 0 && e.isExtra) {
+                continue;
+            }
 
             var newEntity = false;
             if (!other.entity) {
@@ -398,18 +503,24 @@ define(function (require) {
             if (newEntity) {
                 this._growNodeEntity(other, node, Math.random() * 500);
             }
+
+            this._syncOutTipEntities();
         }
 
+        this._syncHeaderBarExplorePercent();
         zr.refreshNextFrame();
     };
 
+    /**
+     * 高亮节点与主节点的关系路径
+     */
     GraphMain.prototype.highlightNodeToMain = function (node) {
         if (typeof(node) === 'string') {
-            node = this._graph.getNodeById(node);
+            node = this._graphLayout.getNodeById(node);
         }
 
-        var graph = this._graph;
-        var graphRendering = this._graphRendering;
+        var graph = this._graphLayout;
+        var graphRendering = this._graph;
         var zr = this._zr;
         node = graph.getNodeById(node.id);
 
@@ -445,6 +556,8 @@ define(function (require) {
             e.entity.highlight();
         }
 
+        this._syncHeaderBarExplorePercent();
+
         zr.refreshNextFrame();
     }
 
@@ -452,7 +565,7 @@ define(function (require) {
      * 在边栏中显示实体详细信息
      */
     GraphMain.prototype.showEntityDetail = function (n) {
-        var graph = this._graph;
+        var graph = this._graphLayout;
         if (typeof(n) === 'string') {
             n = graph.getNodeById(n);
         }
@@ -468,7 +581,7 @@ define(function (require) {
      * 移动视图到指定的实体位置
      */
     GraphMain.prototype.moveToEntity = function (n) {
-        var graph = this._graphRendering;
+        var graph = this._graph;
         if (typeof(n) === 'string') {
             n = graph.getNodeById(n);
         }
@@ -501,22 +614,59 @@ define(function (require) {
             .start('CubicInOut');
     };
 
-    GraphMain.prototype.showAll = function () {
-        this._graphRendering.eachNode(function (n) {
+    GraphMain.prototype.uncollapse = function () {
+        var zr = this._zr;
+        this._graph.eachNode(function (n) {
             if (!n.entity) {
                 this._createNodeEntity(n);
+                n.canCollapse = true;
             }
         }, this);
-        this._graphRendering.eachEdge(function (e) {
+        this._graph.eachEdge(function (e) {
             if (!e.entity) {
                 this._createEdgeEntity(e);
+                e.canCollapse = true;
             }
         }, this);
+
+        this._syncHeaderBarExplorePercent();
+
+        zr.refreshNextFrame();
     };
 
+    GraphMain.prototype.collapse = function () {
+        var zr = this._zr;
+        this._graph.eachNode(function (n) {
+            if (n.canCollapse) {
+                n.entity.stopAnimationAll();
+                this._root.removeChild(n.entity.el);
+                n.canCollapse = false;
+                n.entity = null;
+                this._nodeEntityCount--;
+            }
+        }, this);
+        this._graph.eachEdge(function (e) {
+            if (e.canCollapse) {
+                e.entity.stopAnimationAll();
+                this._root.removeChild(e.entity.el);
+                e.canCollapse = false;
+                e.entity = null;
+            }
+        }, this);
+
+        this._syncHeaderBarExplorePercent();
+        zr.refreshNextFrame();
+    }
+
     GraphMain.prototype.toJSON = function () {
-        var graph = this._graphRendering;
+        var graph = this._graph;
         var res = {
+            viewport: {
+                x: 0,
+                y: 0,
+                width: this._zr.getWidth(),
+                height: this._zr.getHeight()
+            },
             entities: [],
             relations: []
         };
@@ -530,40 +680,79 @@ define(function (require) {
         return res;
     };
 
-    GraphMain.prototype._growOut = function () {
-        var self = this;
-        this._animating = true;
+    GraphMain.prototype.getExplorePercent = function () {
+        var nodes = this._graph.nodes;
+        return this._nodeEntityCount / nodes.length;
+    };
+
+    /**
+     * 同步节点的屏外提示
+     */
+    GraphMain.prototype._syncOutTipEntities = function () {
         var zr = this._zr;
-        var clipCircle = new CircleShape({
-            id: 'main',
-            style: {
-                x: zr.getWidth() / 2,
-                y: zr.getHeight() / 2,
-                r: 80
+
+        var node = this._lastHoverNode;
+        if (!node) {
+            return;
+        }
+        var lineRectIntersectPoint = vec2.create();
+        var layer0 = this._zr.painter.getLayer(0);
+        var rect = {
+            x: -layer0.position[0] / layer0.scale[0],
+            y: -layer0.position[1] / layer0.scale[1],
+            width: zr.getWidth() / layer0.scale[0],
+            height: zr.getHeight() / layer0.scale[1]
+        }
+
+        for (var i = 0; i < node.edges.length; i++) {
+            var e = node.edges[i];
+            var other = e.node1 === node ? e.node2 : e.node1;
+
+            //中心节点不出补边
+            if (node.data.layerCounter === 0 && e.isExtra) {
+                continue;
             }
-        });
-        this._root.clipShape = clipCircle;
-        self._root.modSelf();
-        zr.refreshNextFrame();
-        zr.animation.animate(clipCircle.style)
-            .when(1000, {
-                r: zr.getWidth() * 1.7
-            })
-            .during(function () {
-                self._root.modSelf();
-                zr.refreshNextFrame();
-            })
-            .done(function () {
-                self._animating = false;
-                self._root.clipShape = null;
-            })
-            .delay(500)
-            .start();
+            if (!other.entity) {
+                continue;
+            }
+            if (!other.entity.isInsideViewport(zr)) {
+                var side = e.entity.intersectRect(rect, lineRectIntersectPoint);
+                if (side) {
+                    if (!other._outTipEntity) {
+                        other._outTipEntity = new OutTipEntity({
+                            label: other.data.name
+                        });
+                        other._outTipEntity.initialize(zr);
+                        this._root.addChild(other._outTipEntity.el);   
+                    }
+                    var p = other._outTipEntity.el.position;
+                    vec2.copy(p, lineRectIntersectPoint);
+                    switch (side) {
+                        case 'top':
+                            p[0] += 20;
+                            break;
+                        case 'left':
+                            p[0] += 20;
+                            break;
+                        case 'bottom':
+                            p[1] -= 40;
+                            break;
+                        case 'right':
+                            p[0] -= 80;
+                            break;
+                    }
+                    other._outTipEntity.el.modSelf();
+                }
+            } else if (other._outTipEntity) {
+                this._root.removeChild(other._outTipEntity.el);
+                other._outTipEntity = null;
+            }
+        }
     }
 
     GraphMain.prototype._growNodeEntity = function (toNode, fromNode, delay) {
         var zr = this._zr;
-        var e = this._graphRendering.getEdge(fromNode.id, toNode.id);
+        var e = this._graph.getEdge(fromNode.id, toNode.id);
         var self = this;
 
         var radius = toNode.entity.radius;
@@ -582,7 +771,6 @@ define(function (require) {
             radius: node.layout.radius,
             label: node.data.name,
             image: node.data.image
-            // image: '../mock/avatar.jpg'
         });
         nodeEntity.initialize(this._zr);
 
@@ -595,11 +783,11 @@ define(function (require) {
             if (self._animating) {
                 return;
             }
-            if (self._lastClickNode && self._lastClickNode !== node) {
-                self._lastClickNode.entity.stopActiveAnimation(self._zr);
-            }
             if (self._lastHoverNode !== node) {
-                if (self._lastHoverNode) {
+                if (
+                    self._lastHoverNode && self._lastHoverNode.entity
+                ) {
+                    self._lastHoverNode.entity.stopActiveAnimation(self._zr);
                     self._lastHoverNode.entity.animateRadius(
                         self._zr, self._lastHoverNode.layout.radius, 500
                     );   
@@ -608,19 +796,21 @@ define(function (require) {
                 node.entity.animateRadius(
                     self._zr, node.layout.radius * 1.2, 500
                 );
+                node.entity.startActiveAnimation(self._zr);
+
+                self._lastHoverNode = node;
+                self.highlightNodeAndAdjeceny(node);
             }
-            self._lastHoverNode = node;
-            self.highlightNodeAndAdjeceny(node);
         });
 
         nodeEntity.bind('click', function () {
-            node.entity.startActiveAnimation(self._zr);
             self.showEntityDetail(node);
-            self._lastClickNode = node;
         })
 
         node.entity = nodeEntity;
         this._root.addChild(nodeEntity.el);
+
+        this._nodeEntityCount++;
         return nodeEntity;
     };
 
@@ -653,7 +843,7 @@ define(function (require) {
     GraphMain.prototype._updateNodePositions = function () {
         var zr = this._zr;
         // PENDING
-        var graph = this._graphRendering;
+        var graph = this._graph;
         for (var i = 0; i < graph.nodes.length; i++) {
             var n = graph.nodes[i];
             if (n.entity) {
@@ -675,36 +865,35 @@ define(function (require) {
         zr.refreshNextFrame();
     };
 
+    GraphMain.prototype._syncHeaderBarExplorePercent = function () {
+        var headerBarComponent = this._kgraph.getComponentByType('HEADERBAR');
+        if (headerBarComponent) {
+            headerBarComponent.setExplorePercent(this.getExplorePercent());
+        }
+    }
+
     GraphMain.prototype._culling = function () {
-        var graph = this._graphRendering;
+        var graph = this._graph;
+        var zr = this._zr;
         if (!graph) {
             return;
         }
-        var nodeLayer = this._zr.painter.getLayer(1);
-        var width = this._zr.getWidth();
-        var height = this._zr.getHeight();
+        var nodeLayer = zr.painter.getLayer(1);
+        var width = zr.getWidth();
+        var height = zr.getHeight();
         var min = [0, 0];
         var max = [0, 0];
+        nodeLayer.updateTransform();
         for (var i = 0; i < graph.nodes.length; i++) {
             var n = graph.nodes[i];
             if (n.entity) {
-                var r = n.entity.radius + n.entity.style.lineWidth;
-                min[0] = n.entity.el.position[0] - r;
-                min[1] = n.entity.el.position[1] - r;
-                max[0] = n.entity.el.position[0] + r;
-                max[1] = n.entity.el.position[1] + r;
-                nodeLayer.updateTransform();
-                if (nodeLayer.transform) {
-                    vec2.applyTransform(min, min, nodeLayer.transform);
-                    vec2.applyTransform(max, max, nodeLayer.transform);
-                }
-                var ignore = min[0] > width || min[1] > height || max[0] < 0 || max[1] < 0;
-                n.entity.el.ignore = ignore;
+                n.entity.el.ignore = !n.entity.isInsideViewport(zr);
             }
         }
         for (var i = 0; i < graph.edges.length; i++) {
             var e = graph.edges[i];
             if (e.entity) {
+                // TODO
                 e.entity.el.ignore = e.node1.entity.el.ignore && e.node2.entity.el.ignore;
             }
         }

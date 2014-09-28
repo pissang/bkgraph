@@ -8,6 +8,13 @@
 .bkg-viewport a {
   color: white;
 }
+.bkg-viewport ul {
+  margin: 0px;
+  padding: 0px;
+}
+.bkg-viewport li {
+  list-style: none;
+}
 .bkg-graph {
   position: absolute;
   right: 0px;
@@ -135,7 +142,6 @@
 }
 .bkg-searchbar .bkg-person-list ul {
   margin: 7px 0px 0px 0px;
-  padding: 0px;
   height: 85px;
   position: absolute;
   left: 0px;
@@ -150,7 +156,6 @@
   transition: left 0.5s ease-in-out;
 }
 .bkg-searchbar .bkg-person-list li.bkg-person {
-  list-style: none;
   display: inline-block;
   overflow: hidden;
   position: relative;
@@ -183,23 +188,51 @@
   left: 0px;
   top: 0px;
   bottom: 0px;
-  width: 320px;
+  width: 340px;
   background-color: #0d4075;
   -webkit-transition: left 0.5s ease-in-out;
   -moz-transition: left 0.5s ease-in-out;
   -ms-transition: left 0.5s ease-in-out;
   -o-transition: left 0.5s ease-in-out;
   transition: left 0.5s ease-in-out;
+  font-size: 12px;
+  line-height: 19px;
+}
+.bkg-sidebar a {
+  color: #0595ce;
+  text-decoration: none;
+  padding: 1px 3px;
+}
+.bkg-sidebar a:hover {
+  background-color: #0595ce;
+  color: white;
+  border-radius: 3px;
+}
+.bkg-sidebar p {
+  padding: 0px;
+  margin: 0px;
 }
 .bkg-sidebar.hidden {
-  left: -315px;
+  left: -335px;
+}
+.bkg-sidebar .bkg-sidebar-module {
+  margin-top: 20px;
+}
+.bkg-sidebar .bkg-sidebar-module h4.bkg-title {
+  color: #9bd1fe;
+  margin: 8px 10px;
+  font-size: 16px;
+  padding-left: 28px;
+  background-repeat: no-repeat;
+  background-position: 0px 50%;
+  line-height: 30px;
 }
 .bkg-sidebar .bkg-entity-detail {
   overflow-x: hidden;
+  height: 100%;
 }
-.bkg-sidebar .bkg-entity-detail .bkg-avatar {
+.bkg-sidebar .bkg-entity-detail .bkg-person-pic {
   width: 100px;
-  height: 135px;
   margin-left: 10px;
   margin-top: 30px;
   float: left;
@@ -216,8 +249,62 @@
 }
 .bkg-sidebar .bkg-entity-detail .bkg-person-info p {
   color: white;
-  font-size: 12px;
   margin: 4px 0px;
+}
+.bkg-sidebar .bkg-entity-detail .bkg-person-news h4 {
+  background-image: url(../img/sidebar/news.png);
+}
+.bkg-sidebar .bkg-entity-detail .bkg-person-news li {
+  color: white;
+}
+.bkg-sidebar .bkg-entity-detail .bkg-person-news li h5 {
+  color: white;
+  font-weight: normal;
+  margin: 0px;
+}
+.bkg-sidebar .bkg-entity-detail .bkg-person-news li img.bkg-news-pic {
+  float: left;
+  width: 100px;
+  margin-left: 10px;
+}
+.bkg-sidebar .bkg-entity-detail .bkg-person-news li .bkg-news-detail {
+  float: left;
+  margin-left: 10px;
+  width: 190px;
+}
+.bkg-sidebar .bkg-entity-detail .bkg-person-news li .bkg-news-detail .bkg-news-source {
+  margin-top: 5px;
+}
+.bkg-sidebar .bkg-entity-detail .bkg-person-news li .bkg-news-detail .bkg-news-publish-time {
+  margin-left: 10px;
+}
+.bkg-sidebar .bkg-entity-detail .bkg-person-news li .bkg-news-publish-time {
+  color: #02c0fe;
+}
+.bkg-sidebar .bkg-entity-detail .bkg-person-news li .bkg-news-simple {
+  margin-left: 15px;
+  margin-top: 10px;
+}
+.bkg-sidebar .bkg-entity-detail .bkg-person-news li .bkg-news-simple .bkg-news-title {
+  width: 130px;
+  display: inline-block;
+}
+.bkg-sidebar .bkg-entity-detail .bkg-person-news li .bkg-news-simple .bkg-news-publish-time {
+  float: right;
+  margin-right: 20px;
+}
+.bkg-sidebar .bkg-entity-detail .bkg-person-weibo h4 {
+  background-image: url(../img/sidebar/weibo.png);
+}
+.bkg-sidebar .bkg-entity-detail .bkg-person-weibo h5 {
+  color: white;
+}
+.bkg-sidebar .bkg-entity-detail .bkg-person-weibo .bkg-weibo-info {
+  margin-left: 10px;
+}
+.bkg-sidebar .bkg-entity-detail .bkg-person-weibo p {
+  font-size: 12px;
+  color: white;
 }
 .bkg-sidebar .bkg-toggle {
   width: 20px;
@@ -233,4 +320,101 @@
   padding-top: 20px;
   text-align: center;
   box-sizing: border-box;
+}
+/** 顶栏 */
+.bkg-headerbar {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  height: 55px;
+  background-image: url(../img/searchbar/search-bg.png);
+  color: white;
+}
+.bkg-headerbar h1 {
+  position: absolute;
+  left: 30px;
+  line-height: 55px;
+  margin: 0px;
+  font-size: 20px;
+}
+.bkg-headerbar .bkg-explore-percent {
+  position: absolute;
+  right: 180px;
+  line-height: 55px;
+  height: 55px;
+  font-size: 12px;
+}
+.bkg-headerbar .bkg-explore-percent .bkg-explore-percent-bar {
+  display: inline-block;
+  width: 250px;
+  height: 8px;
+  margin-top: 30px;
+  margin-left: 5px;
+  border-radius: 4px;
+  background-color: #86c4f9;
+  position: relative;
+}
+.bkg-headerbar .bkg-explore-percent .bkg-explore-percent-bar .bkg-explore-percent-bar-inner {
+  width: 0px;
+  height: 100%;
+  border-radius: 4px;
+  background-color: white;
+  float: left;
+  -webkit-transition: width 0.5s ease-in-out;
+  -moz-transition: width 0.5s ease-in-out;
+  -ms-transition: width 0.5s ease-in-out;
+  -o-transition: width 0.5s ease-in-out;
+  transition: width 0.5s ease-in-out;
+}
+.bkg-headerbar .bkg-explore-percent .bkg-explore-percent-bar .bkg-explore-percent-tip {
+  width: 31px;
+  height: 23px;
+  position: absolute;
+  left: 0px;
+  top: -20px;
+  margin-left: -16px;
+  background-image: url(../img/headerbar/explore-percent-tip.png);
+  -webkit-transition: left 0.5s ease-in-out;
+  -moz-transition: left 0.5s ease-in-out;
+  -ms-transition: left 0.5s ease-in-out;
+  -o-transition: left 0.5s ease-in-out;
+  transition: left 0.5s ease-in-out;
+  color: #0e90fe;
+  font-size: 14px;
+  line-height: 18px;
+  box-sizing: border-box;
+  padding-left: 4px;
+}
+.bkg-headerbar .bkg-collapse {
+  position: absolute;
+  right: 50px;
+  margin-top: 20px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.bkg-headerbar .bkg-collapse > span {
+  vertical-align: middle;
+}
+.bkg-headerbar .bkg-collapse .bkg-collapse-checkbox {
+  width: 35px;
+  height: 18px;
+  border-radius: 30px;
+  border: 1px solid white;
+  display: inline-block;
+  margin-right: 5px;
+  box-sizing: border-box;
+}
+.bkg-headerbar .bkg-collapse .bkg-collapse-checkbox-inner {
+  background-color: white;
+  width: 17px;
+  height: 17px;
+  border-radius: 30px;
+  position: absolute;
+  left: 0px;
+  -webkit-transition: left 0.5s ease-in-out;
+  -moz-transition: left 0.5s ease-in-out;
+  -ms-transition: left 0.5s ease-in-out;
+  -o-transition: left 0.5s ease-in-out;
+  transition: left 0.5s ease-in-out;
 }

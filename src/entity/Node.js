@@ -4,9 +4,10 @@ define(function (require) {
     var Group = require('zrender/Group');
     var CircleShape = require('zrender/shape/Circle');
     var ImageShape = require('zrender/shape/Image');
-    var RectShape = require('zrender/shape/Rectangle');
+    var CrescentShape = require('../shape/Crescent');
     var zrUtil = require('zrender/tool/util');
     var zrColor = require('zrender/tool/color');
+    var vec2 = require('zrender/tool/vector');
 
     var baseRadius = 50;
 
@@ -87,11 +88,12 @@ define(function (require) {
                 y: 0
             }
         });
-        contentGroup.clipShape = clipShape;
+        // contentGroup.clipShape = clipShape;
 
         // var image = new Image();
         // image.onload = function () {
         //     imageShape.style.image = image;
+        //     imageShape.modSelf();
         //     zr.refreshNextFrame();
         // }
         // image.src = this.image;
@@ -110,12 +112,12 @@ define(function (require) {
         });
 
         if (this.label) {
-            var labelShape = new RectShape({
+            var labelShape = new CrescentShape({
                 style: {
-                    width: baseRadius * 2,
                     height: 25,
-                    x: -baseRadius,
-                    y: baseRadius - 25,
+                    x: 0,
+                    y: 0,
+                    r: baseRadius,
                     color: zrColor.alpha(this.style.color, 0.8),
                     brushType: 'fill',
                     text: this.label,
@@ -154,7 +156,7 @@ define(function (require) {
         this.el.modSelf();
     }
 
-    NodeEntity.prototype.highlight = function () {
+    NodeEntity.prototype.highlight = function (zr) {
         this._outlineShape.style.strokeColor = this.highlightStyle.color;
         this._outlineShape.style.lineWidth = this.highlightStyle.lineWidth;
         this._labelShape.style.color = zrColor.alpha(this.highlightStyle.color, 0.8);
@@ -181,8 +183,10 @@ define(function (require) {
     }
 
     NodeEntity.prototype.animateRadius = function (zr, r, time, cb) {
+        this.stopAnimation('radius');
+
         var self = this;
-        zr.animation.animate(this)
+        this.addAnimation('radius', zr.animation.animate(this)
             .when(time || 1000, {
                 radius: r
             })
@@ -193,7 +197,8 @@ define(function (require) {
             .done(function () {
                 cb && cb();
             })
-            .start('ElasticOut');
+        )
+        .start('ElasticOut')
     };
 
     NodeEntity.prototype.startActiveAnimation = function (zr) {
@@ -220,7 +225,7 @@ define(function (require) {
                 zlevel: 2
             });
 
-            circle._animation = zr.animation.animate(circle.style, {loop: true})
+            this.addAnimation('glowcircle', zr.animation.animate(circle.style, {loop: true})
                 .when(1000, {
                     x: x1,
                     y: y1
@@ -239,7 +244,8 @@ define(function (require) {
                     zr.refreshNextFrame();
                 })
                 .delay(-500 * i)
-                .start();
+                .start()
+            );
 
             this.el.addChild(circle);
             this._animatingCircles.push(circle);
@@ -250,13 +256,34 @@ define(function (require) {
         if (this._animatingCircles.length) {
             for (var i = 0; i < this._animatingCircles.length; i++) {
                 var circle = this._animatingCircles[i];
-                circle._animation.stop();
                 this.el.removeChild(circle);
             }
             this._animatingCircles.length = 0;
 
+            this.stopAnimation('glowcircle');
+
             zr.refreshNextFrame();
         }
+    }
+
+    var min = [0, 0];
+    var max = [0, 0];
+    NodeEntity.prototype.isInsideViewport = function (zr) {
+        var layer = zr.painter.getLayer(0);
+        var width = zr.getWidth();
+        var height = zr.getHeight();
+        var r = this.radius + this.style.lineWidth;
+
+        min[0] = this.el.position[0] - r;
+        min[1] = this.el.position[1] - r;
+        max[0] = this.el.position[0] + r;
+        max[1] = this.el.position[1] + r;
+        if (layer.transform) {
+            vec2.applyTransform(min, min, layer.transform);
+            vec2.applyTransform(max, max, layer.transform);
+        }
+
+        return !(min[0] > width || min[1] > height || max[0] < 0 || max[1] < 0);
     }
 
     zrUtil.inherits(NodeEntity, Entity);

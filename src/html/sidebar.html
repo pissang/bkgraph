@@ -21,14 +21,17 @@
                         <b>核心提示:</b> ${new.summary|truncate(35)}
                         <a href="${new.url}" class="bkg-more" target="_blank">更多>></a>
                     </p>
-                    <p>
+                    <p class="bkg-news-source">
                         <a href="${new.url}" target="_blank">${new.source}</a>
+                        <span class="bkg-news-publish-time">${new.publishTime}</span>
                     </p>
                 </div>
                 <div style="clear:both;"></div>
                 <!-- else -->
                 <div class="bkg-news-simple">
-                    <h5>${new.title}</h5>
+                    <span class="bkg-news-title">${new.title|truncate(10)}</span>
+                    <a href="${new.url}" target="_blank">${new.source}</a>
+                    <span class="bkg-news-publish-time">${new.publishTime}</span>
                 </div>
                 <!-- /if -->
             </li>

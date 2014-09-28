@@ -329,10 +329,32 @@
                     float: left;
                     margin-left: 10px;
                     width: 190px;
+
+                    .bkg-news-source {
+                        margin-top: 5px;
+                    }
+                    .bkg-news-publish-time {
+                        margin-left: 10px;
+                    }
                 }
+
+                .bkg-news-publish-time {
+                    color: #02c0fe;
+                }
+
                 .bkg-news-simple {
                     margin-left: 15px;
                     margin-top: 10px;
+
+                    .bkg-news-title {
+                        width: 130px;
+                        display: inline-block;
+                    }
+
+                    .bkg-news-publish-time {
+                        float: right;
+                        margin-right: 20px;
+                    }
                 }
             }
         }
@@ -375,5 +397,122 @@
         text-align: center;
 
         box-sizing: border-box;
+    }
+}
+
+/** 顶栏 */
+.bkg-headerbar {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    height: 55px;
+    background-image: url(../img/searchbar/search-bg.png);
+    
+    color: white;
+
+    @headerbar-height: 55px;
+
+    h1 {
+        position: absolute;
+        left: 30px;
+        line-height: @headerbar-height;
+        margin: 0px;
+
+        font-size: 20px;
+    }
+
+    .bkg-explore-percent {
+        position: absolute;
+        right: 170px;
+        line-height: @headerbar-height;
+        height: @headerbar-height;
+
+        font-size: 14px;
+
+        .bkg-explore-percent-bar { 
+            display: inline-block;
+            width: 250px;
+            height: 8px;
+            margin-top: @headerbar-height - 25;
+            margin-left: 5px;
+            border-radius: 4px;
+            background-color: #86c4f9;
+            position: relative;
+
+            .bkg-explore-percent-bar-inner {
+                width: 0px;
+                height: 100%;
+                border-radius: 4px;
+                background-color: white;
+                float: left;
+
+                -webkit-transition: width 0.5s ease-in-out;
+                   -moz-transition: width 0.5s ease-in-out;
+                    -ms-transition: width 0.5s ease-in-out;
+                     -o-transition: width 0.5s ease-in-out;
+                        transition: width 0.5s ease-in-out;
+            }
+
+            .bkg-explore-percent-tip {
+                width: 31px;
+                height: 23px;
+                position: absolute;
+                left: 0px;
+                top: -20px;
+                margin-left: -16px;
+                background-image: url(../img/headerbar/explore-percent-tip.png);
+
+                -webkit-transition: left 0.5s ease-in-out;
+                   -moz-transition: left 0.5s ease-in-out;
+                    -ms-transition: left 0.5s ease-in-out;
+                     -o-transition: left 0.5s ease-in-out;
+                        transition: left 0.5s ease-in-out;
+
+                color: #0e90fe;
+
+                font-size: 14px;
+                line-height: 18px;
+
+                box-sizing: border-box;
+                padding-left: 4px;
+            }
+        }
+    }
+
+    .bkg-collapse {
+        position: absolute;
+        right: 50px;
+        margin-top: @headerbar-height - 35;
+        cursor: pointer;
+        font-size: 14px;
+
+        &>span {
+            vertical-align: middle;
+        }
+
+        .bkg-collapse-checkbox {
+            width: 35px;
+            height: 18px;
+            border-radius: 30px;
+            border: 1px solid white;
+            display: inline-block;
+            margin-right: 5px;
+            box-sizing: border-box;
+        }
+        .bkg-collapse-checkbox-inner {
+            background-color: white;
+            width: 17px;
+            height: 17px;
+            border-radius: 30px;
+            position: absolute;
+            left: 0px;
+            
+            -webkit-transition: left 0.5s ease-in-out;
+               -moz-transition: left 0.5s ease-in-out;
+                -ms-transition: left 0.5s ease-in-out;
+                 -o-transition: left 0.5s ease-in-out;
+                    transition: left 0.5s ease-in-out;
+        }
     }
 }

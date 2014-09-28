@@ -5,26 +5,22 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <link rel="stylesheet" type="text/css" href="./css/index.css" />
         <link rel="stylesheet" type="text/css" href="./css/bkgraph.css" />
-        <script src="//s1.bdstatic.com/r/www/cache/ecom/esl/1-8-4/esl.js"></script>
     </head>
     <body>
         <div id='viewport'></div>
+        <script src="bkgraph.js"></script>
         <script>
-            require.config({
-                paths: {
-                    mock: '../mock'
-                }
-            });
-            require([
-                'bkgraph',
-                'text!mock/200.json'
-            ], function (bkg, data) {
-                var g = bkg.init('viewport', JSON.parse(data));
+            var g = bkgraph.init('viewport', 'j', function () {
+                g.addComponent(new bkgraph.SideBar());
+                g.addComponent(new bkgraph.SearchBar());
+
                 var graphMain = g.getComponentByType('GRAPH');
-                graphMain.startForceLayout();
-                g.addComponent(new bkg.SideBar());
-                g.addComponent(new bkg.SearchBar());
+                graphMain.uncollapse();
             });
+
+            window.onresize = function () {
+                g.resize();
+            }
         </script>
     </body>
 </html>

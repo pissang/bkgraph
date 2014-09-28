@@ -6,6 +6,8 @@ define(function (require) {
     var CircleShape = require('zrender/shape/Circle');
     var zrUtil = require('zrender/tool/util');
 
+    var intersect = require('../util/intersect');
+
     var vec2 = require('zrender/tool/vector');
     var v = vec2.create();
     var v1 = vec2.create();
@@ -118,7 +120,7 @@ define(function (require) {
     EdgeEntity.prototype.animateLength = function (zr, time, delay, fromEntity, cb) {
         this._computeLinePoints(v1, v2);
         var self = this;
-        zr.animation.animate(this._lineShape.style)
+        this.addAnimation('length', zr.animation.animate(this._lineShape.style)
             .when(0, {
                 xStart: v1[0],
                 yStart: v1[1],
@@ -138,8 +140,8 @@ define(function (require) {
             .done(function () {
                 cb && cb();
             })
-            // .delay(delay || 0)
-            .start();
+            .start()
+        );
     };
 
     EdgeEntity.prototype._computeLinePoints = function (v1, v2) {
@@ -172,11 +174,22 @@ define(function (require) {
             this._labelShape.style.r = (
                 this.sourceEntity.radius + this.targetEntity.radius
             ) / 20 + 3;
+            var angle = Math.atan2(v2[1] - v1[1], v2[0] - v1[0]);
+            if (Math.abs(angle) < 0.2 || Math.abs(angle) > 2.94) {
+                this._labelShape.style.textPosition = 'top';
+            } else {
+                this._labelShape.style.textPosition = 'right';
+            }
         }
     }
 
     EdgeEntity.prototype.getRect = function () {
         return this._lineShape.getRect(this._lineShape.style);
+    }
+
+    EdgeEntity.prototype.intersectRect = function (rect, out) {
+
+        return intersect.lineRect(this._lineShape.style, rect, out);
     }
 
     zrUtil.inherits(EdgeEntity, Entity);

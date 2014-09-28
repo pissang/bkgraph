@@ -3,7 +3,6 @@ define(function (require) {
     var Component = require('./Component');
     var zrUtil = require('zrender/tool/util');
     var etpl = require('etpl');
-    var style = require('../config/style');
     var util = require('../util/util');
     var Sizzle = require('Sizzle');
 
