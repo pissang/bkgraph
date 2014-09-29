@@ -1,6 +1,8 @@
+@charset 'UTF-8';
 /** Graph Viewport */
 .bkg-viewport {
     background-image: url(../img/bg.jpg);
+    background-size: 100% 100%;
     position: relative;
     font-family: "Microsoft YaHei";
     overflow: hidden;
@@ -424,7 +426,7 @@
 
     .bkg-explore-percent {
         position: absolute;
-        right: 170px;
+        right: 100px;
         line-height: @headerbar-height;
         height: @headerbar-height;
 
@@ -432,10 +434,9 @@
 
         .bkg-explore-percent-bar { 
             display: inline-block;
-            width: 250px;
-            height: 8px;
-            margin-top: @headerbar-height - 25;
-            margin-left: 5px;
+            width: 700px;
+            height: 5px;
+            margin-top: @headerbar-height - 30;
             border-radius: 4px;
             background-color: #86c4f9;
             position: relative;
@@ -453,66 +454,83 @@
                      -o-transition: width 0.5s ease-in-out;
                         transition: width 0.5s ease-in-out;
             }
+        }
+    }
+    
+    .bkg-milestone {
+        position: absolute;
+        top: -2px;
+        width: 8px;
+        height: 8px;
+        border-radius: 10px;
+        background-color: white;
+    }
 
-            .bkg-explore-percent-tip {
-                width: 31px;
-                height: 23px;
-                position: absolute;
-                left: 0px;
-                top: -20px;
-                margin-left: -16px;
-                background-image: url(../img/headerbar/explore-percent-tip.png);
+    .bkg-level {
+        position: absolute;
+        top: 0px;
+        bottom: 0px;
+    }
 
-                -webkit-transition: left 0.5s ease-in-out;
-                   -moz-transition: left 0.5s ease-in-out;
-                    -ms-transition: left 0.5s ease-in-out;
-                     -o-transition: left 0.5s ease-in-out;
-                        transition: left 0.5s ease-in-out;
+    .bkg-level-icon {
+        width: 100%;
+        top: 5px;
+        height: 28px;
+        background-position: 50% 50%;
+        background-repeat: no-repeat;
+    }
 
-                color: #0e90fe;
+    .bkg-level-title {
+        position: absolute;
+        width: 100%;
+        bottom: 3px;
+        color: #78bdf5;
+        font-size: 12px;
+        text-align: center;
+        height: 20px;
+        line-height: 20px;
+    }
 
-                font-size: 14px;
-                line-height: 18px;
-
-                box-sizing: border-box;
-                padding-left: 4px;
-            }
+    .bkg-level.bkg-active {
+        .bkg-level-title {
+            color: #ffffff;
         }
     }
 
-    .bkg-collapse {
-        position: absolute;
-        right: 50px;
-        margin-top: @headerbar-height - 35;
-        cursor: pointer;
-        font-size: 14px;
-
-        &>span {
-            vertical-align: middle;
-        }
-
-        .bkg-collapse-checkbox {
-            width: 35px;
-            height: 18px;
-            border-radius: 30px;
-            border: 1px solid white;
-            display: inline-block;
-            margin-right: 5px;
-            box-sizing: border-box;
-        }
-        .bkg-collapse-checkbox-inner {
-            background-color: white;
-            width: 17px;
-            height: 17px;
-            border-radius: 30px;
-            position: absolute;
-            left: 0px;
-            
-            -webkit-transition: left 0.5s ease-in-out;
-               -moz-transition: left 0.5s ease-in-out;
-                -ms-transition: left 0.5s ease-in-out;
-                 -o-transition: left 0.5s ease-in-out;
-                    transition: left 0.5s ease-in-out;
-        }
+    .bkg-level-0 .bkg-level-icon {
+        background-image: url('../img/headerbar/僵尸粉2.png');
+    }
+    .bkg-level-0.bkg-active .bkg-level-icon {
+        background-image: url('../img/headerbar/僵尸粉1.png');
+    }
+    .bkg-level-1 .bkg-level-icon {
+        background-image: url('../img/headerbar/初级粉2.png');
+    }
+    .bkg-level-1.bkg-active .bkg-level-icon {
+        background-image: url('../img/headerbar/初级粉1.png');
+    }
+    .bkg-level-2 .bkg-level-icon {
+        background-image: url('../img/headerbar/中级粉2.png');
+    }
+    .bkg-level-2.bkg-active .bkg-level-icon {
+        background-image: url('../img/headerbar/中级粉1.png');
+    }
+    .bkg-level-3 .bkg-level-icon {
+        background-image: url('../img/headerbar/高级粉2.png');
+    }
+    .bkg-level-3.bkg-active .bkg-level-icon {
+        background-image: url('../img/headerbar/高级粉1.png');
+    }
+    .bkg-level-4 .bkg-level-icon {
+        background-image: url('../img/headerbar/顶级粉2.png');
+    }
+    .bkg-level-4.bkg-active .bkg-level-icon {
+        background-image: url('../img/headerbar/顶级粉1.png');
+    }
+    .bkg-level-5 .bkg-level-icon {
+        background-image: url('../img/headerbar/私生粉2.png');
+    }
+    .bkg-level-5.bkg-active .bkg-level-icon {
+        background-image: url('../img/headerbar/私生粉1.png');
     }
 }

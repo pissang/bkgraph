@@ -1,6 +1,7 @@
 define(function (require) {
 
     var vec2 =  require('zrender/tool/vector');
+    var curveTool = require('zrender/tool/curve');
 
     var v1 = vec2.create();
     var v2 = vec2.create();
@@ -13,12 +14,30 @@ define(function (require) {
         }
         return t * (x1 - x0) + x0;
     }
+
     function lineYAtX(x0, y0, x1, y1, x) {
         var t = (x - x0) / (x1 - x0);
         if (t > 1 || t < 0) {
             return -Infinity;
         }
         return t * (y1 - y0) + y0;
+    }
+
+    var t = [];
+    function curveXAtY(x0, y0, x1, y1, x2, y2, y) {
+        var n = curveTool.quadraticRootAt(y0, y1, y2, y, t);
+        if (n === 0) {
+            return -Infinity;
+        }
+        return curveTool.quadraticAt(x0, x1, x2, t[0]);
+    }
+
+    function curveYAtX(x0, y0, x1, y1, x2, y2, x) {
+        var n = curveTool.quadraticRootAt(x0, x1, x2, x, t);
+        if (n === 0) {
+            return -Infinity;
+        }
+        return curveTool.quadraticAt(y0, y1, y2, t[0]);
     }
 
     var lineRect = function (line, rect, out) {
@@ -57,7 +76,47 @@ define(function (require) {
         }
     };
 
+    var curveRect = function (curve, rect, out) {
+        var x0 = curve.xStart;
+        var y0 = curve.yStart;
+        var x1 = curve.cpX1;
+        var y1 = curve.cpY1;
+        var x2 = curve.xEnd;
+        var y2 = curve.yEnd;
+
+        // Intersect with top
+        var x = curveXAtY(x0, y0, x1, y1, x2, y2, rect.y);
+        if (x >= rect.x && x <= rect.x + rect.width) {
+            out[0] = x;
+            out[1] = rect.y;
+            return 'top';
+        }
+        // Intersect with left
+        var y = curveYAtX(x0, y0, x1, y1, x2, y2, rect.x);
+        if (y >= rect.y && y <= rect.y + rect.height) {
+            out[0] = rect.x;
+            out[1] = y;
+            return 'left';
+        }
+        // Intersect with bottom
+        var x = curveXAtY(x0, y0, x1, y1, x2, y2, rect.y + rect.height);
+        if (x >= rect.x && x <= rect.x + rect.width) {
+            out[0] = x;
+            out[1] = rect.y + rect.height;
+            return 'bottom';
+        }
+        // Intersect with right
+        var y = curveYAtX(x0, y0, x1, y1, x2, y2, rect.x + rect.width);
+        if (y >= rect.y && y <= rect.y + rect.height) {
+            out[0] = rect.x + rect.width;
+            out[1] = y;
+            return 'right';
+        }
+    }
+
     return {
-        lineRect: lineRect
+        lineRect: lineRect,
+
+        curveRect: curveRect
     }
 });

@@ -8,6 +8,33 @@ define(function (require) {
 
     var renderHeaderBar = etpl.compile(require('text!../html/headerbar.html'));
 
+    var levels = [
+        {
+            position: 0,
+            title: '僵尸粉'
+        },
+        {
+            position: 8,
+            title: '初级粉'
+        },
+        {
+            position: 20,
+            title: '中级粉'
+        },
+        {
+            position: 40,
+            title: '高级粉'
+        },
+        {
+            position: 60,
+            title: '顶级粉'
+        },
+        {
+            position: 90,
+            title: '私生粉'
+        }
+    ];
+
     var HeaderBar = function () {
 
         Component.call(this);
@@ -44,48 +71,37 @@ define(function (require) {
                 mainEntity = data.entities[i];
             }
         }
+        for (var i = 0; i < levels.length; i++) {
+            if (i === levels.length - 1) {
+                levels[i].interval = 100 - levels[i].position;
+            } else {
+                levels[i].interval = levels[i + 1].position - levels[i].position;
+            }
+        }
         this.render({
-            name: mainEntity.name
+            name: mainEntity.name,
+            levels: levels
         });
     };
 
     HeaderBar.prototype.render = function (data) {
         this.el.innerHTML = renderHeaderBar(data);
-        var self = this;
-        util.addEventListener(Sizzle('.bkg-collapse', this.el)[0], 'click', function () {
-            self.toggleGraphCollapse();
-        });
+
+        this._$levels = Sizzle('.bkg-level', this.el);
     };
 
-    HeaderBar.prototype.toggleGraphCollapse = function () {
-        var graphMain = this._kgraph.getComponentByType('GRAPH');
-        if (graphMain) {
-            var buttonInner = Sizzle('.bkg-collapse-checkbox-inner', this.el)[0];
-            var label = Sizzle('.bkg-collapse-label', this.el)[0];
-            if (this._graphCollapsed) {
-                buttonInner.style.left = '17px';
-                label.innerHTML = '全部收拢';
-                graphMain.uncollapse();
-            } else {
-                buttonInner.style.left = '0px';
-                label.innerHTML = '全部展开';
-                graphMain.collapse();
-            }
-            this._graphCollapsed = !this._graphCollapsed;
-        }
-    }
-
     HeaderBar.prototype.setExplorePercent = function (percent) {
-        percent = percent * 100;
+        percent = Math.max(percent * 100, 1);
         Sizzle('.bkg-explore-percent-bar-inner', this.el)[0].style.width = percent + '%';
-        var tipDom = Sizzle('.bkg-explore-percent-tip', this.el)[0];
-        if (percent === 100) {
-            tipDom.style.fontSize = '12px';
-        } else {
-            tipDom.style.fontSize = '14px';
+
+        for (var i = 0; i < levels.length; i++) {
+            util.removeClass(this._$levels[i], 'bkg-active');
         }
-        tipDom.innerHTML = Math.round(percent);
-        tipDom.style.left = percent + '%';
+        for (var i = 0; i < levels.length - 1; i++) {
+            if (levels[i].position <= percent && levels[i + 1].position > percent) {
+                util.addClass(this._$levels[i], 'bkg-active');
+            }
+        }
     }
 
     return HeaderBar;

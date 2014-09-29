@@ -1,14 +1,15 @@
 <h1>${name} <span style="font-weight:normal;">知识图谱</span></h1>
 <div class="bkg-explore-percent">
-    <span>探索层级</span>
     <span class="bkg-explore-percent-bar">
         <span class="bkg-explore-percent-bar-inner"></span>
-        <span class="bkg-explore-percent-tip"></span>
+        <!-- for: ${levels} as ${level}, ${index} -->
+        <div class="bkg-milestone" style="left:${level.position}%;"></div>
+        <!-- /for -->
     </span>
-</div>
-<div class="bkg-collapse">
-    <span class="bkg-collapse-checkbox">
-        <span class="bkg-collapse-checkbox-inner"></span>
-    </span>
-    <span class="bkg-collapse-label">全部展开</span>
+    <!-- for: ${levels} as ${level}, ${index} -->
+    <div class="bkg-level-${index} bkg-level" style="width:${level.interval}%; left:${level.position}%">
+        <div class="bkg-level-icon"></div>
+        <div class="bkg-level-title">${level.title}</div>
+    </div>
+    <!-- /for -->
 </div>

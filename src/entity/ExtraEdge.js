@@ -31,7 +31,7 @@ define(function (require) {
 
         this.style = {
             color: '#0e90fe',
-            opacity: 0.2,
+            opacity: 0.15,
             labelColor: 'white'
         };
         this.highlightStyle = {
@@ -47,6 +47,8 @@ define(function (require) {
         }
     };
 
+    ExtraEdgeEntity.prototype.hidden = true;
+
     ExtraEdgeEntity.prototype.initialize = function (zr) {
         this._curveShape = new BezierCurveShape({
             style: {
@@ -57,8 +59,8 @@ define(function (require) {
                 cpX1: 0,
                 cpY1: 0,
                 lineWidth: 1,
-                opacity: this.style.opacity,
-                strokeColor: this.style.color
+                opacity: this.highlightStyle.opacity,
+                strokeColor: this.highlightStyle.color
             },
             highlightStyle: {
                 opacity: 0
@@ -72,9 +74,9 @@ define(function (require) {
                 text: this.label,
                 textPosition: 'right',
                 textFont: '12px 微软雅黑',
-                textColor: this.style.labelColor,
-                color: this.style.color,
-                opacity: this.style.opacity,
+                textColor: this.highlightStyle.labelColor,
+                color: this.highlightStyle.color,
+                opacity: this.highlightStyle.opacity,
                 x: 0,
                 y: 0,
                 r: 10
@@ -82,7 +84,6 @@ define(function (require) {
             highlightStyle: {
                 opacity: 0
             },
-            ignore: true,
             z: 0,
             zlevel: 0
         });
@@ -97,44 +98,27 @@ define(function (require) {
         if (this.sourceEntity && this.targetEntity) {
             this._setCurvePoints(
                 this.sourceEntity.el.position,
-                this.targetEntity.el.position
+                this.targetEntity.el.position,
+                1
             );
         }
         this.el.modSelf();
     };
 
     ExtraEdgeEntity.prototype.highlight = function () {
-        this._curveShape.style.strokeColor = this.highlightStyle.color;
-        this._curveShape.style.opacity = this.highlightStyle.opacity;
-        this._curveShape.zlevel = 3;
-        if (this._labelShape) {
-            this._labelShape.style.color = this.highlightStyle.labelColor
-            this._labelShape.style.textColor = this.highlightStyle.labelColor;
-            this._labelShape.style.opacity = this.highlightStyle.opacity;
-            this._labelShape.zlevel = 3;
-            this._labelShape.ignore = false;
-        }
-        this.el.modSelf();
+        this.hidden = false;
     };
 
     ExtraEdgeEntity.prototype.lowlight = function () {
-        this._curveShape.style.strokeColor = this.style.color;
-        this._curveShape.style.opacity = this.style.opacity;
-        this._curveShape.zlevel = 0;
-        if (this._labelShape) {
-            this._labelShape.style.opacity = this.style.opacity;
-            this._labelShape.style.color = this.style.color;
-            this._labelShape.style.textColor = this.style.labelColor;
-            this._labelShape.zlevel = 0;
-            this._labelShape.ignore = true;
-        }
-        this.el.modSelf();
+        this.hidden = true;
     };
 
     ExtraEdgeEntity.prototype.animateLength = function (zr, time, delay, fromEntity, cb) {
+        var inv = 1;
         if (fromEntity === this.targetEntity) {
             vec2.copy(v1, this.targetEntity.el.position);
             vec2.copy(v2, this.sourceEntity.el.position);
+            inv = -1;
         } else {
             vec2.copy(v1, this.sourceEntity.el.position);
             vec2.copy(v2, this.targetEntity.el.position);
@@ -142,7 +126,7 @@ define(function (require) {
         var self = this;
         var obj = {t: 0};
         var curve = this._curveShape;
-        this._setCurvePoints(v1, v2);
+        this._setCurvePoints(v1, v2, inv);
 
         var x0 = curve.style.xStart;
         var x1 = curve.style.cpX1;
@@ -162,7 +146,7 @@ define(function (require) {
                 v[1] = curveTool.quadraticAt(
                     y0, y1, y2, obj.t
                 );
-                self._setCurvePoints(v1, v);
+                self._setCurvePoints(v1, v, inv);
                 self.el.modSelf();
                 zr.refreshNextFrame();
             })
@@ -177,7 +161,7 @@ define(function (require) {
         return this._curveShape.getRect(this._curveShape.style);
     }
 
-    ExtraEdgeEntity.prototype._setCurvePoints = function (p1, p2) {
+    ExtraEdgeEntity.prototype._setCurvePoints = function (p1, p2, inv) {
         var sourceEntity = this.sourceEntity;
         var targetEntity = this.targetEntity;
 
@@ -187,8 +171,10 @@ define(function (require) {
         curve.style.xEnd = p2[0];
         curve.style.yEnd = p2[1];
 
-        curve.style.cpX1 = (p1[0] + p2[0]) / 2 - (p2[1] - p1[1]) / 4;
-        curve.style.cpY1 = (p1[1] + p2[1]) / 2 - (p1[0] - p2[0]) / 4;
+        inv = inv || 1;
+
+        curve.style.cpX1 = (p1[0] + p2[0]) / 2 - inv * (p2[1] - p1[1]) / 4;
+        curve.style.cpY1 = (p1[1] + p2[1]) / 2 - inv * (p1[0] - p2[0]) / 4;
 
         if (this._labelShape) {
             var labelShape = this._labelShape;
@@ -203,7 +189,23 @@ define(function (require) {
 
     ExtraEdgeEntity.prototype.intersectRect = function (rect, out) {
 
-        return intersect.lineRect(this._curveShape.style, rect, out);
+        return intersect.curveRect(this._curveShape.style, rect, out);
+    }
+
+    ExtraEdgeEntity.prototype.isInsideRect = function (rect) {
+        var style = this._curveShape.style;
+        return isPointInRect(style.xStart, style.yStart, rect)
+            || isPointInRect(style.cpX1, style.cpY1, rect)
+            || isPointInRect(style.xEnd, style.yEnd, rect);
+    }
+
+    function isPointInRect(x, y, rect) {
+        return !(
+            x > rect.x + rect.width
+            || y > rect.y + rect.height
+            || x < rect.x
+            || y < rect.y
+        );
     }
 
     zrUtil.inherits(ExtraEdgeEntity, Entity);

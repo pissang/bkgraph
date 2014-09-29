@@ -52,7 +52,7 @@ define(function (require) {
                 xEnd: 0,
                 yEnd: 0,
                 lineWidth: 1,
-                opacity: 1,
+                opacity: 0.7,
                 strokeColor: this.style.color
             },
             highlightStyle: {
@@ -109,6 +109,7 @@ define(function (require) {
     EdgeEntity.prototype.lowlight = function () {
         this._lineShape.style.strokeColor = this.style.color;
         this._lineShape.zlevel = 0;
+        this._lineShape.style.opacity = 0.7;
         if (this._labelShape) {
             this._labelShape.style.color = this.style.color;
             this._labelShape.style.textColor = this.style.labelColor;
@@ -151,11 +152,14 @@ define(function (require) {
         var p1 = sourceEntity.el.position;
         var p2 = targetEntity.el.position;
 
-        vec2.sub(v, p1, p2);
-        vec2.normalize(v, v);
+        // vec2.sub(v, p1, p2);
+        // vec2.normalize(v, v);
 
-        vec2.scaleAndAdd(v1, p1, v, -sourceEntity.radius);
-        vec2.scaleAndAdd(v2, p2, v, targetEntity.radius);
+        // vec2.scaleAndAdd(v1, p1, v, -sourceEntity.radius);
+        // vec2.scaleAndAdd(v2, p2, v, targetEntity.radius);
+        
+        vec2.copy(v1, p1);
+        vec2.copy(v2, p2);
 
         var line = this._lineShape;
     }
@@ -190,6 +194,21 @@ define(function (require) {
     EdgeEntity.prototype.intersectRect = function (rect, out) {
 
         return intersect.lineRect(this._lineShape.style, rect, out);
+    }
+
+    EdgeEntity.prototype.isInsideRect = function (rect) {
+        var style = this._lineShape.style;
+        return isPointInRect(style.xStart, style.yStart, rect)
+            || isPointInRect(style.xEnd, style.yEnd, rect);
+    }
+
+    function isPointInRect(x, y, rect) {
+        return !(
+            x > rect.x + rect.width
+            || y > rect.y + rect.height
+            || x < rect.x
+            || y < rect.y
+        );
     }
 
     zrUtil.inherits(EdgeEntity, Entity);

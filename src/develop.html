@@ -50,6 +50,8 @@
                     }
                     document.getElementById('save').onclick = function () {
                         var jsonStr = JSON.stringify(graphMain.toJSON(), null, 2);
+
+                        
                         var blob = new Blob([jsonStr], {
                             type: 'text/plain;charset=utf-8'
                         });

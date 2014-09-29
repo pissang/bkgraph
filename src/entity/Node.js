@@ -37,7 +37,7 @@ define(function (require) {
         this.highlightStyle = {
             color: '#f9dd05',
             lineWidth: 5,
-            labelColor: '#27408a'
+            labelColor: 'black'
         };
         if (opts.style) {
             zrUtil.merge(this.style, opts.style)
@@ -79,24 +79,14 @@ define(function (require) {
                 self.dispatch('click');
             }
         });
-        
-        var contentGroup = new Group();
-        var clipShape = new CircleShape({
-            style: {
-                r: baseRadius,
-                x: 0,
-                y: 0
-            }
-        });
-        // contentGroup.clipShape = clipShape;
 
-        // var image = new Image();
-        // image.onload = function () {
-        //     imageShape.style.image = image;
-        //     imageShape.modSelf();
-        //     zr.refreshNextFrame();
-        // }
-        // image.src = this.image;
+        var image = new Image();
+        image.onload = function () {
+            imageShape.style.image = image;
+            imageShape.modSelf();
+            zr.refreshNextFrame();
+        }
+        image.src = this.image;
 
         var imageShape = new ImageShape({
             style: {
@@ -133,19 +123,17 @@ define(function (require) {
             });
         }
 
-        contentGroup.addChild(imageShape);
+        this.el.addChild(imageShape);
 
         if (labelShape) {
-            contentGroup.addChild(labelShape);
+            this.el.addChild(labelShape);
         }
 
-        this.el.addChild(contentGroup);
         this.el.addChild(outlineShape);
 
         this._imageShape = imageShape;
         this._labelShape = labelShape;
         this._outlineShape = outlineShape;
-        this._clipShape = clipShape;
 
         this.el.scale[0] = this.el.scale[1] = this.radius / baseRadius;
     }
@@ -268,22 +256,20 @@ define(function (require) {
 
     var min = [0, 0];
     var max = [0, 0];
-    NodeEntity.prototype.isInsideViewport = function (zr) {
-        var layer = zr.painter.getLayer(0);
-        var width = zr.getWidth();
-        var height = zr.getHeight();
+    NodeEntity.prototype.isInsideRect = function (rect) {
         var r = this.radius + this.style.lineWidth;
 
         min[0] = this.el.position[0] - r;
         min[1] = this.el.position[1] - r;
         max[0] = this.el.position[0] + r;
         max[1] = this.el.position[1] + r;
-        if (layer.transform) {
-            vec2.applyTransform(min, min, layer.transform);
-            vec2.applyTransform(max, max, layer.transform);
-        }
 
-        return !(min[0] > width || min[1] > height || max[0] < 0 || max[1] < 0);
+        return !(
+            min[0] > rect.x + rect.width
+            || min[1] > rect.y + rect.height
+            || max[0] < rect.x
+            || max[1] < rect.y
+        );
     }
 
     zrUtil.inherits(NodeEntity, Entity);

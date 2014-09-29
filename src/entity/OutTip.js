@@ -13,16 +13,18 @@ define(function (require) {
 
         this.label = opts.label || '';
 
-        this.color = opts.color || 'green';
+        this.color = opts.color || '#f9dd05';
 
         this.el = new RectShape({
             style: {
-                x: 0,
+                x: -25,
                 y: 0,
                 width: 50,
                 height: 25,
                 radius: 5,
                 textPosition: 'inside',
+                textColor: 'black',
+                textFont: '12px 微软雅黑',
                 opacity: 0.7
             },
             highlightStyle: {
