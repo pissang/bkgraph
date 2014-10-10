@@ -49,14 +49,14 @@ define(function (require) {
 
     HeaderBar.prototype.type = 'HEADERBAR';
 
-    HeaderBar.prototype.initialize = function (kg) {
+    HeaderBar.prototype.initialize = function (kg, rawData) {
 
         var el = this.el;
         el.className = 'bkg-headerbar';
 
         this._kgraph = kg;
 
-        this.setData(kg.getRawData());
+        this.setData(rawData);
 
         var graphMain = kg.getComponentByType('GRAPH');
         if (graphMain) {
@@ -104,6 +104,8 @@ define(function (require) {
             }
         }
     }
+
+    zrUtil.inherits(HeaderBar, Component);
 
     return HeaderBar;
 });

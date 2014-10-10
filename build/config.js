@@ -1,7 +1,7 @@
 {
     // appDir: './',
     baseUrl: '../src',
-    optimize: 'none',
+    // optimize: 'none',
     paths: {
         'etpl': '../dep/etpl/src/main',
         'Sizzle': '../dep/sizzle',

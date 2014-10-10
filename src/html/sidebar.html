@@ -1,5 +1,5 @@
 <div class="bkg-entity-detail">
-    <img class="bkg-person-pic" src="${image}" />
+    <img class="bkg-person-pic" src="${imageSquare}" />
     <div class="bkg-person-info">
         <h4>${name}</h4>
         <p><b>出生:</b> ${birthDate|raw}</p>
@@ -29,7 +29,7 @@
                 <div style="clear:both;"></div>
                 <!-- else -->
                 <div class="bkg-news-simple">
-                    <span class="bkg-news-title">${new.title|truncate(10)}</span>
+                    <a href="${new.url}" class="bkg-news-title">${new.title|truncate(10)}<a/>
                     <a href="${new.url}" target="_blank">${new.source}</a>
                     <span class="bkg-news-publish-time">${new.publishTime}</span>
                 </div>

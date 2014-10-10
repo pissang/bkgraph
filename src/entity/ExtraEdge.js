@@ -50,6 +50,8 @@ define(function (require) {
     ExtraEdgeEntity.prototype.hidden = true;
 
     ExtraEdgeEntity.prototype.initialize = function (zr) {
+        var self = this;
+
         this._curveShape = new BezierCurveShape({
             style: {
                 xStart: 0,
@@ -85,7 +87,16 @@ define(function (require) {
                 opacity: 0
             },
             z: 0,
-            zlevel: 0
+            zlevel: 0,
+            onclick: function () {
+                self.dispatch('click')
+            },
+            onmouseover: function () {
+                self.dispatch('mouseover');
+            },
+            onmouseout: function () {
+                self.dispatch('mouseout');
+            }
         });
 
         this.el.addChild(this._curveShape);

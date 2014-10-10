@@ -22,7 +22,7 @@ define(function (require) {
 
     SideBar.prototype.type = 'SIDEBAR';
 
-    SideBar.prototype.initialize = function (kg) {
+    SideBar.prototype.initialize = function (kg, rawData) {
         this.el.className = 'bkg-sidebar';
 
         this._$viewport = document.createElement('div');
@@ -42,8 +42,15 @@ define(function (require) {
 
         this._kgraph = kg;
 
+        // 默认显示主要实体
+        var mainEntity;
+        for (var i = 0; i < rawData.entities.length; i++) {
+            if (+rawData.entities[i].layerCounter === 0) {
+                mainEntity = rawData.entities[i];
+            }
+        }
         // 使用空数据
-        this.render({});
+        this.render(mainEntity);
 
         this.hide();
 

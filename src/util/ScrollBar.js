@@ -90,6 +90,9 @@ define(function (require) {
         scroll = Math.max(0, scroll);
 
         var max = this._contentHeight - this._viewportHeight;
+        if (max < 0) {
+            return;
+        }
         scroll = Math.min(scroll, max);
 
         this._scroll = scroll;

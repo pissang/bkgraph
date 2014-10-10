@@ -45,6 +45,8 @@ define(function (require) {
     };
 
     EdgeEntity.prototype.initialize = function (zr) {
+        var self = this;
+
         this._lineShape = new LineShape({
             style: {
                 xStart: 0,
@@ -55,13 +57,10 @@ define(function (require) {
                 opacity: 0.7,
                 strokeColor: this.style.color
             },
-            highlightStyle: {
-                opacity: 0
-            },
             z: 0,
-            zlevel: 0
+            zlevel: 0,
+            hoverable: false
         });
-
         this._labelShape = new CircleShape({
             style: {
                 text: this.label,
@@ -78,7 +77,17 @@ define(function (require) {
                 opacity: 0
             },
             z: 0,
-            zlevel: 0
+            zlevel: 0,
+            clickable: true,
+            onclick: function () {
+                self.dispatch('click')
+            },
+            onmouseover: function () {
+                self.dispatch('mouseover');
+            },
+            onmouseout: function () {
+                self.dispatch('mouseout');
+            }
         });
 
         this.el.addChild(this._lineShape);

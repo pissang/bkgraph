@@ -129,6 +129,8 @@ define(function (require) {
         this.el.style.height = h + 'px';
 
         this._zr.resize();
+
+        this._zr.refresh();
     };
 
     GraphMain.prototype.setData = function (data) {

@@ -47,6 +47,8 @@ define(function (require) {
 
         this._viewportWidth = this._$viewport.clientWidth;
 
+        this._itemWidth = Sizzle
+
         var self = this;
         util.addEventListener(this._$input, 'keydown', util.debounce(function () {
             self.filter(self._$input.value);
@@ -106,6 +108,8 @@ define(function (require) {
 
         this._isFirstPage = false;
         util.removeClass(this._$prevPageBtn, 'disable');
+
+        this._loadImage();
     }
     /**
      * 人物列表翻到上一页
@@ -126,6 +130,9 @@ define(function (require) {
 
         this._isLastPage = false;
         util.removeClass(this._$nextPageBtn, 'disable');
+
+
+        this._loadImage();
     }
 
     /**
@@ -202,6 +209,28 @@ define(function (require) {
             : util.removeClass(this._$prevPageBtn, 'disable');
 
         this._left = 0;
+
+        this._$imageList = Sizzle('li img', this._$list);
+        var $img = this._$imageList[0];
+        if ($img) {
+            var $li = $img.parentNode;
+            this._itemWidth = $li.clientWidth;
+            var style = util.getStyle($li);
+            this._itemWidth += parseInt(style['margin-left']) + parseInt(style['margin-right']);
+        }
+
+        this._loadImage();
+    }
+
+    SearchBar.prototype._loadImage = function () {
+        var start = Math.floor(this._left / this._itemWidth);
+        var end = Math.ceil((this._left + this._viewportWidth) / this._itemWidth);
+        for (var i = start; i < end; i++) {
+            var $item = this._$imageList[i];
+            if ($item && !$item.getAttribute('src')) {
+                $item.src = $item.getAttribute('data-src');
+            }
+        }
     }
 
     zrUtil.inherits(SearchBar, Component);

@@ -9,22 +9,24 @@
     <body>
         <div id='viewport'></div>
         <script src="bkgraph.js"></script>
-        <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
         <script>
-            $.get('../mock/200_f.json', function (data) {
-                if (typeof(data) === 'string') {
-                    data = JSON.parse(data);
-                }
-                var g = bkgraph.init('viewport', data, function (g) {
-                    g.addComponent(new bkgraph.SideBar());
-                    // g.addComponent(new bkgraph.SearchBar());
-                    g.addComponent(new bkgraph.HeaderBar());
-                });
+            var name = window.location.hash.slice(1);
+            name = name || '杨幂';
+            name += '_f';
 
-                window.onresize = function () {
-                    g.resize();
-                }  
-            })
+            var g = bkgraph.init('viewport', name, function (g) {
+                g.addComponent(new bkgraph.SideBar());
+                g.addComponent(new bkgraph.SearchBar());
+                g.addComponent(new bkgraph.HeaderBar());
+                
+                setTimeout(function () {
+                    g.getComponentByType('SEARCHBAR').hide();
+                }, 500);
+            });
+
+            window.onresize = function () {
+                g.resize();
+            }
         </script>
     </body>
 </html>

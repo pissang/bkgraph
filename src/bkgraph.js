@@ -23,7 +23,7 @@ define(function (require) {
         return str;
     });
 
-    var TUPU_URL = 'http://nj02-wd-knowledge45-ssd1l.nj02.baidu.com:8866/api/tupu';
+    // var TUPU_URL = 'http://nj02-wd-knowledge45-ssd1l.nj02.baidu.com:8866/api/tupu';
 
     /**
      * @alias bkgraph~BKGraph
@@ -46,16 +46,22 @@ define(function (require) {
                 
             var self = this;
 
-            jsonp(TUPU_URL, {
-                query: data
-            }, 'callback', function (res) {
-                if (res.errorCode === 200) {             
-                    self._rawData = res.data;
+            // jsonp(TUPU_URL, {
+            //     query: data
+            // }, 'callback', function (res) {
+            //     if (res.errorCode === 200) {             
+            //         self._rawData = res.data;
 
-                    self.initialize(res.data);
+            //         self.initialize(res.data);
 
-                    onsuccess && onsuccess(this);
-                }
+            //         onsuccess && onsuccess(this);
+            //     }
+            // });
+            http.get('../mock/person/' + data, function (data) {
+                data = JSON.parse(data);
+                self._rawData = data;
+                self.initialize(data);
+                onsuccess && onsuccess(self);
             });
         } else {
             this._rawData = data;
