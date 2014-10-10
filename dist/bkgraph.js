@@ -2690,6 +2690,10 @@ define(
         var ArrayCtor = typeof Float32Array === 'undefined'
             ? Array
             : Float32Array;
+
+        /**
+         * @typedef {Float32Array|Array.<number>} Vector2
+         */
         /**
          * 二维向量类
          * @exports zrender/tool/vector
@@ -2699,7 +2703,7 @@ define(
              * 创建一个向量
              * @param {number} [x=0]
              * @param {number} [y=0]
-             * @return {Float32Array|Array.<number>}
+             * @return {Vector2}
              */
             create: function (x, y) {
                 var out = new ArrayCtor(2);
@@ -2710,8 +2714,8 @@ define(
 
             /**
              * 复制一个向量
-             * @return {Float32Array|Array.<number>} out
-             * @return {Float32Array|Array.<number>} v
+             * @return {Vector2} out
+             * @return {Vector2} v
              */
             copy: function (out, v) {
                 out[0] = v[0];
@@ -2721,10 +2725,10 @@ define(
 
             /**
              * 设置向量的两个项
-             * @param {Float32Array|Array.<number>} out
+             * @param {Vector2} out
              * @param {number} a
              * @param {number} b
-             * @return {Float32Array|Array.<number>} 结果
+             * @return {Vector2} 结果
              */
             set: function (out, a, b) {
                 out[0] = a;
@@ -2734,9 +2738,9 @@ define(
 
             /**
              * 向量相加
-             * @param {Float32Array|Array.<number>} out
-             * @param {Float32Array|Array.<number>} v1
-             * @param {Float32Array|Array.<number>} v2
+             * @param {Vector2} out
+             * @param {Vector2} v1
+             * @param {Vector2} v2
              */
             add: function (out, v1, v2) {
                 out[0] = v1[0] + v2[0];
@@ -2746,9 +2750,9 @@ define(
 
             /**
              * 向量缩放后相加
-             * @param {Float32Array|Array.<number>} out
-             * @param {Float32Array|Array.<number>} v1
-             * @param {Float32Array|Array.<number>} v2
+             * @param {Vector2} out
+             * @param {Vector2} v1
+             * @param {Vector2} v2
              * @param {number} a
              */
             scaleAndAdd: function (out, v1, v2, a) {
@@ -2759,9 +2763,9 @@ define(
 
             /**
              * 向量相减
-             * @param {Float32Array|Array.<number>} out
-             * @param {Float32Array|Array.<number>} v1
-             * @param {Float32Array|Array.<number>} v2
+             * @param {Vector2} out
+             * @param {Vector2} v1
+             * @param {Vector2} v2
              */
             sub: function (out, v1, v2) {
                 out[0] = v1[0] - v2[0];
@@ -2771,7 +2775,7 @@ define(
 
             /**
              * 向量长度
-             * @param {Float32Array|Array.<number>} v
+             * @param {Vector2} v
              * @return {number}
              */
             len: function (v) {
@@ -2780,7 +2784,7 @@ define(
 
             /**
              * 向量长度平方
-             * @param {Float32Array|Array.<number>} v
+             * @param {Vector2} v
              * @return {number}
              */
             lenSquare: function (v) {
@@ -2789,9 +2793,9 @@ define(
 
             /**
              * 向量乘法
-             * @param {Float32Array|Array.<number>} out
-             * @param {Float32Array|Array.<number>} v1
-             * @param {Float32Array|Array.<number>} v2
+             * @param {Vector2} out
+             * @param {Vector2} v1
+             * @param {Vector2} v2
              */
             mul: function (out, v1, v2) {
                 out[0] = v1[0] * v2[0];
@@ -2801,9 +2805,9 @@ define(
 
             /**
              * 向量除法
-             * @param {Float32Array|Array.<number>} out
-             * @param {Float32Array|Array.<number>} v1
-             * @param {Float32Array|Array.<number>} v2
+             * @param {Vector2} out
+             * @param {Vector2} v1
+             * @param {Vector2} v2
              */
             div: function (out, v1, v2) {
                 out[0] = v1[0] / v2[0];
@@ -2813,8 +2817,8 @@ define(
 
             /**
              * 向量点乘
-             * @param {Float32Array|Array.<number>} v1
-             * @param {Float32Array|Array.<number>} v2
+             * @param {Vector2} v1
+             * @param {Vector2} v2
              * @return {number}
              */
             dot: function (v1, v2) {
@@ -2823,8 +2827,8 @@ define(
 
             /**
              * 向量缩放
-             * @param {Float32Array|Array.<number>} out
-             * @param {Float32Array|Array.<number>} v
+             * @param {Vector2} out
+             * @param {Vector2} v
              * @param {number} s
              */
             scale: function (out, v, s) {
@@ -2835,8 +2839,8 @@ define(
 
             /**
              * 向量归一化
-             * @param {Float32Array|Array.<number>} out
-             * @param {Float32Array|Array.<number>} v
+             * @param {Vector2} out
+             * @param {Vector2} v
              */
             normalize: function (out, v) {
                 var d = vector.len(v);
@@ -2853,8 +2857,8 @@ define(
 
             /**
              * 计算向量间距离
-             * @param {Float32Array|Array.<number>} v1
-             * @param {Float32Array|Array.<number>} v2
+             * @param {Vector2} v1
+             * @param {Vector2} v2
              * @return {number}
              */
             distance: function (v1, v2) {
@@ -2866,8 +2870,8 @@ define(
 
             /**
              * 向量距离平方
-             * @param {Float32Array|Array.<number>} v1
-             * @param {Float32Array|Array.<number>} v2
+             * @param {Vector2} v1
+             * @param {Vector2} v2
              * @return {number}
              */
             distanceSquare: function (v1, v2) {
@@ -2877,8 +2881,8 @@ define(
 
             /**
              * 求负向量
-             * @param {Float32Array|Array.<number>} out
-             * @param {Float32Array|Array.<number>} v
+             * @param {Vector2} out
+             * @param {Vector2} v
              */
             negate: function (out, v) {
                 out[0] = -v[0];
@@ -2888,9 +2892,9 @@ define(
 
             /**
              * 插值两个点
-             * @param {Float32Array|Array.<number>} out
-             * @param {Float32Array|Array.<number>} v1
-             * @param {Float32Array|Array.<number>} v2
+             * @param {Vector2} out
+             * @param {Vector2} v1
+             * @param {Vector2} v2
              * @param {number} t
              */
             lerp: function (out, v1, v2, t) {
@@ -2903,9 +2907,9 @@ define(
             
             /**
              * 矩阵左乘向量
-             * @param {Float32Array|Array.<number>} out
-             * @param {Float32Array|Array.<number>} v
-             * @param {Float32Array|Array.<number>} m
+             * @param {Vector2} out
+             * @param {Vector2} v
+             * @param {Vector2} m
              */
             applyTransform: function (out, v, m) {
                 var x = v[0];
@@ -2916,9 +2920,9 @@ define(
             },
             /**
              * 求两个向量最小值
-             * @param  {Float32Array|Array.<number>} out
-             * @param  {Float32Array|Array.<number>} v1
-             * @param  {Float32Array|Array.<number>} v2
+             * @param  {Vector2} out
+             * @param  {Vector2} v1
+             * @param  {Vector2} v2
              */
             min: function (out, v1, v2) {
                 out[0] = Math.min(v1[0], v2[0]);
@@ -2927,9 +2931,9 @@ define(
             },
             /**
              * 求两个向量最大值
-             * @param  {Float32Array|Array.<number>} out
-             * @param  {Float32Array|Array.<number>} v1
-             * @param  {Float32Array|Array.<number>} v2
+             * @param  {Vector2} out
+             * @param  {Vector2} v1
+             * @param  {Vector2} v2
              */
             max: function (out, v1, v2) {
                 out[0] = Math.max(v1[0], v2[0]);
@@ -2942,7 +2946,7 @@ define(
         vector.lengthSquare = vector.lenSquare;
         vector.dist = vector.distance;
         vector.distSquare = vector.distanceSquare;
-
+        
         return vector;
     }
 );
@@ -3178,7 +3182,7 @@ define(
                 ) {
 
                     // 判断没有发生拖拽才触发click事件
-                    if (!this._noClick) {
+                    if (this._clickThreshold < 5) {
                         this._dispatchAgency(_lastHover, EVENT.CLICK, event);
                     }
                 }
@@ -3201,7 +3205,7 @@ define(
                 ) {
 
                     // 判断没有发生拖拽才触发dblclick事件
-                    if (!this._noClick) {
+                    if (this._clickThreshold < 5) {
                         this._dispatchAgency(_lastHover, EVENT.DBLCLICK, event);
                     }
                 }
@@ -3270,7 +3274,7 @@ define(
                     return;
                 }
                 // 拖拽不触发click事件
-                this._noClick = true;
+                this._clickThreshold++;
 
                 event = this._zrenderEventFixed(event);
                 this._lastX = this._mouseX;
@@ -3398,8 +3402,8 @@ define(
              * @param {Event} event
              */
             mousedown: function (event) {
-                // 重置 noClick flag
-                this._noClick = false;
+                // 重置 clickThreshold
+                this._clickThreshold = 0;
 
                 if (this._lastDownButton == 2) {
                     this._lastDownButton = event.button;
@@ -4715,7 +4719,18 @@ define(
                     );
                 // 扇形
                 case 'sector':
-                    return isInsideSector(area, x, y);
+                    var startAngle = area.startAngle * Math.PI / 180;
+                    var endAngle = area.endAngle * Math.PI / 180;
+                    if (!area.clockwise) {
+                        startAngle = -startAngle;
+                        endAngle = -endAngle;
+                    }
+                    return isInsideSector(
+                        area.x, area.y, area.r0, area.r,
+                        startAngle, endAngle,
+                        !area.clockwise,
+                        x, y
+                    );
                 // 多边形
                 case 'path':
                     return isInsidePath(
@@ -4913,8 +4928,9 @@ define(
                 return false;
             }
             if (anticlockwise) {
+                var tmp = startAngle;
                 startAngle = normalizeRadian(endAngle);
-                endAngle = normalizeRadian(startAngle);
+                endAngle = normalizeRadian(tmp);
             } else {
                 startAngle = normalizeRadian(startAngle);
                 endAngle = normalizeRadian(endAngle);
@@ -4971,29 +4987,13 @@ define(
         /**
          * 扇形包含判断
          */
-        function isInsideSector(area, x, y) {
-            if (!isInsideRing(area.x, area.y, area.r0 || 0, area.r, x, y)) {
-                // 大圆外或者小圆内直接false
-                return false;
-            }
-
-            // 判断夹角
-            if (Math.abs(area.endAngle - area.startAngle) >= 360) {
-                // 大于360度的扇形，在环内就为true
-                return true;
-            }
-            
-            var angle = (360
-                         - Math.atan2(y - area.y, x - area.x) / Math.PI
-                         * 180)
-                         % 360;
-            var endA = (360 + area.endAngle) % 360;
-            var startA = (360 + area.startAngle) % 360;
-            if (endA > startA) {
-                return (angle >= startA && angle <= endA);
-            }
-
-            return !(angle >= endA && angle <= startA);
+        function isInsideSector(
+            cx, cy, r0, r, startAngle, endAngle, anticlockwise, x, y
+        ) {
+            return isInsideArcStroke(
+                cx, cy, (r0 + r) / 2, startAngle, endAngle, anticlockwise,
+                r - r0, x, y
+            );
         }
 
         /**
@@ -5151,8 +5151,9 @@ define(
             roots[1] = tmp;
 
             if (anticlockwise) {
+                var tmp = startAngle;
                 startAngle = normalizeRadian(endAngle);
-                endAngle = normalizeRadian(startAngle);
+                endAngle = normalizeRadian(tmp);
             } else {
                 startAngle = normalizeRadian(startAngle);
                 endAngle = normalizeRadian(endAngle);
@@ -9170,6 +9171,7 @@ define('zrender/Group',['require','./tool/guid','./tool/util','./mixin/Transform
      * 添加子节点，可以是Shape或者Group
      * @param {module:zrender/Group|module:zrender/shape/Base} child
      */
+    // TODO Type Check
     Group.prototype.addChild = function(child) {
         if (child == this) {
             return;
@@ -9199,18 +9201,19 @@ define('zrender/Group',['require','./tool/guid','./tool/util','./mixin/Transform
      * 移除子节点
      * @param {module:zrender/Group|module:zrender/shape/Base} child
      */
+    // TODO Type Check
     Group.prototype.removeChild = function(child) {
         var idx = util.indexOf(this._children, child);
 
         this._children.splice(idx, 1);
         child.parent = null;
 
-        if (child._storage) {
+        if (this._storage) {
             
             this._storage.delFromMap(child.id);
 
             if (child instanceof Group) {
-                child.delChildrenFromStorage(child._storage);
+                child.delChildrenFromStorage(this._storage);
             }
         }
     };
@@ -12082,7 +12085,7 @@ define('echarts/layout/Force',['require','./forceLayoutWorker','zrender/tool/vec
         var len = graph.nodes.length;
         var positionArr = new ArrayCtor(len * 2);
         var massArr = new ArrayCtor(len);
-        var radiusArr = new ArrayCtor(len);
+        var sizeArr = new ArrayCtor(len);
 
         for (var i = 0; i < len; i++) {
             var n = graph.nodes[i];
@@ -12090,8 +12093,8 @@ define('echarts/layout/Force',['require','./forceLayoutWorker','zrender/tool/vec
             positionArr[i * 2 + 1] = n.layout.position[1];
             massArr[i] = typeof(n.layout.mass) === 'undefined'
                 ? 1 : n.layout.mass;
-            radiusArr[i] = typeof(n.layout.radius) === 'undefined'
-                ? 1 : n.layout.radius;
+            sizeArr[i] = typeof(n.layout.size) === 'undefined'
+                ? 1 : n.layout.size;
 
             n.layout.__index = i;
         }
@@ -12114,7 +12117,7 @@ define('echarts/layout/Force',['require','./forceLayoutWorker','zrender/tool/vec
                 cmd: 'init',
                 nodesPosition: positionArr,
                 nodesMass: massArr,
-                nodesSize: radiusArr,
+                nodesSize: sizeArr,
                 edges: edgeArr,
                 edgesWeight: edgeWeightArr,
                 token: this._token
@@ -12122,7 +12125,7 @@ define('echarts/layout/Force',['require','./forceLayoutWorker','zrender/tool/vec
         }
         else {
             this._layout.setToken(this._token);
-            this._layout.initNodes(positionArr, massArr, radiusArr);
+            this._layout.initNodes(positionArr, massArr, sizeArr);
             this._layout.initEdges(edgeArr, edgeWeightArr);   
         }
 
@@ -12238,6 +12241,14 @@ define('echarts/data/Graph',['require','zrender/tool/util'],function(require) {
     };
 
     /**
+     * 是否是有向图
+     * @return {boolean}
+     */
+    Graph.prototype.isDirected = function () {
+        return this._directed;
+    }
+
+    /**
      * 添加一个新的节点
      * @param {string} id 节点名称
      * @param {*} [data] 存储的数据
@@ -12294,7 +12305,9 @@ define('echarts/data/Graph',['require','zrender/tool/util'],function(require) {
             n2.inEdges.push(edge);   
         }
         n1.edges.push(edge);
-        n2.edges.push(edge);
+        if (n1 !== n2) {
+            n2.edges.push(edge);
+        }
 
         this.edges.push(edge);
         this._edgesMap[key] = edge;
@@ -12315,7 +12328,9 @@ define('echarts/data/Graph',['require','zrender/tool/util'],function(require) {
             n2.inEdges.splice(util.indexOf(n2.inEdges, edge), 1);   
         }
         n1.edges.splice(util.indexOf(n1.edges, edge), 1);
-        n2.edges.splice(util.indexOf(n2.edges, edge), 1);
+        if (n1 !== n2) {
+            n2.edges.splice(util.indexOf(n2.edges, edge), 1);
+        }
 
         delete this._edgesMap[key];
         this.edges.splice(util.indexOf(this.edges, edge), 1);
@@ -12360,7 +12375,7 @@ define('echarts/data/Graph',['require','zrender/tool/util'],function(require) {
 
         for (var i = 0; i < this.edges.length;) {
             var edge = this.edges[i];
-            if (edge.node1 == node || edge.node2 == node) {
+            if (edge.node1 === node || edge.node2 === node) {
                 this.removeEdge(edge);
             } else {
                 i++;
@@ -12371,22 +12386,22 @@ define('echarts/data/Graph',['require','zrender/tool/util'],function(require) {
     /**
      * 线性遍历所有节点
      * @param  {Function} cb
-     * @param  {*}   context
+     * @param  {*}   [context]
      */
     Graph.prototype.eachNode = function (cb, context) {
         for (var i = 0; i < this.nodes.length; i++) {
-            cb.call(context, this.nodes[i]);
+            cb.call(context, this.nodes[i], i);
         }
     };
     
     /**
      * 线性遍历所有边
      * @param  {Function} cb
-     * @param  {*}   context
+     * @param  {*}   [context]
      */
     Graph.prototype.eachEdge = function (cb, context) {
         for (var i = 0; i < this.edges.length; i++) {
-            cb.call(context, this.edges[i]);
+            cb.call(context, this.edges[i], i);
         }
     };
     
@@ -12403,6 +12418,10 @@ define('echarts/data/Graph',['require','zrender/tool/util'],function(require) {
     
     /**
      * 广度优先遍历
+     * @param {Function} cb
+     * @param {module:echarts/data/Graph~Node} startNode 遍历起始节点
+     * @param {string} [direction=none] none, in, out 指定遍历边
+     * @param {*} [context] 回调函数调用context
      */
     Graph.prototype.breadthFirstTraverse = function (
         cb, startNode, direction, context
@@ -12570,7 +12589,7 @@ define('echarts/data/Graph',['require','zrender/tool/util'],function(require) {
      * 如果是有向图被写到`edge.data.sourceWeight`和`edge.data.targetWeight`
      * 
      * @method module:echarts/data/Graph.fromMatrix
-     * @param {Array.<Object>} nodesData 节点信息，必须有`id`属性
+     * @param {Array.<Object>} nodesData 节点信息，必须有`id`属性, 会保存到`node.data`中
      * @param {Array} matrix 邻接矩阵
      * @param {boolean} directed 是否是有向图
      * @return {module:echarts/data/Graph}
@@ -12589,7 +12608,9 @@ define('echarts/data/Graph',['require','zrender/tool/util'],function(require) {
         var graph = new Graph(directed);
 
         for (var i = 0; i < size; i++) {
-            var node = graph.addNode(nodesData[i].id, {});
+            var node = graph.addNode(nodesData[i].id, nodesData[i]);
+            // TODO
+            // node.data已经有value的情况
             node.data.value = 0;
             if (directed) {
                 node.data.outValue = node.data.inValue = 0;
@@ -12599,11 +12620,11 @@ define('echarts/data/Graph',['require','zrender/tool/util'],function(require) {
             for (var j = 0; j < size; j++) {
                 var item = matrix[i][j];
                 if (directed) {
-                    graph.nodes[i].outValue += item;
-                    graph.nodes[j].inValue += item;
+                    graph.nodes[i].data.outValue += item;
+                    graph.nodes[j].data.inValue += item;
                 }
-                graph.nodes[i].value += item;
-                graph.nodes[j].value += item;
+                graph.nodes[i].data.value += item;
+                graph.nodes[j].data.value += item;
             }
         }
 
@@ -12624,13 +12645,15 @@ define('echarts/data/Graph',['require','zrender/tool/util'],function(require) {
                 if (i !== j) {
                     if (directed) {
                         var inEdge = graph.addEdge(n2, n1, {});
-                        inEdge.sourceWeight = matrix[j][i];
-                        inEdge.targetWeight = item;
+                        inEdge.data.sourceWeight = matrix[j][i];
+                        inEdge.data.targetWeight = item;
                     }
                     edge.data.weight += matrix[j][i];
                 }
             }
         }
+
+        return graph;
     };
 
     return Graph;
@@ -12741,31 +12764,36 @@ define('echarts/data/Tree',['require'],function(require) {
 
     return Tree;
 });
+/**
+ * Tree layout
+ * @module echarts/layout/Tree
+ * @author pissang(http://github.com/pissang)
+ */
 define('echarts/layout/Tree',['require','zrender/tool/vector'],function (require) {
 
     var vec2 = require('zrender/tool/vector');
 
-    function TreeLayout(tree) {
-        
-        this.tree = tree;
-        
-        this.nodePadding = 30;
+    function TreeLayout(opts) {
 
-        this.layerPadding = 100;
+        opts = opts || {};
+
+        this.nodePadding = opts.nodePadding || 30;
+
+        this.layerPadding = opts.layerPadding || 100;
 
         this._layerOffsets = [];
 
         this._layers = [];
     };
 
-    TreeLayout.prototype.run = function () {
+    TreeLayout.prototype.run = function (tree) {
         this._layerOffsets.length = 0;
-        for (var i = 0; i < this.tree.root.height + 1; i++) {
+        for (var i = 0; i < tree.root.height + 1; i++) {
             this._layerOffsets[i] = 0;
             this._layers[i] = [];
         }
-        this._updateNodeXPosition(this.tree.root);
-        var root = this.tree.root;
+        this._updateNodeXPosition(tree.root);
+        var root = tree.root;
         this._updateNodeYPosition(root, 0, root.layout.height);
     };
 
@@ -13016,15 +13044,72 @@ define(
     }
 );
 
-define('bkgraph/entity/Node',['require','./Entity','zrender/Group','zrender/shape/Circle','zrender/shape/Image','zrender/shape/Rectangle','zrender/tool/util','zrender/tool/color'],function (require) {
+define('bkgraph/shape/Crescent',['require','zrender/shape/Base','zrender/tool/util'],function (require) {
+
+    var ShapeBase = require('zrender/shape/Base');
+    var zrUtil = require('zrender/tool/util');
+
+    var Cresent = function (opts) {
+
+        ShapeBase.call(this, opts);
+    }
+
+    Cresent.prototype.type = 'cresent';
+
+    Cresent.prototype.buildPath = function (ctx, style) {
+        var r = style.r;
+        var cx = style.x;
+        var cy = style.y;
+
+        var rad1 = Math.PI / 2;
+        var angle = Math.acos((r - style.height) / r);
+        var rad0 = rad1 - angle;
+        var rad2 = rad1 + angle;
+
+        var x0 = cx + Math.cos(rad0) * r;
+        var y0 = cy + Math.sin(rad0) * r;
+        ctx.moveTo(x0, y0);
+        ctx.arc(cx, cy, r, rad0, rad2);
+        ctx.closePath();
+    }
+
+    Cresent.prototype.getRect = function (style) {
+        var r = style.r;
+        var cx = style.x;
+        var cy = style.y;
+
+        var rad1 = Math.PI / 2;
+        var angle = Math.acos((r - style.height) / r);
+        var rad0 = rad1 - angle;
+        var rad2 = rad1 + angle;
+
+        var x0 = cx + Math.cos(rad0) * r;
+        var y0 = cy + Math.sin(rad0) * r;
+        var x1 = cx + Math.cos(rad2) * r;
+        var y1 = cy + Math.sin(rad2) * r;
+
+        return {
+            x: x0,
+            y: y0,
+            width: x1 - x0,
+            height: r - y0
+        }
+    }
+
+    zrUtil.inherits(Cresent, ShapeBase);
+
+    return Cresent;
+});
+define('bkgraph/entity/Node',['require','./Entity','zrender/Group','zrender/shape/Circle','zrender/shape/Image','../shape/Crescent','zrender/tool/util','zrender/tool/color','zrender/tool/vector'],function (require) {
 
     var Entity = require('./Entity');
     var Group = require('zrender/Group');
     var CircleShape = require('zrender/shape/Circle');
     var ImageShape = require('zrender/shape/Image');
-    var RectShape = require('zrender/shape/Rectangle');
+    var CrescentShape = require('../shape/Crescent');
     var zrUtil = require('zrender/tool/util');
     var zrColor = require('zrender/tool/color');
+    var vec2 = require('zrender/tool/vector');
 
     var baseRadius = 50;
 
@@ -13054,7 +13139,7 @@ define('bkgraph/entity/Node',['require','./Entity','zrender/Group','zrender/shap
         this.highlightStyle = {
             color: '#f9dd05',
             lineWidth: 5,
-            labelColor: '#27408a'
+            labelColor: 'black'
         };
         if (opts.style) {
             zrUtil.merge(this.style, opts.style)
@@ -13096,20 +13181,11 @@ define('bkgraph/entity/Node',['require','./Entity','zrender/Group','zrender/shap
                 self.dispatch('click');
             }
         });
-        
-        var contentGroup = new Group();
-        var clipShape = new CircleShape({
-            style: {
-                r: baseRadius,
-                x: 0,
-                y: 0
-            }
-        });
-        contentGroup.clipShape = clipShape;
 
         var image = new Image();
         image.onload = function () {
             imageShape.style.image = image;
+            imageShape.modSelf();
             zr.refreshNextFrame();
         }
         image.src = this.image;
@@ -13128,12 +13204,12 @@ define('bkgraph/entity/Node',['require','./Entity','zrender/Group','zrender/shap
         });
 
         if (this.label) {
-            var labelShape = new RectShape({
+            var labelShape = new CrescentShape({
                 style: {
-                    width: baseRadius * 2,
                     height: 25,
-                    x: -baseRadius,
-                    y: baseRadius - 25,
+                    x: 0,
+                    y: 0,
+                    r: baseRadius,
                     color: zrColor.alpha(this.style.color, 0.8),
                     brushType: 'fill',
                     text: this.label,
@@ -13149,19 +13225,17 @@ define('bkgraph/entity/Node',['require','./Entity','zrender/Group','zrender/shap
             });
         }
 
-        contentGroup.addChild(imageShape);
+        this.el.addChild(imageShape);
 
         if (labelShape) {
-            contentGroup.addChild(labelShape);
+            this.el.addChild(labelShape);
         }
 
-        this.el.addChild(contentGroup);
         this.el.addChild(outlineShape);
 
         this._imageShape = imageShape;
         this._labelShape = labelShape;
         this._outlineShape = outlineShape;
-        this._clipShape = clipShape;
 
         this.el.scale[0] = this.el.scale[1] = this.radius / baseRadius;
     }
@@ -13280,6 +13354,24 @@ define('bkgraph/entity/Node',['require','./Entity','zrender/Group','zrender/shap
 
             zr.refreshNextFrame();
         }
+    }
+
+    var min = [0, 0];
+    var max = [0, 0];
+    NodeEntity.prototype.isInsideRect = function (rect) {
+        var r = this.radius + this.style.lineWidth;
+
+        min[0] = this.el.position[0] - r;
+        min[1] = this.el.position[1] - r;
+        max[0] = this.el.position[0] + r;
+        max[1] = this.el.position[1] + r;
+
+        return !(
+            min[0] > rect.x + rect.width
+            || min[1] > rect.y + rect.height
+            || max[0] < rect.x
+            || max[1] < rect.y
+        );
     }
 
     zrUtil.inherits(NodeEntity, Entity);
@@ -13463,13 +13555,137 @@ define(
     }
 );
 
-define('bkgraph/entity/Edge',['require','./Entity','zrender/shape/Line','zrender/Group','zrender/shape/Circle','zrender/tool/util','zrender/tool/vector'],function (require) {
+define('bkgraph/util/intersect',['require','zrender/tool/vector','zrender/tool/curve'],function (require) {
+
+    var vec2 =  require('zrender/tool/vector');
+    var curveTool = require('zrender/tool/curve');
+
+    var v1 = vec2.create();
+    var v2 = vec2.create();
+    var v3 = vec2.create();
+
+    function lineXAtY(x0, y0, x1, y1, y) {
+        var t = (y - y0) / (y1 - y0);
+        if (t > 1 || t < 0) {
+            return -Infinity;
+        }
+        return t * (x1 - x0) + x0;
+    }
+
+    function lineYAtX(x0, y0, x1, y1, x) {
+        var t = (x - x0) / (x1 - x0);
+        if (t > 1 || t < 0) {
+            return -Infinity;
+        }
+        return t * (y1 - y0) + y0;
+    }
+
+    var t = [];
+    function curveXAtY(x0, y0, x1, y1, x2, y2, y) {
+        var n = curveTool.quadraticRootAt(y0, y1, y2, y, t);
+        if (n === 0) {
+            return -Infinity;
+        }
+        return curveTool.quadraticAt(x0, x1, x2, t[0]);
+    }
+
+    function curveYAtX(x0, y0, x1, y1, x2, y2, x) {
+        var n = curveTool.quadraticRootAt(x0, x1, x2, x, t);
+        if (n === 0) {
+            return -Infinity;
+        }
+        return curveTool.quadraticAt(y0, y1, y2, t[0]);
+    }
+
+    var lineRect = function (line, rect, out) {
+        var x0 = line.xStart;
+        var y0 = line.yStart;
+        var x1 = line.xEnd;
+        var y1 = line.yEnd;
+
+        // Intersect with top
+        var x = lineXAtY(x0, y0, x1, y1, rect.y);
+        if (x >= rect.x && x <= rect.x + rect.width) {
+            out[0] = x;
+            out[1] = rect.y;
+            return 'top';
+        }
+        // Intersect with left
+        var y = lineYAtX(x0, y0, x1, y1, rect.x);
+        if (y >= rect.y && y <= rect.y + rect.height) {
+            out[0] = rect.x;
+            out[1] = y;
+            return 'left';
+        }
+        // Intersect with bottom
+        var x = lineXAtY(x0, y0, x1, y1, rect.y + rect.height);
+        if (x >= rect.x && x <= rect.x + rect.width) {
+            out[0] = x;
+            out[1] = rect.y + rect.height;
+            return 'bottom';
+        }
+        // Intersect with right
+        var y = lineYAtX(x0, y0, x1, y1, rect.x + rect.width);
+        if (y >= rect.y && y <= rect.y + rect.height) {
+            out[0] = rect.x + rect.width;
+            out[1] = y;
+            return 'right';
+        }
+    };
+
+    var curveRect = function (curve, rect, out) {
+        var x0 = curve.xStart;
+        var y0 = curve.yStart;
+        var x1 = curve.cpX1;
+        var y1 = curve.cpY1;
+        var x2 = curve.xEnd;
+        var y2 = curve.yEnd;
+
+        // Intersect with top
+        var x = curveXAtY(x0, y0, x1, y1, x2, y2, rect.y);
+        if (x >= rect.x && x <= rect.x + rect.width) {
+            out[0] = x;
+            out[1] = rect.y;
+            return 'top';
+        }
+        // Intersect with left
+        var y = curveYAtX(x0, y0, x1, y1, x2, y2, rect.x);
+        if (y >= rect.y && y <= rect.y + rect.height) {
+            out[0] = rect.x;
+            out[1] = y;
+            return 'left';
+        }
+        // Intersect with bottom
+        var x = curveXAtY(x0, y0, x1, y1, x2, y2, rect.y + rect.height);
+        if (x >= rect.x && x <= rect.x + rect.width) {
+            out[0] = x;
+            out[1] = rect.y + rect.height;
+            return 'bottom';
+        }
+        // Intersect with right
+        var y = curveYAtX(x0, y0, x1, y1, x2, y2, rect.x + rect.width);
+        if (y >= rect.y && y <= rect.y + rect.height) {
+            out[0] = rect.x + rect.width;
+            out[1] = y;
+            return 'right';
+        }
+    }
+
+    return {
+        lineRect: lineRect,
+
+        curveRect: curveRect
+    }
+});
+define('bkgraph/entity/Edge',['require','./Entity','zrender/shape/Line','zrender/Group','zrender/shape/Circle','zrender/tool/util','../util/intersect','zrender/tool/vector'],function (require) {
 
     var Entity = require('./Entity');
     var LineShape = require('zrender/shape/Line');
     var Group = require('zrender/Group');
     var CircleShape = require('zrender/shape/Circle');
     var zrUtil = require('zrender/tool/util');
+
+    var intersect = require('../util/intersect');
 
     var vec2 = require('zrender/tool/vector');
     var v = vec2.create();
@@ -13515,7 +13731,7 @@ define('bkgraph/entity/Edge',['require','./Entity','zrender/shape/Line','zrender
                 xEnd: 0,
                 yEnd: 0,
                 lineWidth: 1,
-                opacity: 1,
+                opacity: 0.7,
                 strokeColor: this.style.color
             },
             highlightStyle: {
@@ -13533,10 +13749,6 @@ define('bkgraph/entity/Edge',['require','./Entity','zrender/shape/Line','zrender
                 textColor: this.style.labelColor,
                 color: this.style.color,
                 opacity: this.style.opacity,
-                shadowColor: 'black',
-                shadowOffsetX: 0,
-                shadowOffsetY: 0,
-                shadowBlur: 4,
                 x: 0,
                 y: 0,
                 r: 5
@@ -13576,6 +13788,7 @@ define('bkgraph/entity/Edge',['require','./Entity','zrender/shape/Line','zrender
     EdgeEntity.prototype.lowlight = function () {
         this._lineShape.style.strokeColor = this.style.color;
         this._lineShape.zlevel = 0;
+        this._lineShape.style.opacity = 0.7;
         if (this._labelShape) {
             this._labelShape.style.color = this.style.color;
             this._labelShape.style.textColor = this.style.labelColor;
@@ -13618,11 +13831,14 @@ define('bkgraph/entity/Edge',['require','./Entity','zrender/shape/Line','zrender
         var p1 = sourceEntity.el.position;
         var p2 = targetEntity.el.position;
 
-        vec2.sub(v, p1, p2);
-        vec2.normalize(v, v);
+        // vec2.sub(v, p1, p2);
+        // vec2.normalize(v, v);
 
-        vec2.scaleAndAdd(v1, p1, v, -sourceEntity.radius);
-        vec2.scaleAndAdd(v2, p2, v, targetEntity.radius);
+        // vec2.scaleAndAdd(v1, p1, v, -sourceEntity.radius);
+        // vec2.scaleAndAdd(v2, p2, v, targetEntity.radius);
+        
+        vec2.copy(v1, p1);
+        vec2.copy(v2, p2);
 
         var line = this._lineShape;
     }
@@ -13641,11 +13857,37 @@ define('bkgraph/entity/Edge',['require','./Entity','zrender/shape/Line','zrender
             this._labelShape.style.r = (
                 this.sourceEntity.radius + this.targetEntity.radius
             ) / 20 + 3;
+            var angle = Math.atan2(v2[1] - v1[1], v2[0] - v1[0]);
+            if (Math.abs(angle) < 0.2 || Math.abs(angle) > 2.94) {
+                this._labelShape.style.textPosition = 'top';
+            } else {
+                this._labelShape.style.textPosition = 'right';
+            }
         }
     }
 
     EdgeEntity.prototype.getRect = function () {
         return this._lineShape.getRect(this._lineShape.style);
+    }
+
+    EdgeEntity.prototype.intersectRect = function (rect, out) {
+
+        return intersect.lineRect(this._lineShape.style, rect, out);
+    }
+
+    EdgeEntity.prototype.isInsideRect = function (rect) {
+        var style = this._lineShape.style;
+        return isPointInRect(style.xStart, style.yStart, rect)
+            || isPointInRect(style.xEnd, style.yEnd, rect);
+    }
+
+    function isPointInRect(x, y, rect) {
+        return !(
+            x > rect.x + rect.width
+            || y > rect.y + rect.height
+            || x < rect.x
+            || y < rect.y
+        );
     }
 
     zrUtil.inherits(EdgeEntity, Entity);
@@ -13801,7 +14043,7 @@ define(
     }
 );
 
-define('bkgraph/entity/ExtraEdge',['require','./Entity','zrender/shape/BezierCurve','zrender/Group','zrender/shape/Circle','zrender/tool/util','zrender/tool/curve','zrender/tool/vector'],function (require) {
+define('bkgraph/entity/ExtraEdge',['require','./Entity','zrender/shape/BezierCurve','zrender/Group','zrender/shape/Circle','zrender/tool/util','zrender/tool/curve','../util/intersect','zrender/tool/vector'],function (require) {
 
     var Entity = require('./Entity');
     var BezierCurveShape = require('zrender/shape/BezierCurve');
@@ -13809,6 +14051,8 @@ define('bkgraph/entity/ExtraEdge',['require','./Entity','zrender/shape/BezierCur
     var CircleShape = require('zrender/shape/Circle');
     var zrUtil = require('zrender/tool/util');
     var curveTool = require('zrender/tool/curve');
+
+    var intersect = require('../util/intersect');
 
     var vec2 = require('zrender/tool/vector');
     var v = vec2.create();
@@ -13832,7 +14076,7 @@ define('bkgraph/entity/ExtraEdge',['require','./Entity','zrender/shape/BezierCur
 
         this.style = {
             color: '#0e90fe',
-            opacity: 0.2,
+            opacity: 0.15,
             labelColor: 'white'
         };
         this.highlightStyle = {
@@ -13848,6 +14092,8 @@ define('bkgraph/entity/ExtraEdge',['require','./Entity','zrender/shape/BezierCur
         }
     };
 
+    ExtraEdgeEntity.prototype.hidden = true;
+
     ExtraEdgeEntity.prototype.initialize = function (zr) {
         this._curveShape = new BezierCurveShape({
             style: {
@@ -13858,8 +14104,8 @@ define('bkgraph/entity/ExtraEdge',['require','./Entity','zrender/shape/BezierCur
                 cpX1: 0,
                 cpY1: 0,
                 lineWidth: 1,
-                opacity: this.style.opacity,
-                strokeColor: this.style.color
+                opacity: this.highlightStyle.opacity,
+                strokeColor: this.highlightStyle.color
             },
             highlightStyle: {
                 opacity: 0
@@ -13873,9 +14119,9 @@ define('bkgraph/entity/ExtraEdge',['require','./Entity','zrender/shape/BezierCur
                 text: this.label,
                 textPosition: 'right',
                 textFont: '12px 微软雅黑',
-                textColor: this.style.labelColor,
-                color: this.style.color,
-                opacity: this.style.opacity,
+                textColor: this.highlightStyle.labelColor,
+                color: this.highlightStyle.color,
+                opacity: this.highlightStyle.opacity,
                 x: 0,
                 y: 0,
                 r: 10
@@ -13897,42 +14143,27 @@ define('bkgraph/entity/ExtraEdge',['require','./Entity','zrender/shape/BezierCur
         if (this.sourceEntity && this.targetEntity) {
             this._setCurvePoints(
                 this.sourceEntity.el.position,
-                this.targetEntity.el.position
+                this.targetEntity.el.position,
+                1
             );
         }
         this.el.modSelf();
     };
 
     ExtraEdgeEntity.prototype.highlight = function () {
-        this._curveShape.style.strokeColor = this.highlightStyle.color;
-        this._curveShape.style.opacity = this.highlightStyle.opacity;
-        this._curveShape.zlevel = 3;
-        if (this._labelShape) {
-            this._labelShape.style.color = this.highlightStyle.labelColor
-            this._labelShape.style.textColor = this.highlightStyle.labelColor;
-            this._labelShape.style.opacity = this.highlightStyle.opacity;
-            this._labelShape.zlevel = 3;
-        }
-        this.el.modSelf();
+        this.hidden = false;
     };
 
     ExtraEdgeEntity.prototype.lowlight = function () {
-        this._curveShape.style.strokeColor = this.style.color;
-        this._curveShape.style.opacity = this.style.opacity;
-        this._curveShape.zlevel = 0;
-        if (this._labelShape) {
-            this._labelShape.style.opacity = this.style.opacity;
-            this._labelShape.style.color = this.style.color;
-            this._labelShape.style.textColor = this.style.labelColor;
-            this._labelShape.zlevel = 0;
-        }
-        this.el.modSelf();
+        this.hidden = true;
     };
 
     ExtraEdgeEntity.prototype.animateLength = function (zr, time, delay, fromEntity, cb) {
+        var inv = 1;
         if (fromEntity === this.targetEntity) {
             vec2.copy(v1, this.targetEntity.el.position);
             vec2.copy(v2, this.sourceEntity.el.position);
+            inv = -1;
         } else {
             vec2.copy(v1, this.sourceEntity.el.position);
             vec2.copy(v2, this.targetEntity.el.position);
@@ -13940,7 +14171,7 @@ define('bkgraph/entity/ExtraEdge',['require','./Entity','zrender/shape/BezierCur
         var self = this;
         var obj = {t: 0};
         var curve = this._curveShape;
-        this._setCurvePoints(v1, v2);
+        this._setCurvePoints(v1, v2, inv);
 
         var x0 = curve.style.xStart;
         var x1 = curve.style.cpX1;
@@ -13960,7 +14191,7 @@ define('bkgraph/entity/ExtraEdge',['require','./Entity','zrender/shape/BezierCur
                 v[1] = curveTool.quadraticAt(
                     y0, y1, y2, obj.t
                 );
-                self._setCurvePoints(v1, v);
+                self._setCurvePoints(v1, v, inv);
                 self.el.modSelf();
                 zr.refreshNextFrame();
             })
@@ -13975,7 +14206,7 @@ define('bkgraph/entity/ExtraEdge',['require','./Entity','zrender/shape/BezierCur
         return this._curveShape.getRect(this._curveShape.style);
     }
 
-    ExtraEdgeEntity.prototype._setCurvePoints = function (p1, p2) {
+    ExtraEdgeEntity.prototype._setCurvePoints = function (p1, p2, inv) {
         var sourceEntity = this.sourceEntity;
         var targetEntity = this.targetEntity;
 
@@ -13985,8 +14216,10 @@ define('bkgraph/entity/ExtraEdge',['require','./Entity','zrender/shape/BezierCur
         curve.style.xEnd = p2[0];
         curve.style.yEnd = p2[1];
 
-        curve.style.cpX1 = (p1[0] + p2[0]) / 2 - (p2[1] - p1[1]) / 4;
-        curve.style.cpY1 = (p1[1] + p2[1]) / 2 - (p1[0] - p2[0]) / 4;
+        inv = inv || 1;
+
+        curve.style.cpX1 = (p1[0] + p2[0]) / 2 - inv * (p2[1] - p1[1]) / 4;
+        curve.style.cpY1 = (p1[1] + p2[1]) / 2 - inv * (p1[0] - p2[0]) / 4;
 
         if (this._labelShape) {
             var labelShape = this._labelShape;
@@ -13999,11 +14232,221 @@ define('bkgraph/entity/ExtraEdge',['require','./Entity','zrender/shape/BezierCur
         }
     }
 
+    ExtraEdgeEntity.prototype.intersectRect = function (rect, out) {
+
+        return intersect.curveRect(this._curveShape.style, rect, out);
+    }
+
+    ExtraEdgeEntity.prototype.isInsideRect = function (rect) {
+        var style = this._curveShape.style;
+        return isPointInRect(style.xStart, style.yStart, rect)
+            || isPointInRect(style.cpX1, style.cpY1, rect)
+            || isPointInRect(style.xEnd, style.yEnd, rect);
+    }
+
+    function isPointInRect(x, y, rect) {
+        return !(
+            x > rect.x + rect.width
+            || y > rect.y + rect.height
+            || x < rect.x
+            || y < rect.y
+        );
+    }
+
     zrUtil.inherits(ExtraEdgeEntity, Entity);
 
     return ExtraEdgeEntity;
 });
-define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force','echarts/data/Graph','echarts/data/Tree','echarts/layout/Tree','zrender/tool/util','zrender/Group','./Component','zrender/tool/vector','../entity/Node','../entity/Edge','../entity/ExtraEdge','zrender/shape/Circle'],function (require) {
+/**
+ * 屏外提示形状
+ */
+define('bkgraph/entity/OutTip',['require','./Entity','zrender/tool/util','zrender/shape/Rectangle'],function (require) {
+
+    var Entity = require('./Entity');
+    var zrUtil = require('zrender/tool/util');
+    var RectShape = require('zrender/shape/Rectangle');
+    
+    var OutTip = function (opts) {
+        
+        Entity.call(this);
+
+        this.label = opts.label || '';
+
+        this.color = opts.color || '#f9dd05';
+
+        this.el = new RectShape({
+            style: {
+                x: -25,
+                y: 0,
+                width: 50,
+                height: 25,
+                radius: 5,
+                textPosition: 'inside',
+                textColor: 'black',
+                textFont: '12px 微软雅黑',
+                opacity: 0.7
+            },
+            highlightStyle: {
+                opacity: 0
+            },
+            hoverable: false,
+            zlevel: 3,
+            z: 100
+        });
+    }
+
+    OutTip.prototype.initialize = function (zr) {
+        this.el.style.color = this.color;
+        this.el.style.text = this.label;
+    }
+
+    zrUtil.inherits(OutTip, Entity);
+
+    return OutTip;
+});
+define('bkgraph/shape/CurveBundle',['require','zrender/shape/Base','zrender/tool/util'],function (require) {
+
+    var Base = require('zrender/shape/Base');
+    var zrUtil = require('zrender/tool/util');
+
+    var CurveBundle = function (opts) {
+        Base.call(this, opts);
+    }
+
+    CurveBundle.prototype = {
+
+        type: 'curvebundle',
+
+        brushTypeOnly: 'stroke',
+
+        buildPath: function (ctx, style) {
+            for (var i = 0; i < style.segments.length; i++) {
+                var points = style.segments[i];
+                ctx.moveTo(points[0], points[1]);
+                ctx.quadraticCurveTo(
+                    points[2], points[3],
+                    points[4], points[5]
+                );
+            }
+        }
+    };
+
+    zrUtil.inherits(CurveBundle, Base);
+
+    return CurveBundle;
+});
+define('bkgraph/entity/ExtraEdgeBundle',['require','./Entity','zrender/tool/curve','zrender/tool/util','../shape/CurveBundle','zrender/tool/vector'],function (require) {
+
+    var Entity = require('./Entity');
+    var curveTool = require('zrender/tool/curve');
+    var zrUtil = require('zrender/tool/util');
+
+    var CurveBundleShape = require('../shape/CurveBundle');
+
+    var vec2 = require('zrender/tool/vector');
+
+    var ExtraEdgeBundleEntity = function (opts) {
+        opts = opts || {};
+
+        Entity.call(this);
+
+        this.el = new CurveBundleShape({
+            style: {
+                segments: [],
+                lineWidth: 1
+            },
+            hoverable: false
+        });
+
+        this.style = {
+            color: '#0e90fe',
+            opacity: 0.15
+        }
+        if (opts.style) {
+            zrUtil.merge(this.style, opts.style);
+        }
+
+        this.edges = [];
+    }
+
+    ExtraEdgeBundleEntity.prototype.initialize = function (zr) {
+        this.el.style.strokeColor = this.style.color;
+        this.el.style.opacity = this.style.opacity;
+
+        this.update(zr);
+    }
+
+    ExtraEdgeBundleEntity.prototype.update = function (zr) {
+
+        var len = 0;
+        for (var i = 0; i < this.edges.length; i++) {
+            var e = this.edges[i];
+            var sourceEntity = e.source.entity;
+            var targetEntity = e.target.entity;
+
+            var segs = this.el.style.segments;
+            var seg = segs[i];
+            if (!seg) {
+                seg = segs[i] = [];
+            }
+            if (sourceEntity && targetEntity) {
+                this._calCurvePoints(
+                    sourceEntity.el.position,
+                    targetEntity.el.position,
+                    seg
+                );
+
+                len++;
+            }
+        }
+
+        this.el.style.segments.length = len;
+
+        this.el.modSelf();
+    }
+
+    ExtraEdgeBundleEntity.prototype.addEdge = function (e) {
+        var sourceEntity = e.node1.entity;
+        var targetEntity = e.node2.entity;
+
+        var seg = [];
+        if (sourceEntity && targetEntity) {
+            this._calCurvePoints(
+                sourceEntity.el.position,
+                targetEntity.el.position,
+                seg
+            );
+
+            this.edges.push(e);
+            this.el.style.segments.push(seg);
+
+            this.el.modSelf();
+        }
+    }
+
+    ExtraEdgeBundleEntity.prototype.removeEdge = function (e) {
+        var idx = this.edges.indexOf(e);
+        if (idx > 0) {
+            this.edges.splice(idx, 1);
+            this.el.style.segments.splice(idx, 1);
+        }
+    }
+
+    ExtraEdgeBundleEntity.prototype._calCurvePoints = function (p1, p2, out) {
+        out[0] = p1[0];
+        out[1] = p1[1];
+        out[2] = (p1[0] + p2[0]) / 2 - (p2[1] - p1[1]) / 4;
+        out[3] = (p1[1] + p2[1]) / 2 - (p1[0] - p2[0]) / 4;
+        out[4] = p2[0];
+        out[5] = p2[1];
+    }
+
+
+    zrUtil.inherits(ExtraEdgeBundleEntity, Entity);
+
+    return ExtraEdgeBundleEntity;
+});
+define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force','echarts/data/Graph','echarts/data/Tree','echarts/layout/Tree','zrender/tool/util','zrender/Group','./Component','zrender/tool/vector','../entity/Node','../entity/Edge','../entity/ExtraEdge','../entity/OutTip','../entity/ExtraEdgeBundle','zrender/shape/Circle','../util/intersect'],function (require) {
 
     var zrender = require('zrender');
     var ForceLayout = require('echarts/layout/Force');
@@ -14018,8 +14461,12 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
     var NodeEntity = require('../entity/Node');
     var EdgeEntity = require('../entity/Edge');
     var ExtraEdgeEntity = require('../entity/ExtraEdge');
+    var OutTipEntity = require('../entity/OutTip');
+    var ExtraEdgeBundleEntity = require('../entity/ExtraEdgeBundle');
 
     var CircleShape = require('zrender/shape/Circle');
+
+    var intersect = require('../util/intersect');
 
     var EPSILON = 1e-2;
     var isAroundZero = function (val) {
@@ -14047,7 +14494,7 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
         this._graph = null;
 
         // Graph for layouting
-        this._graphLayout = null
+        this._graphLayout = null;
 
         this._layouting = false;
 
@@ -14062,6 +14509,9 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
         this._lastHoverNode = null;
 
         this._nodeEntityCount = 0;
+        this._baseEntityCount = 0;
+
+        this._firstShowEntityDetail = true;
     };
 
     GraphMain.prototype.type = 'GRAPH';
@@ -14108,12 +14558,15 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
                             layers[z].dirty = true;   
                         }
                     }
+
+                    self._syncOutTipEntities();
                 }
                 x0 = position[0];
                 y0 = position[1];
                 sx0 = scale[0];
-                sy0 = scale[1]; 
+                sy0 = scale[1];
             }
+
             zrRefresh.call(this);
         }
     };
@@ -14164,7 +14617,7 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
             n.layout = {
                 position: entity.position,
                 mass: 1,
-                radius: r
+                size: r
             };
             if (!entity.position) {
                 noPosition = true;
@@ -14249,11 +14702,17 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
         this._root = new Group();
         zr.addGroup(this._root);
 
+        // 补边使用bundle优化性能
+        this._extraEdgeBundle = new ExtraEdgeBundleEntity();
+        this._extraEdgeBundle.initialize(zr);
+        this._root.addChild(this._extraEdgeBundle.el);
+
         // 所有实体都在 zlevel-1 层
         graph.eachNode(function (n) {
             if (n.data.layerCounter > 2) {
                 return;
             }
+            this._baseEntityCount++;
             this._createNodeEntity(n);
         }, this);
 
@@ -14280,6 +14739,9 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
         });
     };
 
+    /**
+     * 简单的摆放成放射状
+     */
     GraphMain.prototype.naiveLayout = function (mainNode) {
         graph.breadthFirstTraverse(function (n2, n1) {
             if (n1) {
@@ -14303,6 +14765,9 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
         }, mainNode, 'out');
     };
 
+    /**
+     * 放射树状布局
+     */
     GraphMain.prototype.radialTreeLayout = function () {
         var cx = this._zr.getWidth() / 2;
         var cy = this._zr.getHeight() / 2;
@@ -14310,16 +14775,16 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
         tree.traverse(function (treeNode) {
             var graphNode = this._graphLayout.getNodeById(treeNode.id);
             treeNode.layout = {
-                width: graphNode.layout.radius * 2,
-                height: graphNode.layout.radius * 2
+                width: graphNode.layout.size * 2,
+                height: graphNode.layout.size * 2
             };
         }, this);
-        var layout = new TreeLayout(tree);
+        var layout = new TreeLayout();
         var layerPadding = [100, 400, 200, 200, 200, 200, 200];
         layout.layerPadding = function (level) {
             return layerPadding[level] || 200;
         };
-        layout.run();
+        layout.run(tree);
 
         var min = [Infinity, Infinity];
         var max = [-Infinity, -Infinity];
@@ -14344,6 +14809,9 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
         }, this);
     }
 
+    /**
+     * 开始力导向布局
+     */
     GraphMain.prototype.startForceLayout = function (cb) {
         var graph = this._graphLayout;
         var forceLayout = new ForceLayout();
@@ -14353,7 +14821,7 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
         ];
         // forceLayout.gravity = 0.8;
         forceLayout.scaling = 12;
-        forceLayout.coolDown = 0.995;
+        forceLayout.coolDown = 0.99;
         // forceLayout.enableAcceleration = false;
         forceLayout.maxSpeedIncrease = 100;
         // 这个真是不好使
@@ -14365,19 +14833,19 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
 
         // 在边上加入顶点防止重叠实体与边发生重叠
         var edgeNodes = [];
-        graph.eachEdge(function (e) {
-            var n = graph.addNode(e.id, e);
-            var p = vec2.create();
-            vec2.add(p, e.node1.layout.position, e.node2.layout.position);
-            vec2.scale(p, p, 0.5);
-            n.layout = {
-                position: p,
-                mass: 0,
-                radius: 10
-            };
-            edgeNodes.push(n);
-            n.isEdgeNode = true;
-        });
+        // graph.eachEdge(function (e) {
+        //     var n = graph.addNode(e.id, e);
+        //     var p = vec2.create();
+        //     vec2.add(p, e.node1.layout.position, e.node2.layout.position);
+        //     vec2.scale(p, p, 0.5);
+        //     n.layout = {
+        //         position: p,
+        //         mass: 0,
+        //         radius: 10
+        //     };
+        //     edgeNodes.push(n);
+        //     n.isEdgeNode = true;
+        // });
         
         forceLayout.init(graph, false);
         this._layouting = true;
@@ -14411,6 +14879,9 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
        forceLayout.step(10);
     };
 
+    /**
+     * 停止力导向布局
+     */
     GraphMain.prototype.stopForceLayout = function () {
         var graph = this._graphLayout;
         var edgeNodes = [];
@@ -14426,23 +14897,94 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
         this._layouting = false;
     }
 
+    GraphMain.prototype.unhoverAll = function () {
+        var zr = this._zr;
+        var graph = this._graph;
+        for (var i = 0; i < graph.nodes.length; i++) {
+            var n = graph.nodes[i];
+            if (n.entity && n !== this._lastClickNode) {
+                this.unhoverNode(n);
+                if (n._isHighlight) {
+                    n.entity.highlight(zr);
+                }
+            }
+        }
+    }
+
+    /**
+     * 低亮所有节点
+     */
     GraphMain.prototype.lowlightAll = function () {
         var zr = this._zr;
-
-        this._graph.eachNode(function (n) {
+        var graph = this._graph;
+        for (var i = 0; i < graph.nodes.length; i++) {
+            var n = graph.nodes[i];
             if (n.entity) {
-                n.entity.lowlight();
+                this.unhoverNode(n);
+                this.lowlightNode(n);
             }
-        });
-        this._graph.eachEdge(function (e) {
+            // 移除屏外提示
+            if (n._outTipEntity) {
+                this._root.removeChild(n._outTipEntity.el);
+                n._outTipEntity = null;
+            }
+        }
+        for (var i = 0; i < graph.edges.length; i++) {
+            var e = graph.edges[i];
             if (e.entity) {
                 e.entity.lowlight();
             }
-        });
+        }
 
         zr.refreshNextFrame();
     }
 
+    GraphMain.prototype.unhoverNode = function (node) {
+        if (node._isHover) {
+            node.entity.stopActiveAnimation(this._zr);
+            node.entity.animateRadius(
+                this._zr, node.layout.size, 500
+            );
+
+            node.entity.lowlight();
+
+            node._isHover = false;
+        }
+    }
+
+    GraphMain.prototype.hoverNode = function (node) {
+        if (node._isHover) {
+            return;
+        }
+
+        node._isHover = true;
+
+        // Hover 实体放大
+        node.entity.animateRadius(
+            this._zr, node.layout.size * 1.2, 500
+        );
+        node.entity.startActiveAnimation(this._zr);
+
+        node.entity.highlight();
+    }
+
+    GraphMain.prototype.lowlightNode = function (node) {
+        if (node.entity && node._isHighlight) {
+            node.entity.lowlight();
+            node._isHighlight = false;
+        }
+    }
+
+    GraphMain.prototype.highlightNode = function (node) {
+        if (node.entity && !node._isHighlight) {
+            node.entity.highlight();
+            node._isHighlight = true;
+        }
+    }
+
+    /**
+     * 高亮节点与邻接节点
+     */
     GraphMain.prototype.highlightNodeAndAdjeceny = function (node) {
         if (typeof(node) === 'string') {
             node = this._graph.getNodeById(node);
@@ -14451,10 +14993,17 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
 
         this.lowlightAll();
 
-        node.entity.highlight();
+        this.hoverNode(node);
+        node._isHighlight = true;
+
         for (var i = 0; i < node.edges.length; i++) {
             var e = node.edges[i];
             var other = e.node1 === node ? e.node2 : e.node1;
+
+            //中心节点不出补边
+            if (node.data.layerCounter === 0 && e.isExtra) {
+                continue;
+            }
 
             var newEntity = false;
             if (!other.entity) {
@@ -14473,21 +15022,28 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
             if (newEntity) {
                 this._growNodeEntity(other, node, Math.random() * 500);
             }
+
+            other._isHighlight = true;
+
+            this._syncOutTipEntities();
         }
 
         this._syncHeaderBarExplorePercent();
         zr.refreshNextFrame();
     };
 
+    /**
+     * 高亮节点与主节点的关系路径
+     */
     GraphMain.prototype.highlightNodeToMain = function (node) {
         if (typeof(node) === 'string') {
             node = this._graphLayout.getNodeById(node);
         }
 
-        var graph = this._graphLayout;
-        var graphRendering = this._graph;
+        var graphLayout = this._graphLayout;
+        var graph = this._graph;
         var zr = this._zr;
-        node = graph.getNodeById(node.id);
+        node = graphLayout.getNodeById(node.id);
 
         this.lowlightAll();
 
@@ -14495,11 +15051,17 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
         var current = node;
         var nodes = [current];
         while (current) {
-            var n = graphRendering.getNodeById(current.id);
+            var n = graph.getNodeById(current.id);
             if (!n.entity) {
                 this._createNodeEntity(n);
             }
-            n.entity.highlight();
+            if (node === current) {
+                this.hoverNode(n);
+                n._isHighlight = true;
+            } else {
+                n.entity.highlight();
+                n._isHighlight = true;   
+            }
 
             var inEdge = current.inEdges[0];
             if (!inEdge) {
@@ -14513,7 +15075,7 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
         for (var i = 0; i < nodes.length - 1; i++) {
             var n2 = nodes[i];
             var n1 = nodes[i + 1];
-            var e = graphRendering.getEdge(n1.id, n2.id);
+            var e = graph.getEdge(n1.id, n2.id);
 
             if (!e.entity) {
                 this._createEdgeEntity(e);
@@ -14538,7 +15100,10 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
         var sideBar = this._kgraph.getComponentByType('SIDEBAR');
         if (sideBar) {
             sideBar.setData(n.data);
-            sideBar.show();
+            if (this._firstShowEntityDetail) {
+                sideBar.show();
+            }
+            this._firstShowEntityDetail = false;
         }
     }
 
@@ -14569,6 +15134,8 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
     GraphMain.prototype.moveTo = function (x, y, cb) {
         var zr = this._zr;
         var layers = zr.painter.getLayers();
+        var self = this;
+        self._animating = true;
         zr.animation.animate(layers[0])
             .when(800, {
                 position: [x, y]
@@ -14576,7 +15143,55 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
             .during(function () {
                 zr.refreshNextFrame();
             })
+            .done(function () {
+                self._animating = false;
+                cb && cb();
+            })
             .start('CubicInOut');
+    };
+
+    GraphMain.prototype.moveLeft = function (cb) {
+        if (!zr) {
+            return;
+        }
+        var layer = zr.painter.getLayer(0);
+        var newPos = Array.prototype.slice.call(layer.position);
+        newPos[0] += zr.getWidth() * 0.6;
+
+        hierarchy.moveTo(newPos[0], newPos[1], cb);
+    };
+
+    GraphMain.prototype.moveRight = function (cb) {
+        if (!zr) {
+            return;
+        }
+        var layer = zr.painter.getLayer(0);
+        var newPos = Array.prototype.slice.call(layer.position);
+        newPos[0] -= zr.getWidth() * 0.6;
+
+        hierarchy.moveTo(newPos[0], newPos[1], cb);
+    };
+
+    GraphMain.prototype.moveTop = function (cb) {
+        if (!zr) {
+            return;
+        }
+        var layer = zr.painter.getLayer(0);
+        var newPos = Array.prototype.slice.call(layer.position);
+        newPos[1] += zr.getHeight() * 0.3;
+
+        hierarchy.moveTo(newPos[0], newPos[1], cb);
+    };
+
+    GraphMain.prototype.moveDown = function (cb) {
+        if (!zr) {
+            return;
+        }
+        var layer = zr.painter.getLayer(0);
+        var newPos = Array.prototype.slice.call(layer.position);
+        newPos[1] -= zr.getHeight() * 0.3;
+
+        hierarchy.moveTo(newPos[0], newPos[1], cb);
     };
 
     GraphMain.prototype.uncollapse = function () {
@@ -14604,7 +15219,7 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
         this._graph.eachNode(function (n) {
             if (n.canCollapse) {
                 n.entity.stopAnimationAll();
-                this._root.removeChild(n.entity);
+                this._root.removeChild(n.entity.el);
                 n.canCollapse = false;
                 n.entity = null;
                 this._nodeEntityCount--;
@@ -14613,11 +15228,34 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
         this._graph.eachEdge(function (e) {
             if (e.canCollapse) {
                 e.entity.stopAnimationAll();
-                this._root.removeChild(e.entity);
+                this._root.removeChild(e.entity.el);
                 e.canCollapse = false;
                 e.entity = null;
+
+                this._extraEdgeBundle.removeEdge(e);
             }
         }, this);
+
+        this._syncHeaderBarExplorePercent();
+        zr.refreshNextFrame();
+    }
+
+    GraphMain.prototype.expandNode = function (node) {
+        var zr = this._zr;
+
+        for (var i = 0; i < node.edges.length; i++) {
+            var e = node.edges[i];
+            var other = e.node1 === node ? e.node2 : e.node1;
+
+            // 不出补边
+            if (e.isExtra || other.entity) {
+                continue;
+            }
+
+            this._createNodeEntity(other);
+            this._createEdgeEntity(e);
+            this._growNodeEntity(other, node, Math.random() * 500);
+        }
 
         this._syncHeaderBarExplorePercent();
         zr.refreshNextFrame();
@@ -14647,8 +15285,75 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
 
     GraphMain.prototype.getExplorePercent = function () {
         var nodes = this._graph.nodes;
-        return this._nodeEntityCount / nodes.length;
+        return (this._nodeEntityCount - this._baseEntityCount) / (nodes.length - this._baseEntityCount);
     };
+
+    /**
+     * 同步节点的屏外提示
+     */
+    GraphMain.prototype._syncOutTipEntities = function () {
+        var zr = this._zr;
+        var node = this._lastClickNode;
+        if (!node) {
+            return;
+        }
+        var headerBar = this._kgraph.getComponentByType('HEADERBAR');
+        var top = headerBar.el.clientHeight;
+        var right = -parseInt(this.el.style.right);
+
+        var lineRectIntersectPoint = vec2.create();
+        var layer0 = this._zr.painter.getLayer(0);
+        var rect = {
+            x: -layer0.position[0] / layer0.scale[0],
+            y: (-layer0.position[1] + top)/ layer0.scale[1],
+            width: (zr.getWidth() - right) / layer0.scale[0],
+            height: (zr.getHeight() - top) / layer0.scale[1]
+        }
+
+        for (var i = 0; i < node.edges.length; i++) {
+            var e = node.edges[i];
+            var other = e.node1 === node ? e.node2 : e.node1;
+
+            //中心节点不出补边
+            if (node.data.layerCounter === 0 && e.isExtra) {
+                continue;
+            }
+            if (!e.entity || !other.entity) {
+                continue;
+            }
+            if (!other.entity.isInsideRect(rect)) {
+                var side = e.entity.intersectRect(rect, lineRectIntersectPoint);
+                if (side) {
+                    if (!other._outTipEntity) {
+                        other._outTipEntity = new OutTipEntity({
+                            label: other.data.name
+                        });
+                        other._outTipEntity.initialize(zr);
+                        this._root.addChild(other._outTipEntity.el);   
+                    }
+                    var p = other._outTipEntity.el.position;
+                    vec2.copy(p, lineRectIntersectPoint);
+                    switch (side) {
+                        case 'top':
+                            break;
+                        case 'left':
+                            p[0] += 25;
+                            break;
+                        case 'bottom':
+                            p[1] -= 25;
+                            break;
+                        case 'right':
+                            p[0] -= 25;
+                            break;
+                    }
+                    other._outTipEntity.el.modSelf();
+                }
+            } else if (other._outTipEntity) {
+                this._root.removeChild(other._outTipEntity.el);
+                other._outTipEntity = null;
+            }
+        }
+    }
 
     GraphMain.prototype._growNodeEntity = function (toNode, fromNode, delay) {
         var zr = this._zr;
@@ -14668,7 +15373,7 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
 
     GraphMain.prototype._createNodeEntity = function (node) {
         var nodeEntity = new NodeEntity({
-            radius: node.layout.radius,
+            radius: node.layout.size,
             label: node.data.name,
             image: node.data.image
         });
@@ -14683,33 +15388,30 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
             if (self._animating) {
                 return;
             }
-            if (
-                self._lastClickNode && self._lastClickNode !== node
-                && self._lastClickNode.entity
-            ) {
-                self._lastClickNode.entity.stopActiveAnimation(self._zr);
-            }
             if (self._lastHoverNode !== node) {
-                if (
-                    self._lastHoverNode && self._lastHoverNode.entity
-                ) {
-                    self._lastHoverNode.entity.animateRadius(
-                        self._zr, self._lastHoverNode.layout.radius, 500
-                    );   
-                }
-                // Hover 实体放大
-                node.entity.animateRadius(
-                    self._zr, node.layout.radius * 1.2, 500
-                );
+                self.hoverNode(node);
+                self.expandNode(node);
             }
             self._lastHoverNode = node;
-            self.highlightNodeAndAdjeceny(node);
         });
+        nodeEntity.bind('mouseout', function () {
+            if (node !== self._lastClickNode) {
+                self.unhoverNode(node);
+                //  回复到高亮状态
+                if (node._isHighlight) {
+                    node.entity.highlight(self._zr);
+                }
+            }
+            self._lastHoverNode = null;
+        })
 
         nodeEntity.bind('click', function () {
-            node.entity.startActiveAnimation(self._zr);
-            self.showEntityDetail(node);
-            self._lastClickNode = node;
+            if (self._lastClickNode !== node) {
+                self.showEntityDetail(node);
+                self._lastClickNode = node;
+                self._syncOutTipEntities();
+                self.highlightNodeAndAdjeceny(node);
+            }
         })
 
         node.entity = nodeEntity;
@@ -14728,6 +15430,8 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
                     targetEntity: e.node2.entity,
                     label: e.data.relationName
                 });
+
+                this._extraEdgeBundle.addEdge(e);
             } else {
                 edgeEntity = new EdgeEntity({
                     sourceEntity: e.node1.entity,
@@ -14779,36 +15483,37 @@ define('bkgraph/component/GraphMain',['require','zrender','echarts/layout/Force'
 
     GraphMain.prototype._culling = function () {
         var graph = this._graph;
+        var zr = this._zr;
         if (!graph) {
             return;
         }
-        var nodeLayer = this._zr.painter.getLayer(1);
-        var width = this._zr.getWidth();
-        var height = this._zr.getHeight();
+        var right = -parseInt(this.el.style.right);
+
+        var nodeLayer = zr.painter.getLayer(1);
+        var width = zr.getWidth();
+        var height = zr.getHeight();
         var min = [0, 0];
         var max = [0, 0];
+        nodeLayer.updateTransform();
+
+        var layer0 = this._zr.painter.getLayer(0);
+        var rect = {
+            x: -layer0.position[0] / layer0.scale[0],
+            y: -layer0.position[1] / layer0.scale[1],
+            width: (zr.getWidth() - right) / layer0.scale[0],
+            height: zr.getHeight() / layer0.scale[1]
+        }
+
         for (var i = 0; i < graph.nodes.length; i++) {
             var n = graph.nodes[i];
             if (n.entity) {
-                var r = n.entity.radius + n.entity.style.lineWidth;
-                min[0] = n.entity.el.position[0] - r;
-                min[1] = n.entity.el.position[1] - r;
-                max[0] = n.entity.el.position[0] + r;
-                max[1] = n.entity.el.position[1] + r;
-                nodeLayer.updateTransform();
-                if (nodeLayer.transform) {
-                    vec2.applyTransform(min, min, nodeLayer.transform);
-                    vec2.applyTransform(max, max, nodeLayer.transform);
-                }
-                var ignore = min[0] > width || min[1] > height || max[0] < 0 || max[1] < 0;
-                n.entity.el.ignore = ignore;
+                n.entity.el.ignore = !n.entity.isInsideRect(rect);
             }
         }
         for (var i = 0; i < graph.edges.length; i++) {
             var e = graph.edges[i];
             if (e.entity) {
-                // TODO
-                e.entity.el.ignore = e.node1.entity.el.ignore && e.node2.entity.el.ignore;
+                e.entity.el.ignore = e.entity.hidden || !e.entity.isInsideRect(rect);
             }
         }
     }
@@ -16594,7 +17299,16 @@ define('bkgraph/util/util',['require'],function (require) {
                 el.addEventListener(name, func, useCapture);
             }
             else {
-                el.attachEvent(name, func);
+                el.attachEvent('on' + name, func);
+            }
+        },
+
+        removeEventListener: function (el, name, func, useCapture) {
+            if (window.removeEventListener) {
+                el.removeEventListener(name, func, useCapture);
+            }
+            else {
+                el.detachEvent('on' + name, func);
             }
         },
 
@@ -18919,15 +19633,139 @@ define('bkgraph/component/SearchBar',['require','./Component','zrender/tool/util
 
     return SearchBar;
 });
-define('text!bkgraph/html/sidebar.html',[],function () { return '<div class="bkg-entity-detail">\n    <img class="bkg-person-pic" src="${image}" />\n    <div class="bkg-person-info">\n        <h4>${name}</h4>\n        <p><b>出生:</b> ${birthDate|raw}</p>\n        <p>\n            <b>简介:</b> ${introduction.content|truncate(30)}\n            <a href="${sourceUrl}" class="bkg-more" target="_blank">更多>></a>\n        </p>\n    </div>\n    <div style="clear:both;"></div>\n    <div class="bkg-person-news bkg-sidebar-module">\n        <h4 class="bkg-title">最新动态</h4>\n        <ul>\n            <!-- for: ${news} as ${new}, ${index} -->\n            <li>\n                <!-- if: ${index} === 0 -->\n                <img class="bkg-news-pic" src="${new.image}"></img>\n                <div class="bkg-news-detail">\n                    <p>\n                        <b>核心提示:</b> ${new.summary|truncate(35)}\n                        <a href="${new.url}" class="bkg-more" target="_blank">更多>></a>\n                    </p>\n                    <p class="bkg-news-source">\n                        <a href="${new.url}" target="_blank">${new.source}</a>\n                        <span class="bkg-news-publish-time">${new.publishTime}</span>\n                    </p>\n                </div>\n                <div style="clear:both;"></div>\n                <!-- else -->\n                <div class="bkg-news-simple">\n                    <span class="bkg-news-title">${new.title|truncate(10)}</span>\n                    <a href="${new.url}" target="_blank">${new.source}</a>\n                    <span class="bkg-news-publish-time">${new.publishTime}</span>\n                </div>\n                <!-- /if -->\n            </li>\n            <!-- /for -->\n        </ul>\n    </div>\n    \n    <!-- if: ${weibo} -->\n    <div class="bkg-person-weibo bkg-sidebar-module">\n        <h4 class="bkg-title">新浪微博</h4>\n        <div class="bkg-weibo-info">\n            <h5>\n                ${weibo.name}\n            </h5>\n            <p>\n                粉丝: ${weibo.fans}\n                &nbsp;&nbsp;\n                微博: ${weibo.weiboNum}\n            </p>\n        </div>\n    </div>\n    <!-- /if -->\n</div>\n<div class="bkg-toggle">隐<br />藏<br /><</div>';});
+define('bkgraph/util/ScrollBar',['require','./util','Sizzle'],function (require) {
 
-define('bkgraph/component/SideBar',['require','./Component','zrender/tool/util','etpl','Sizzle','../util/util','text!../html/sidebar.html'],function (require) {
+    var util = require('./util');
+    var Sizzle = require('Sizzle');
+
+    var ScrollBar = function (content) {
+
+        this._$viewport = content.parentNode;
+
+        this._$content = content;
+
+        this._$scrollButton = null;
+
+        this._$scrollBar = null;
+
+        this._scroll = 0;
+
+        this._onMouseDown = util.bind(this._onMouseDown, this);
+        this._onMouseMove = util.bind(this._onMouseMove, this);
+        this._onMouseUp = util.bind(this._onMouseUp, this);
+        this._onMouseScroll = util.bind(this._onMouseScroll, this);
+
+        this._init();
+
+        this._sx = 0;
+        this._sy = 0;
+        this._thumbTop = 0;
+    };
+
+    ScrollBar.prototype._init = function () {
+        if (util.getStyle(this._$viewport, 'position') !== 'absolute') {
+            this._$viewport.style.position = 'relative';
+        }
+        util.addClass(this._$viewport, 'bkg-scrollbar-viewport');
+        util.addClass(this._$content, 'bkg-scrollbar-content');
+
+        this._$scrollButton = document.createElement('div');
+        this._$scrollButton.className = 'bkg-scrollbar-button';
+        this._$scrollBar = document.createElement('div');
+        this._$scrollBar.className = 'bkg-scrollbar-bar-y';
+
+        this._$viewport.appendChild(this._$scrollBar);
+        this._$scrollBar.appendChild(this._$scrollButton);
+
+        util.addEventListener(this._$scrollButton, 'mousedown', this._onMouseDown);
+
+        util.addEventListener(this._$viewport, 'mousewheel', this._onMouseScroll);
+        util.addEventListener(this._$viewport, 'DOMMouseScroll', this._onMouseScroll);
+
+        this.resize();
+    };
+
+    ScrollBar.prototype._onMouseDown = function (e) {
+        util.addEventListener(document.body, 'mousemove', this._onMouseMove);
+        util.addEventListener(document.body, 'mouseup', this._onMouseUp);
+
+        this._sx = e.screenX;
+        this._sy = e.screenY;
+    };
+
+    ScrollBar.prototype._onMouseUp = function () {
+        util.removeEventListener(document.body, 'mouseup', this._onMouseUp);
+        util.removeEventListener(document.body, 'mousemove', this._onMouseMove);
+    };
+
+    ScrollBar.prototype._onMouseMove = function (e) {
+        this._thumbTop += e.screenY - this._sy;
+
+        this._thumbTop = Math.max(this._thumbTop, 0);
+
+        var max = this._scrollBarHeight - this._scrollButtonHeight;
+        this._thumbTop = Math.min(max, this._thumbTop);
+
+        this._$scrollButton.style.top = this._thumbTop + 'px';
+        this._scroll = (this._contentHeight - this._viewportHeight) * this._thumbTop / max;
+        this._$content.style.top = -this._scroll + 'px';
+
+        this._sy = e.screenY;
+        this._sx = e.screenX;
+    };
+
+    ScrollBar.prototype._onMouseScroll = function (e) {
+        var delta = e.wheelDelta    // Webkit
+            || -e.detail * 5;   // Firefox
+
+        this.scrollTo(this._scroll - delta);
+    }
+
+    ScrollBar.prototype.scrollTo = function (scroll) {
+        scroll = Math.max(0, scroll);
+
+        var max = this._contentHeight - this._viewportHeight;
+        scroll = Math.min(scroll, max);
+
+        this._scroll = scroll;
+
+        this._$content.style.top = -scroll + 'px';
+
+        this._thumbTop = (this._scrollBarHeight - this._scrollButtonHeight) * scroll / max;
+        this._$scrollButton.style.top = this._thumbTop + 'px';
+    };
+
+    ScrollBar.prototype.resize = function () {
+        this._contentHeight = parseInt(this._$content.clientHeight);
+        this._viewportHeight = parseInt(this._$viewport.clientHeight);
+
+        if (this._viewportHeight > this._contentHeight) {
+            this._$scrollBar.style.display = 'none';
+            return;
+        } else {
+            this._$scrollBar.style.display = 'block';
+        }
+
+        this._scrollBarHeight = parseInt(this._$scrollBar.clientHeight);
+        var thumbHeight = this._scrollBarHeight * this._viewportHeight / this._contentHeight;
+        this._scrollButtonHeight = thumbHeight;
+
+        this._$scrollButton.style.height = thumbHeight + 'px';
+    }
+
+    return ScrollBar;
+});
+define('text!bkgraph/html/sidebar.html',[],function () { return '<div class="bkg-entity-detail">\n    <img class="bkg-person-pic" src="${image}" />\n    <div class="bkg-person-info">\n        <h4>${name}</h4>\n        <p><b>出生:</b> ${birthDate|raw}</p>\n        <p>\n            <b>简介:</b> ${introduction.content|truncate(30)}\n            <a href="${sourceUrl}" class="bkg-more" target="_blank">更多>></a>\n        </p>\n    </div>\n    <div style="clear:both;"></div>\n    <div class="bkg-person-news bkg-sidebar-module">\n        <h4 class="bkg-title">最新动态</h4>\n        <ul>\n            <!-- for: ${news} as ${new}, ${index} -->\n            <li>\n                <!-- if: ${index} === 0 -->\n                <img class="bkg-news-pic" src="${new.image}"></img>\n                <div class="bkg-news-detail">\n                    <p>\n                        <b>核心提示:</b> ${new.summary|truncate(35)}\n                        <a href="${new.url}" class="bkg-more" target="_blank">更多>></a>\n                    </p>\n                    <p class="bkg-news-source">\n                        <a href="${new.url}" target="_blank">${new.source}</a>\n                        <span class="bkg-news-publish-time">${new.publishTime}</span>\n                    </p>\n                </div>\n                <div style="clear:both;"></div>\n                <!-- else -->\n                <div class="bkg-news-simple">\n                    <span class="bkg-news-title">${new.title|truncate(10)}</span>\n                    <a href="${new.url}" target="_blank">${new.source}</a>\n                    <span class="bkg-news-publish-time">${new.publishTime}</span>\n                </div>\n                <!-- /if -->\n            </li>\n            <!-- /for -->\n        </ul>\n    </div>\n    \n    <!-- if: ${weibo} -->\n    <div class="bkg-person-weibo bkg-sidebar-module">\n        <h4 class="bkg-title">新浪微博</h4>\n        <div class="bkg-weibo-info">\n            <h5>\n                ${weibo.name}\n            </h5>\n            <p>\n                粉丝: ${weibo.fans}\n                &nbsp;&nbsp;\n                微博: ${weibo.weiboNum}\n            </p>\n        </div>\n    </div>\n    <!-- /if -->\n</div>';});
+
+define('bkgraph/component/SideBar',['require','./Component','zrender/tool/util','etpl','Sizzle','../util/util','../util/ScrollBar','text!../html/sidebar.html'],function (require) {
     
     var Component = require('./Component');
     var zrUtil = require('zrender/tool/util');
     var etpl = require('etpl');
     var Sizzle = require('Sizzle');
     var util = require('../util/util');
+
+    var ScrollBar = require('../util/ScrollBar');
 
     var renderSidebar = etpl.compile(require('text!../html/sidebar.html'));
 
@@ -18944,9 +19782,22 @@ define('bkgraph/component/SideBar',['require','./Component','zrender/tool/util',
     SideBar.prototype.type = 'SIDEBAR';
 
     SideBar.prototype.initialize = function (kg) {
-        
-        var el = this.el;
-        el.className = 'bkg-sidebar';
+        this.el.className = 'bkg-sidebar';
+
+        this._$viewport = document.createElement('div');
+        this._$viewport.className = 'bkg-sidebar-viewport';
+
+        this._$content = document.createElement('div');
+        this._$viewport.appendChild(this._$content);
+
+        this._$toggleBtn = document.createElement('div');
+        this._$toggleBtn.className = 'bkg-toggle';
+        this._$toggleBtn.innerHTML = '隐<br />藏<br />';
+
+        this.el.appendChild(this._$viewport);
+        this.el.appendChild(this._$toggleBtn);
+
+        this._scrollbar = new ScrollBar(this._$content);
 
         this._kgraph = kg;
 
@@ -18960,49 +19811,54 @@ define('bkgraph/component/SideBar',['require','./Component','zrender/tool/util',
             this.el.style.top = headerBar.el.clientHeight + 'px';
         }
         
-        return el;
+        return this.el;
     }
 
     SideBar.prototype.resize = function (w, h) {
-        // Do nothing
-    }
+        this._scrollbar.resize();
+    };
 
     SideBar.prototype.setData = function (data) {
         this.render(data);
-    }
+    };
 
     SideBar.prototype.render = function (data) {
-        this.el.innerHTML = renderSidebar(data);
-        this._$toggleBtn = Sizzle('.bkg-toggle', this.el)[0];
-    }
+        this._$content.innerHTML = renderSidebar(data);
+
+        this._scrollbar.resize();
+    };
 
     /**
      * 显示边栏
      */
     SideBar.prototype.show = function () {
-        util.removeClass(this.el, 'hidden');
+        if (util.hasClass(this.el, 'hidden')) {
+            util.removeClass(this.el, 'hidden');
 
-        var graphMain = this._kgraph.getComponentByType('GRAPH');
-        if (graphMain) {
-            graphMain.el.style.right = -this.el.clientWidth + 'px';
+            var graphMain = this._kgraph.getComponentByType('GRAPH');
+            if (graphMain) {
+                graphMain.el.style.right = -this.el.clientWidth + 'px';
+            }
+
+            this._$toggleBtn.innerHTML = '隐<br />藏<br /><';
         }
-
-        this._$toggleBtn.innerHTML = '隐<br />藏<br /><';
-    }
+    };
 
     /**
      * 隐藏边栏
      */
     SideBar.prototype.hide = function () {
-        util.addClass(this.el, 'hidden');
+        if (!util.hasClass(this.el, 'hidden')) {
+            util.addClass(this.el, 'hidden');
 
-        var graphMain = this._kgraph.getComponentByType('GRAPH');
-        if (graphMain) {
-            graphMain.el.style.right = '0px';
+            var graphMain = this._kgraph.getComponentByType('GRAPH');
+            if (graphMain) {
+                graphMain.el.style.right = '0px';
+            }
+
+            this._$toggleBtn.innerHTML = '显<br />示<br />>';
         }
-
-        this._$toggleBtn.innerHTML = '显<br />示<br />>';
-    }
+    };
 
     /**
      * 切换边栏的显示隐藏
@@ -19014,19 +19870,20 @@ define('bkgraph/component/SideBar',['require','./Component','zrender/tool/util',
         else {
             this.hide();
         }
-    }
+    };
 
     SideBar.prototype._dispatchClick= function (e) {
         var target = e.target || e.srcElement;
         if (Sizzle.matchesSelector(target, '.bkg-toggle')) {
             this.toggle();
         }
-    }
+    };
+
     zrUtil.inherits(SideBar, Component);
 
     return SideBar;
 });
-define('text!bkgraph/html/headerbar.html',[],function () { return '<h1>${name} <span style="font-weight:normal;">知识图谱</span></h1>\n<div class="bkg-explore-percent">\n    <span>探索层级</span>\n    <span class="bkg-explore-percent-bar">\n        <span class="bkg-explore-percent-bar-inner"></span>\n        <span class="bkg-explore-percent-tip"></span>\n    </span>\n</div>\n<div class="bkg-collapse">\n    <span class="bkg-collapse-checkbox">\n        <span class="bkg-collapse-checkbox-inner"></span>\n    </span>\n    <span class="bkg-collapse-label">全部展开</span>\n</div>';});
+define('text!bkgraph/html/headerbar.html',[],function () { return '<h1>${name} <span style="font-weight:normal;">知识图谱</span></h1>\n<div class="bkg-explore-percent">\n    <span class="bkg-explore-percent-bar">\n        <span class="bkg-explore-percent-bar-inner"></span>\n        <!-- for: ${levels} as ${level}, ${index} -->\n        <div class="bkg-milestone" style="left:${level.position}%;"></div>\n        <!-- /for -->\n    </span>\n    <!-- for: ${levels} as ${level}, ${index} -->\n    <div class="bkg-level-${index} bkg-level" style="width:${level.interval}%; left:${level.position}%">\n        <div class="bkg-level-icon"></div>\n        <div class="bkg-level-title">${level.title}</div>\n    </div>\n    <!-- /for -->\n</div>';});
 
 define('bkgraph/component/HeaderBar',['require','./Component','zrender/tool/util','etpl','../util/util','Sizzle','text!../html/headerbar.html'],function (require) {
 
@@ -19037,6 +19894,38 @@ define('bkgraph/component/HeaderBar',['require','./Component','zrender/tool/util
     var Sizzle = require('Sizzle');
 
     var renderHeaderBar = etpl.compile(require('text!../html/headerbar.html'));
+
+    var levels = [
+        {
+            position: 0,
+            title: '僵尸粉'
+        },
+        {
+            position: 8,
+            title: '初级粉'
+        },
+        {
+            position: 20,
+            title: '中级粉'
+        },
+        {
+            position: 40,
+            title: '高级粉'
+        },
+        {
+            position: 60,
+            title: '顶级粉'
+        },
+        {
+            position: 90,
+            title: '私生粉'
+        },
+        {
+            position: 100,
+            title: '',
+            interval: 0
+        }
+    ];
 
     var HeaderBar = function () {
 
@@ -19074,48 +19963,33 @@ define('bkgraph/component/HeaderBar',['require','./Component','zrender/tool/util
                 mainEntity = data.entities[i];
             }
         }
+        for (var i = 0; i < levels.length - 1; i++) {
+            levels[i].interval = levels[i + 1].position - levels[i].position;
+        }
         this.render({
-            name: mainEntity.name
+            name: mainEntity.name,
+            levels: levels
         });
     };
 
     HeaderBar.prototype.render = function (data) {
         this.el.innerHTML = renderHeaderBar(data);
-        var self = this;
-        util.addEventListener(Sizzle('.bkg-collapse', this.el)[0], 'click', function () {
-            self.toggleGraphCollapse();
-        });
+
+        this._$levels = Sizzle('.bkg-level', this.el);
     };
 
-    HeaderBar.prototype.toggleGraphCollapse = function () {
-        var graphMain = this._kgraph.getComponentByType('GRAPH');
-        if (graphMain) {
-            var buttonInner = Sizzle('.bkg-collapse-checkbox-inner', this.el)[0];
-            var label = Sizzle('.bkg-collapse-label', this.el)[0];
-            if (this._graphCollapsed) {
-                buttonInner.style.left = '17px';
-                label.innerHTML = '全部收拢';
-                graphMain.uncollapse();
-            } else {
-                buttonInner.style.left = '0px';
-                label.innerHTML = '全部展开';
-                graphMain.collapse();
-            }
-            this._graphCollapsed = !this._graphCollapsed;
-        }
-    }
-
     HeaderBar.prototype.setExplorePercent = function (percent) {
-        percent = percent * 100;
+        percent = Math.max(percent * 100, 1);
         Sizzle('.bkg-explore-percent-bar-inner', this.el)[0].style.width = percent + '%';
-        var tipDom = Sizzle('.bkg-explore-percent-tip', this.el)[0];
-        if (percent === 100) {
-            tipDom.style.fontSize = '12px';
-        } else {
-            tipDom.style.fontSize = '14px';
+
+        for (var i = 0; i < levels.length; i++) {
+            util.removeClass(this._$levels[i], 'bkg-active');
         }
-        tipDom.innerHTML = Math.round(percent);
-        tipDom.style.left = percent + '%';
+        for (var i = 0; i < levels.length; i++) {
+            if (levels[i].position <= percent && levels[i + 1].position > percent) {
+                util.addClass(this._$levels[i], 'bkg-active');
+            }
+        }
     }
 
     return HeaderBar;
@@ -19310,13 +20184,15 @@ define('bkgraph/bkgraph',['require','./component/GraphMain','./component/PanCont
 
                     self.initialize(res.data);
 
-                    onsuccess && onsuccess();
+                    onsuccess && onsuccess(this);
                 }
             });
         } else {
+            this._rawData = data;
+
             this.initialize(data);
 
-            onsuccess && onsuccess();
+            onsuccess && onsuccess(this);
         }
     }
 

@@ -32,6 +32,11 @@ define(function (require) {
         {
             position: 90,
             title: '私生粉'
+        },
+        {
+            position: 100,
+            title: '',
+            interval: 0
         }
     ];
 
@@ -71,12 +76,8 @@ define(function (require) {
                 mainEntity = data.entities[i];
             }
         }
-        for (var i = 0; i < levels.length; i++) {
-            if (i === levels.length - 1) {
-                levels[i].interval = 100 - levels[i].position;
-            } else {
-                levels[i].interval = levels[i + 1].position - levels[i].position;
-            }
+        for (var i = 0; i < levels.length - 1; i++) {
+            levels[i].interval = levels[i + 1].position - levels[i].position;
         }
         this.render({
             name: mainEntity.name,
@@ -97,7 +98,7 @@ define(function (require) {
         for (var i = 0; i < levels.length; i++) {
             util.removeClass(this._$levels[i], 'bkg-active');
         }
-        for (var i = 0; i < levels.length - 1; i++) {
+        for (var i = 0; i < levels.length; i++) {
             if (levels[i].position <= percent && levels[i + 1].position > percent) {
                 util.addClass(this._$levels[i], 'bkg-active');
             }

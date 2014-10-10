@@ -93,7 +93,7 @@
     }
 
     .bkg-toggle {
-        width: 143px;
+        width: 106px;
         height: 32px;
         position: absolute;
         right: 50px;
@@ -103,7 +103,7 @@
         background-image: url(../img/searchbar/toggle-btn.png);
 
         text-align: center;
-        font-size: 18px;
+        font-size: 16px;
         line-height: 34px;
 
         cursor: pointer;
@@ -225,7 +225,7 @@
     left: 0px;
     top: 0px;
     bottom: 0px;
-    width: 340px;
+    width: 310px;
     background-color: #0d4075;
     
     -webkit-transition: left 0.5s ease-in-out;
@@ -256,6 +256,11 @@
 
     &.hidden {
         left: -335px;
+    }
+
+    .bkg-sidebar-viewport {
+        width: 100%;
+        height: 100%;
     }
 
     .bkg-sidebar-module {
@@ -355,7 +360,7 @@
 
                     .bkg-news-publish-time {
                         float: right;
-                        margin-right: 20px;
+                        margin-right: 10px;
                     }
                 }
             }
@@ -430,13 +435,13 @@
         line-height: @headerbar-height;
         height: @headerbar-height;
 
-        font-size: 14px;
+        font-size: 12px;
 
         .bkg-explore-percent-bar { 
             display: inline-block;
             width: 700px;
             height: 5px;
-            margin-top: @headerbar-height - 30;
+            margin-top: @headerbar-height - 25;
             border-radius: 4px;
             background-color: #86c4f9;
             position: relative;
@@ -474,7 +479,7 @@
 
     .bkg-level-icon {
         width: 100%;
-        top: 5px;
+        top: 10px;
         height: 28px;
         background-position: 50% 50%;
         background-repeat: no-repeat;
@@ -532,5 +537,31 @@
     }
     .bkg-level-5.bkg-active .bkg-level-icon {
         background-image: url('../img/headerbar/私生粉1.png');
+    }
+}
+
+/**滚动条*/
+.bkg-scrollbar-viewport {
+    overflow: hidden;
+
+    .bkg-scrollbar-content {
+        position: absolute;
+    }
+
+    .bkg-scrollbar-bar-y {
+        top: 0px;
+        bottom: 0px;
+        width: 10px;
+        right: 0px;
+        position: absolute;
+    }
+
+    .bkg-scrollbar-button {
+        position: absolute;
+        width: 10px;
+        left: 0px;
+        background-color: #837AE0;
+        border-radius: 4px;
+        opacity: 0.3;
     }
 }

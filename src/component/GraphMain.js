@@ -62,6 +62,8 @@ define(function (require) {
 
         this._nodeEntityCount = 0;
         this._baseEntityCount = 0;
+
+        this._firstShowEntityDetail = true;
     };
 
     GraphMain.prototype.type = 'GRAPH';
@@ -167,7 +169,7 @@ define(function (require) {
             n.layout = {
                 position: entity.position,
                 mass: 1,
-                radius: r
+                size: r
             };
             if (!entity.position) {
                 noPosition = true;
@@ -325,16 +327,16 @@ define(function (require) {
         tree.traverse(function (treeNode) {
             var graphNode = this._graphLayout.getNodeById(treeNode.id);
             treeNode.layout = {
-                width: graphNode.layout.radius * 2,
-                height: graphNode.layout.radius * 2
+                width: graphNode.layout.size * 2,
+                height: graphNode.layout.size * 2
             };
         }, this);
-        var layout = new TreeLayout(tree);
+        var layout = new TreeLayout();
         var layerPadding = [100, 400, 200, 200, 200, 200, 200];
         layout.layerPadding = function (level) {
             return layerPadding[level] || 200;
         };
-        layout.run();
+        layout.run(tree);
 
         var min = [Infinity, Infinity];
         var max = [-Infinity, -Infinity];
@@ -454,7 +456,6 @@ define(function (require) {
             var n = graph.nodes[i];
             if (n.entity && n !== this._lastClickNode) {
                 this.unhoverNode(n);
-
                 if (n._isHighlight) {
                     n.entity.highlight(zr);
                 }
@@ -494,7 +495,7 @@ define(function (require) {
         if (node._isHover) {
             node.entity.stopActiveAnimation(this._zr);
             node.entity.animateRadius(
-                this._zr, node.layout.radius, 500
+                this._zr, node.layout.size, 500
             );
 
             node.entity.lowlight();
@@ -512,7 +513,7 @@ define(function (require) {
 
         // Hover 实体放大
         node.entity.animateRadius(
-            this._zr, node.layout.radius * 1.2, 500
+            this._zr, node.layout.size * 1.2, 500
         );
         node.entity.startActiveAnimation(this._zr);
 
@@ -591,10 +592,10 @@ define(function (require) {
             node = this._graphLayout.getNodeById(node);
         }
 
-        var graph = this._graphLayout;
-        var graphRendering = this._graph;
+        var graphLayout = this._graphLayout;
+        var graph = this._graph;
         var zr = this._zr;
-        node = graph.getNodeById(node.id);
+        node = graphLayout.getNodeById(node.id);
 
         this.lowlightAll();
 
@@ -602,11 +603,17 @@ define(function (require) {
         var current = node;
         var nodes = [current];
         while (current) {
-            var n = graphRendering.getNodeById(current.id);
+            var n = graph.getNodeById(current.id);
             if (!n.entity) {
                 this._createNodeEntity(n);
             }
-            n.entity.highlight();
+            if (node === current) {
+                this.hoverNode(n);
+                n._isHighlight = true;
+            } else {
+                n.entity.highlight();
+                n._isHighlight = true;   
+            }
 
             var inEdge = current.inEdges[0];
             if (!inEdge) {
@@ -620,7 +627,7 @@ define(function (require) {
         for (var i = 0; i < nodes.length - 1; i++) {
             var n2 = nodes[i];
             var n1 = nodes[i + 1];
-            var e = graphRendering.getEdge(n1.id, n2.id);
+            var e = graph.getEdge(n1.id, n2.id);
 
             if (!e.entity) {
                 this._createEdgeEntity(e);
@@ -645,7 +652,10 @@ define(function (require) {
         var sideBar = this._kgraph.getComponentByType('SIDEBAR');
         if (sideBar) {
             sideBar.setData(n.data);
-            sideBar.show();
+            if (this._firstShowEntityDetail) {
+                sideBar.show();
+            }
+            this._firstShowEntityDetail = false;
         }
     }
 
@@ -798,6 +808,9 @@ define(function (require) {
             this._createEdgeEntity(e);
             this._growNodeEntity(other, node, Math.random() * 500);
         }
+
+        this._syncHeaderBarExplorePercent();
+        zr.refreshNextFrame();
     }
 
     GraphMain.prototype.toJSON = function () {
@@ -912,7 +925,7 @@ define(function (require) {
 
     GraphMain.prototype._createNodeEntity = function (node) {
         var nodeEntity = new NodeEntity({
-            radius: node.layout.radius,
+            radius: node.layout.size,
             label: node.data.name,
             image: node.data.image
         });
@@ -945,8 +958,8 @@ define(function (require) {
         })
 
         nodeEntity.bind('click', function () {
-            // self.showEntityDetail(node);
             if (self._lastClickNode !== node) {
+                self.showEntityDetail(node);
                 self._lastClickNode = node;
                 self._syncOutTipEntities();
                 self.highlightNodeAndAdjeceny(node);

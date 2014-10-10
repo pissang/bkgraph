@@ -9,18 +9,22 @@
     <body>
         <div id='viewport'></div>
         <script src="bkgraph.js"></script>
+        <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
         <script>
-            var g = bkgraph.init('viewport', 'j', function () {
-                g.addComponent(new bkgraph.SideBar());
-                g.addComponent(new bkgraph.SearchBar());
+            $.get('../mock/200_f.json', function (data) {
+                if (typeof(data) === 'string') {
+                    data = JSON.parse(data);
+                }
+                var g = bkgraph.init('viewport', data, function (g) {
+                    g.addComponent(new bkgraph.SideBar());
+                    // g.addComponent(new bkgraph.SearchBar());
+                    g.addComponent(new bkgraph.HeaderBar());
+                });
 
-                var graphMain = g.getComponentByType('GRAPH');
-                graphMain.uncollapse();
-            });
-
-            window.onresize = function () {
-                g.resize();
-            }
+                window.onresize = function () {
+                    g.resize();
+                }  
+            })
         </script>
     </body>
 </html>

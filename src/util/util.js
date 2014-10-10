@@ -29,7 +29,16 @@ define(function (require) {
                 el.addEventListener(name, func, useCapture);
             }
             else {
-                el.attachEvent(name, func);
+                el.attachEvent('on' + name, func);
+            }
+        },
+
+        removeEventListener: function (el, name, func, useCapture) {
+            if (window.removeEventListener) {
+                el.removeEventListener(name, func, useCapture);
+            }
+            else {
+                el.detachEvent('on' + name, func);
             }
         },
 
