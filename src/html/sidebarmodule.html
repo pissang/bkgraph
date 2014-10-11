@@ -1,0 +1,67 @@
+<!-- target: sidebar-news -->
+<div class="bkg-news bkg-sidebar-module">
+    <h4 class="bkg-title">最新动态</h4>
+    <ul>
+        <!-- for: ${news} as ${new}, ${index} -->
+        <li>
+            <!-- if: ${index} === 0 -->
+            <div class="bkg-news-pic">
+                <img src="${new.image}"></img>
+            </div>
+            <div class="bkg-news-detail">
+                <p>
+                    <b>核心提示:</b> ${new.summary|truncate(35)}
+                    <a href="${new.url}" class="bkg-more" target="_blank">更多>></a>
+                </p>
+                <p class="bkg-news-source">
+                    <a href="${new.url}" target="_blank">${new.source|truncate(5)}</a>
+                    <span class="bkg-news-publish-time">${new.publishTime|truncate(10, '')}</span>
+                </p>
+            </div>
+            <!-- else -->
+            <div class="bkg-news-simple">
+                <a href="${new.url}" class="bkg-news-title">${new.title|truncate(10)}</a>
+                <a href="${new.url}" target="_blank">${new.source|truncate(5)}</a>
+                <span class="bkg-news-publish-time">${new.publishTime|truncate(10, '')}</span>
+            </div>
+            <!-- /if -->
+        </li>
+        <!-- /for -->
+    </ul>
+</div>
+
+<!-- target: sidebar-weibo -->
+<div class="bkg-weibo bkg-sidebar-module">
+    <h4 class="bkg-title">新浪微博</h4>
+    <div class="bkg-weibo-info">
+        <img class="bkg-left" src="${weibo.image}" alt="">
+        <div class="bkg-right">
+            <h5>${weibo.name}</h5>
+            <p>粉丝: ${weibo.fans}&nbsp;&nbsp;微博: ${weibo.weiboNum}</p>
+        </div>
+    </div>
+    <div class="bkg-latest-weibo">
+        <p class="bkg-latest-weibo-content">${weibo.latestWeibo|trim}<a href="${weibo.latestWeiboUrl}">查看全文</a></p>
+        <div class="bkg-latest-weibo-info">
+            <span class="bkg-latest-weibo-time" target="_blank">${weibo.latestWeiboTime}</span>
+            <a class="bkg-latest-weibo-comment" href="${weibo.latestWeiboUrl}" target="_blank">${weibo.latestWeiboComment}</a>
+            <a class="bkg-latest-weibo-forward" href="${weibo.latestWeiboUrl}" target="_blank">${weibo.latestWeiboForward}</a>
+        </div>
+    </div>
+    <div style="clear:both;"></div>
+</div>
+
+<!-- target: sidebar-works -->
+<div class="bkg-works bkg-sidebar-module">
+    <h4 class="bkg-title">主要代表作品</h4>
+    <ul>
+    <!-- for: ${representativeWork} as ${work}, ${idx} -->
+        <li>
+            <a href="${work.movieRedir}" target="_blank">
+                <img src="${work.movieImage}" alt="" />
+                <span class="bkg-work-title">${work.movieName|truncate(5)}</span>
+            </a>
+        </li>
+    <!-- /for -->
+    </ul>
+</div>

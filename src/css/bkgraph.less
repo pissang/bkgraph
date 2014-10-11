@@ -226,7 +226,8 @@
     top: 0px;
     bottom: 0px;
     width: 310px;
-    background-color: #0d4075;
+    background-color: #1d4b7a;
+    color: white;
     
     -webkit-transition: left 0.5s ease-in-out;
        -moz-transition: left 0.5s ease-in-out;
@@ -235,7 +236,18 @@
             transition: left 0.5s ease-in-out;
 
     font-size: 12px;
-    line-height: 19px;
+    line-height: 20px;
+
+    .bkg-sidebar-viewport {
+        box-sizing: border-box;
+    }
+
+    .bkg-sidebar-content {
+        margin-left: 10px;
+        margin-right: 10px;
+        left: 0px;
+        right: 0px;
+    }
 
     a {
         color: #0595ce;
@@ -269,7 +281,7 @@
 
         h4.bkg-title {
             color: #9bd1fe;
-            margin: 8px 10px;
+            margin: 8px 0px;
             font-size: 16px;
 
             padding-left: 28px;
@@ -286,114 +298,231 @@
 
         .bkg-person-pic {
             width: 100px;
-            margin-left: 10px;
             margin-top: 30px;
 
             float: left;
         }
 
         .bkg-person-info {
-            
-            float: left;
-            margin-top: 30px;
-            margin-left: 10px;
-            width: 190px;
+            margin-top: 28px;
+            margin-left: 110px;
 
             h4 {
                 color: #9bd1fe;
                 margin: 0px;
+                font-size: 14px;
             }
 
             p {
-                color: white;
                 margin: 4px 0px;
             }
         }
+    }
     
-        .bkg-person-news {
-        
-            h4 {
-                background-image: url(../img/sidebar/news.png);
+    .bkg-relation-detail {
+        .bkg-relation-description {
+            img {
+                width: 100px;
+            }
+            margin-top: 20px;
+            position: relative;
+        }
+        .bkg-relation-entity-from {
+            float: left;
+        }
+        .bkg-relation-entity-to {
+            float: right;
+        }
+        .bkg-relation-name {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            width: 65px;
+            height: 5px;
+            margin-left: -32px;
+
+            border-radius: 3px;
+            background-color: #2a98fa;
+            text-align: center;
+
+            span {
+                position: relative;
+                top: -30px;
+                font-size: 14px;
+            }
+        }
+
+        .bkg-relation-source {
+            margin: 30px -10px 0px -10px;
+            font-size: 14px;
+
+            background-color: #20619e;
+            height: 3px;
+            text-align: center;
+        }
+        .bkg-relation-site {
+            background-color: #1d4b7a;
+            color: #2ab7ed;
+            line-height: 20px;
+            padding: 0px 10px;
+            position: relative;
+            top: -8px;
+        }
+
+        .bkg-relation-baidu {
+            height: 30px;
+            padding: 0px 10px;
+            border-radius: 15px;
+            background-color: #2374be;
+            border: 5px solid #1d4b7a;
+            box-sizing: border-box;
+            color: white;
+            position: relative;
+            top: -15px;
+        }
+    }
+
+    /******* 微博模块 ***********/
+    .bkg-weibo {
+        h4 {
+            background-image: url(../img/sidebar/weibo.png);
+        }
+
+        .bkg-weibo-info {
+            .bkg-left {
+                float: left;
+            }
+            .bkg-right {
+                margin-left: 65px;
+            }
+            h5 {
+                margin: 0px;
+                font-size: 14px;
+            }
+            p {
+                margin: 5px 0px;
+            }
+        }
+
+        .bkg-latest-weibo-content {
+            margin-top: 10px;
+        }
+
+        .bkg-latest-weibo-info {
+            margin-top: 5px;
+        }
+
+        .bkg-latest-weibo-time {
+            color: #02c0fe;
+        }
+
+        .bkg-latest-weibo-comment {
+            float: right;
+        }
+        .bkg-latest-weibo-forward {
+            float: right;
+            margin-right: 10px;
+        }
+    }
+
+    /******* 新闻模块 ***********/
+    .bkg-news {
+    
+        h4 {
+            background-image: url(../img/sidebar/news.png);
+        }
+
+        li {
+            
+            h5 {
+                color: white;
+                font-weight: normal;
+                margin: 0px;
             }
 
-            li {
-                
-                color: white;
+            .bkg-news-pic {
+                float: left;
+                width: 100px;
+                height: 75px;
+                overflow: hidden;
 
-                h5 {
+                img {
+                    height: 75px;
+                }
+            }
+
+            .bkg-news-detail {
+                margin-left: 120px;
+                margin-top: -4px;
+
+                .bkg-news-source {
+                    // margin-top: 5px;
+                }
+                .bkg-news-publish-time {
+                    float: right;
+                    margin-right: 10px;
+                }
+            }
+
+            .bkg-news-publish-time {
+                color: #02c0fe;
+            }
+
+            .bkg-news-simple {
+                margin-top: 6px;
+
+                .bkg-news-title {
+                    width: 130px;
+                    display: inline-block;
+
                     color: white;
-                    font-weight: normal;
-                    margin: 0px;
-                }
 
-                img.bkg-news-pic {
-                    float: left;
-                    width: 100px;
-                    margin-left: 10px;
-                }
-
-                .bkg-news-detail {
-                    float: left;
-                    margin-left: 10px;
-                    width: 190px;
-
-                    .bkg-news-source {
-                        margin-top: 5px;
-                    }
-                    .bkg-news-publish-time {
-                        margin-left: 10px;
+                    &:hover {
+                        background: transparent;
+                        color: white;
+                        text-decoration: underline;
                     }
                 }
 
                 .bkg-news-publish-time {
-                    color: #02c0fe;
+                    float: right;
+                    margin-right: 10px;
                 }
-
-                .bkg-news-simple {
-                    margin-left: 5px;
-                    margin-top: 10px;
-
-                    .bkg-news-title {
-                        width: 130px;
-                        display: inline-block;
-
-                        color: white;
-
-                        &:hover {
-                            background: transparent;
-                            color: white;
-                            text-decoration: underline;
-                        }
-                    }
-
-                    .bkg-news-publish-time {
-                        float: right;
-                        margin-right: 10px;
-                    }
-                }
-            }
-        }
-
-        .bkg-person-weibo {
-            h4 {
-                background-image: url(../img/sidebar/weibo.png);
-            }
-
-            h5 {
-                color: white;
-            }
-
-            .bkg-weibo-info {
-                margin-left: 10px;
-            }
-
-            p {
-                font-size: 12px;
-                color: white;
             }
         }
     }
+    
+    /** 作品模块 */
+    .bkg-works {
+        h4 {
+            background-image: url(../img/sidebar/works.png);
+        }
 
+        li {
+            float: left;
+            text-align: center;
+            margin-right: 8px;
+
+            img {
+                width: 60px;
+                height: 78px;
+            }
+        }
+
+        a {
+            color: white;
+            display: inline-block;
+
+            &:hover {
+                background: transparent;
+            }
+        }
+
+        .bkg-work-title {
+            margin-top: 3px;
+            display: block;
+        }
+    }
 
     .bkg-toggle {
         width: 20px;
@@ -417,16 +546,24 @@
 
 /** 顶栏 */
 .bkg-headerbar {
+    @headerbar-height: 55px;
+
     position: absolute;
     top: 0px;
     left: 0px;
     right: 0px;
-    height: 55px;
-    background-image: url(../img/searchbar/search-bg.png);
+    height: @headerbar-height;
     
     color: white;
-
-    @headerbar-height: 55px;
+    
+    .bkg-bg {
+        background-image: url(../img/headerbar/bg.png);
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        right: 0px;
+        bottom: 0px;
+    }
 
     h1 {
         position: absolute;

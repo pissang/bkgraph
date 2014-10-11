@@ -191,14 +191,30 @@
   top: 0px;
   bottom: 0px;
   width: 310px;
-  background-color: #0d4075;
+  background-color: #1d4b7a;
+  color: white;
   -webkit-transition: left 0.5s ease-in-out;
   -moz-transition: left 0.5s ease-in-out;
   -ms-transition: left 0.5s ease-in-out;
   -o-transition: left 0.5s ease-in-out;
   transition: left 0.5s ease-in-out;
   font-size: 12px;
-  line-height: 19px;
+  line-height: 20px;
+  /******* 微博模块 ***********/
+
+  /******* 新闻模块 ***********/
+
+  /** 作品模块 */
+
+}
+.bkg-sidebar .bkg-sidebar-viewport {
+  box-sizing: border-box;
+}
+.bkg-sidebar .bkg-sidebar-content {
+  margin-left: 10px;
+  margin-right: 10px;
+  left: 0px;
+  right: 0px;
 }
 .bkg-sidebar a {
   color: #0595ce;
@@ -226,7 +242,7 @@
 }
 .bkg-sidebar .bkg-sidebar-module h4.bkg-title {
   color: #9bd1fe;
-  margin: 8px 10px;
+  margin: 8px 0px;
   font-size: 16px;
   padding-left: 28px;
   background-repeat: no-repeat;
@@ -239,84 +255,175 @@
 }
 .bkg-sidebar .bkg-entity-detail .bkg-person-pic {
   width: 100px;
-  margin-left: 10px;
   margin-top: 30px;
   float: left;
 }
 .bkg-sidebar .bkg-entity-detail .bkg-person-info {
-  float: left;
-  margin-top: 30px;
-  margin-left: 10px;
-  width: 190px;
+  margin-top: 28px;
+  margin-left: 110px;
 }
 .bkg-sidebar .bkg-entity-detail .bkg-person-info h4 {
   color: #9bd1fe;
   margin: 0px;
+  font-size: 14px;
 }
 .bkg-sidebar .bkg-entity-detail .bkg-person-info p {
-  color: white;
   margin: 4px 0px;
 }
-.bkg-sidebar .bkg-entity-detail .bkg-person-news h4 {
+.bkg-sidebar .bkg-relation-detail .bkg-relation-description {
+  margin-top: 20px;
+  position: relative;
+}
+.bkg-sidebar .bkg-relation-detail .bkg-relation-description img {
+  width: 100px;
+}
+.bkg-sidebar .bkg-relation-detail .bkg-relation-entity-from {
+  float: left;
+}
+.bkg-sidebar .bkg-relation-detail .bkg-relation-entity-to {
+  float: right;
+}
+.bkg-sidebar .bkg-relation-detail .bkg-relation-name {
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  width: 65px;
+  height: 5px;
+  margin-left: -32px;
+  border-radius: 3px;
+  background-color: #2a98fa;
+  text-align: center;
+}
+.bkg-sidebar .bkg-relation-detail .bkg-relation-name span {
+  position: relative;
+  top: -30px;
+  font-size: 14px;
+}
+.bkg-sidebar .bkg-relation-detail .bkg-relation-source {
+  margin: 30px -10px 0px -10px;
+  font-size: 14px;
+  background-color: #20619e;
+  height: 3px;
+  text-align: center;
+}
+.bkg-sidebar .bkg-relation-detail .bkg-relation-site {
+  background-color: #1d4b7a;
+  color: #2ab7ed;
+  line-height: 20px;
+  padding: 0px 10px;
+  position: relative;
+  top: -8px;
+}
+.bkg-sidebar .bkg-relation-detail .bkg-relation-baidu {
+  height: 30px;
+  padding: 0px 10px;
+  border-radius: 15px;
+  background-color: #2374be;
+  border: 5px solid #1d4b7a;
+  box-sizing: border-box;
+  color: white;
+  position: relative;
+  top: -15px;
+}
+.bkg-sidebar .bkg-weibo h4 {
+  background-image: url(../img/sidebar/weibo.png);
+}
+.bkg-sidebar .bkg-weibo .bkg-weibo-info .bkg-left {
+  float: left;
+}
+.bkg-sidebar .bkg-weibo .bkg-weibo-info .bkg-right {
+  margin-left: 65px;
+}
+.bkg-sidebar .bkg-weibo .bkg-weibo-info h5 {
+  margin: 0px;
+  font-size: 14px;
+}
+.bkg-sidebar .bkg-weibo .bkg-weibo-info p {
+  margin: 5px 0px;
+}
+.bkg-sidebar .bkg-weibo .bkg-latest-weibo-content {
+  margin-top: 10px;
+}
+.bkg-sidebar .bkg-weibo .bkg-latest-weibo-info {
+  margin-top: 5px;
+}
+.bkg-sidebar .bkg-weibo .bkg-latest-weibo-time {
+  color: #02c0fe;
+}
+.bkg-sidebar .bkg-weibo .bkg-latest-weibo-comment {
+  float: right;
+}
+.bkg-sidebar .bkg-weibo .bkg-latest-weibo-forward {
+  float: right;
+  margin-right: 10px;
+}
+.bkg-sidebar .bkg-news h4 {
   background-image: url(../img/sidebar/news.png);
 }
-.bkg-sidebar .bkg-entity-detail .bkg-person-news li {
-  color: white;
-}
-.bkg-sidebar .bkg-entity-detail .bkg-person-news li h5 {
+.bkg-sidebar .bkg-news li h5 {
   color: white;
   font-weight: normal;
   margin: 0px;
 }
-.bkg-sidebar .bkg-entity-detail .bkg-person-news li img.bkg-news-pic {
+.bkg-sidebar .bkg-news li .bkg-news-pic {
   float: left;
   width: 100px;
-  margin-left: 10px;
+  height: 75px;
+  overflow: hidden;
 }
-.bkg-sidebar .bkg-entity-detail .bkg-person-news li .bkg-news-detail {
-  float: left;
-  margin-left: 10px;
-  width: 190px;
+.bkg-sidebar .bkg-news li .bkg-news-pic img {
+  height: 75px;
 }
-.bkg-sidebar .bkg-entity-detail .bkg-person-news li .bkg-news-detail .bkg-news-source {
-  margin-top: 5px;
+.bkg-sidebar .bkg-news li .bkg-news-detail {
+  margin-left: 120px;
+  margin-top: -4px;
 }
-.bkg-sidebar .bkg-entity-detail .bkg-person-news li .bkg-news-detail .bkg-news-publish-time {
-  margin-left: 10px;
+.bkg-sidebar .bkg-news li .bkg-news-detail .bkg-news-publish-time {
+  float: right;
+  margin-right: 10px;
 }
-.bkg-sidebar .bkg-entity-detail .bkg-person-news li .bkg-news-publish-time {
+.bkg-sidebar .bkg-news li .bkg-news-publish-time {
   color: #02c0fe;
 }
-.bkg-sidebar .bkg-entity-detail .bkg-person-news li .bkg-news-simple {
-  margin-left: 5px;
-  margin-top: 10px;
+.bkg-sidebar .bkg-news li .bkg-news-simple {
+  margin-top: 6px;
 }
-.bkg-sidebar .bkg-entity-detail .bkg-person-news li .bkg-news-simple .bkg-news-title {
+.bkg-sidebar .bkg-news li .bkg-news-simple .bkg-news-title {
   width: 130px;
   display: inline-block;
   color: white;
 }
-.bkg-sidebar .bkg-entity-detail .bkg-person-news li .bkg-news-simple .bkg-news-title:hover {
+.bkg-sidebar .bkg-news li .bkg-news-simple .bkg-news-title:hover {
   background: transparent;
   color: white;
   text-decoration: underline;
 }
-.bkg-sidebar .bkg-entity-detail .bkg-person-news li .bkg-news-simple .bkg-news-publish-time {
+.bkg-sidebar .bkg-news li .bkg-news-simple .bkg-news-publish-time {
   float: right;
   margin-right: 10px;
 }
-.bkg-sidebar .bkg-entity-detail .bkg-person-weibo h4 {
-  background-image: url(../img/sidebar/weibo.png);
+.bkg-sidebar .bkg-works h4 {
+  background-image: url(../img/sidebar/works.png);
 }
-.bkg-sidebar .bkg-entity-detail .bkg-person-weibo h5 {
+.bkg-sidebar .bkg-works li {
+  float: left;
+  text-align: center;
+  margin-right: 8px;
+}
+.bkg-sidebar .bkg-works li img {
+  width: 60px;
+  height: 78px;
+}
+.bkg-sidebar .bkg-works a {
   color: white;
+  display: inline-block;
 }
-.bkg-sidebar .bkg-entity-detail .bkg-person-weibo .bkg-weibo-info {
-  margin-left: 10px;
+.bkg-sidebar .bkg-works a:hover {
+  background: transparent;
 }
-.bkg-sidebar .bkg-entity-detail .bkg-person-weibo p {
-  font-size: 12px;
-  color: white;
+.bkg-sidebar .bkg-works .bkg-work-title {
+  margin-top: 3px;
+  display: block;
 }
 .bkg-sidebar .bkg-toggle {
   width: 20px;
@@ -340,8 +447,15 @@
   left: 0px;
   right: 0px;
   height: 55px;
-  background-image: url(../img/searchbar/search-bg.png);
   color: white;
+}
+.bkg-headerbar .bkg-bg {
+  background-image: url(../img/headerbar/bg.png);
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
 }
 .bkg-headerbar h1 {
   position: absolute;

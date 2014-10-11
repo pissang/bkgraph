@@ -285,11 +285,9 @@ define(function (require) {
 
         zr.modLayer(0, {
             panable: true,
-            zoomable: true
-        });
-        zr.modLayer(2, {
-            panable: true,
-            zoomable: true
+            zoomable: true,
+            maxZoom: 1.5,
+            minZoom: 0.5
         });
     };
 
@@ -493,6 +491,9 @@ define(function (require) {
         zr.refreshNextFrame();
     }
 
+    /**
+     * 节点移除hover特效
+     */
     GraphMain.prototype.unhoverNode = function (node) {
         if (node._isHover) {
             node.entity.stopActiveAnimation(this._zr);
@@ -506,6 +507,9 @@ define(function (require) {
         }
     }
 
+    /**
+     * 鼠标 hover 到节点上的特效
+     */
     GraphMain.prototype.hoverNode = function (node) {
         if (node._isHover) {
             return;
@@ -522,6 +526,9 @@ define(function (require) {
         node.entity.highlight();
     }
 
+    /**
+     * 低亮指定节点
+     */
     GraphMain.prototype.lowlightNode = function (node) {
         if (node.entity && node._isHighlight) {
             node.entity.lowlight();
@@ -529,6 +536,9 @@ define(function (require) {
         }
     }
 
+    /**
+     * 高亮指定节点
+     */
     GraphMain.prototype.highlightNode = function (node) {
         if (node.entity && !node._isHighlight) {
             node.entity.highlight();
@@ -537,7 +547,7 @@ define(function (require) {
     }
 
     /**
-     * 高亮节点与邻接节点
+     * 高亮节点与邻接节点, 点击的时候出发
      */
     GraphMain.prototype.highlightNodeAndAdjeceny = function (node) {
         if (typeof(node) === 'string') {
@@ -660,6 +670,24 @@ define(function (require) {
             this._firstShowEntityDetail = false;
         }
     }
+
+    /**
+     * 在边栏中显示关系的详细信息
+     */
+     GraphMain.prototype.showRelationDetail = function (e) {
+        var sideBar = this._kgraph.getComponentByType('SIDEBAR');
+        if (sideBar) {
+            var data = {};
+            for (var name in e.data) {
+                data[name] = e.data[name];
+            }
+            data.fromEntity = this._graph.getNodeById(data.fromID).data;
+            data.toEntity = this._graph.getNodeById(data.toID).data;
+
+            sideBar.setData(data, true);
+            sideBar.show();
+        }
+     }
 
     /**
      * 移动视图到指定的实体位置
@@ -994,6 +1022,10 @@ define(function (require) {
                 });
             }
             edgeEntity.initialize(this._zr);
+
+            edgeEntity.bind('click', function () {
+                this.showRelationDetail(e);
+            }, this);
 
             e.entity = edgeEntity;
 

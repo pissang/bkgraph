@@ -16,11 +16,16 @@ define(function (require) {
     var http = require('zrender/tool/http');
 
     // etpl truncate
-    etpl.addFilter('truncate', function (str, len) {
+    etpl.addFilter('truncate', function (str, len, tail) {
         if (str.length > len) {
-            return str.substring(0, len) + '...';
+            tail = tail == null ? '…' : tail;
+            return str.substring(0, len - tail.length) + tail;
         }
         return str;
+    });
+    // etpl trun
+    etpl.addFilter('trim', function (str) {
+        return str.replace(/^\s+|\s+$/g, '');
     });
 
     // var TUPU_URL = 'http://nj02-wd-knowledge45-ssd1l.nj02.baidu.com:8866/api/tupu';

@@ -8,7 +8,9 @@ define(function (require) {
 
     var ScrollBar = require('../util/ScrollBar');
 
-    var renderSidebar = etpl.compile(require('text!../html/sidebar.html'));
+    etpl.compile(require('text!../html/sidebarmodule.html'));
+    var renderEntityDetail = etpl.compile(require('text!../html/entitydetail.html'));
+    var renderRelationDetail = etpl.compile(require('text!../html/relationdetail.html'));
 
     var SideBar = function () {
         
@@ -29,6 +31,7 @@ define(function (require) {
         this._$viewport.className = 'bkg-sidebar-viewport';
 
         this._$content = document.createElement('div');
+        this._$content.className = 'bkg-sidebar-content';
         this._$viewport.appendChild(this._$content);
 
         this._$toggleBtn = document.createElement('div');
@@ -66,13 +69,18 @@ define(function (require) {
         this._scrollbar.resize();
     };
 
-    SideBar.prototype.setData = function (data) {
-        this.render(data);
+    SideBar.prototype.setData = function (data, isRelation) {
+        this.render(data, isRelation);
     };
 
-    SideBar.prototype.render = function (data) {
-        this._$content.innerHTML = renderSidebar(data);
+    SideBar.prototype.render = function (data, isRelation) {
+        if (isRelation) {
+            this._$content.innerHTML = renderRelationDetail(data);
+        } else {
+            this._$content.innerHTML = renderEntityDetail(data);
+        }
 
+        this._scrollbar.scrollTo(0);
         this._scrollbar.resize();
     };
 

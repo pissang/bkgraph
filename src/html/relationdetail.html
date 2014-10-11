@@ -1,0 +1,25 @@
+<div class="bkg-relation-detail">
+    <div class="bkg-relation-description">
+        <div class="bkg-relation-entity-from">
+            <img src="${fromEntity.imageSquare}" alt="">
+        </div>
+        <div class="bkg-relation-name">
+            <span>${relationName}</span>
+        </div>
+        <div class="bkg-relation-entity-to">
+            <img src="${toEntity.imageSquare}" alt="">
+        </div>
+        <div style="clear:both"></div>
+    </div>
+    <div class="bkg-relation-source">
+        <!-- if: ${relationSite} -->
+        <a class="bkg-relation-site"  href="${relationUrl}" target="_blank">来源: ${relationSite}</a>
+        <!-- else -->
+        <a class="bkg-relation-baidu" target="_blank">百度一下</a>
+        <!-- /if -->
+    </div>
+
+    <!-- if: ${news} -->
+    <!-- import: sidebar-news -->
+    <!-- /if -->
+</div>

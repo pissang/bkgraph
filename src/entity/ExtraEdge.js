@@ -88,6 +88,7 @@ define(function (require) {
             },
             z: 0,
             zlevel: 0,
+            clickable: true,
             onclick: function () {
                 self.dispatch('click')
             },

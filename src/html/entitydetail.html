@@ -1,0 +1,21 @@
+<div class="bkg-entity-detail">
+    <img class="bkg-person-pic" src="${imageSquare}" />
+    <div class="bkg-person-info">
+        <h4>${name}</h4>
+        <p><b>出生:</b> ${birthDate|raw}</p>
+        <p>
+            <b>简介:</b> ${introduction.content|truncate(30)}
+            <a href="${sourceUrl}" class="bkg-more" target="_blank">更多>></a>
+        </p>
+    </div>
+    <div style="clear:both;"></div>
+    <!-- if: ${news} -->
+    <!-- import: sidebar-news -->
+    <!-- /if -->
+    <!-- if: ${weibo} -->
+    <!-- import: sidebar-weibo -->
+    <!-- /if -->
+    <!-- if: ${representativeWork} -->
+    <!-- import: sidebar-works -->
+    <!-- /if -->
+</div>
