@@ -48,6 +48,10 @@
                         g.getComponentByType('SEARCHBAR').hide();
                     }, 500);
                 });
+
+                window.onresize = function () {
+                    g.resize();
+                }
             });
         </script>
     </body>

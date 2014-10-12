@@ -323,6 +323,7 @@
         .bkg-relation-description {
             img {
                 width: 100px;
+                height: 100px;
             }
             margin-top: 20px;
             position: relative;
@@ -337,9 +338,9 @@
             position: absolute;
             top: 50px;
             left: 50%;
-            width: 65px;
+            width: 80px;
             height: 5px;
-            margin-left: -32px;
+            margin-left: -40px;
 
             border-radius: 3px;
             background-color: #2a98fa;
@@ -348,7 +349,7 @@
             span {
                 position: relative;
                 top: -30px;
-                font-size: 14px;
+                font-size: 12px;
             }
         }
 
@@ -367,6 +368,12 @@
             padding: 0px 10px;
             position: relative;
             top: -8px;
+            border-radius: 5px;
+
+            &:hover {
+                color: #1d4b7a;
+                background-color: #2ab7ed;
+            }
         }
 
         .bkg-relation-baidu {
@@ -562,7 +569,7 @@
         top: 0px;
         left: 0px;
         right: 0px;
-        bottom: 0px;
+        height: 73px;
     }
 
     h1 {
@@ -572,6 +579,26 @@
         margin: 0px;
 
         font-size: 20px;
+    }
+
+    .bkg-share {
+        position: absolute;
+        top: 16px;
+        right: 25px;
+        border-radius: 4px;
+        background-color: #8ec8f7;
+        color: #295280;
+        display: inline-block;
+        cursor: pointer;
+        text-align: center;
+        font-size: 14px;
+
+        padding: 3px 10px;
+
+        &:hover {
+            color: #8ec8f7;
+            background-color: #295280;
+        }
     }
 
     .bkg-explore-percent {
@@ -584,7 +611,7 @@
 
         .bkg-explore-percent-bar { 
             display: inline-block;
-            width: 700px;
+            width: 600px;
             height: 5px;
             margin-top: @headerbar-height - 25;
             border-radius: 4px;
@@ -639,6 +666,7 @@
         text-align: center;
         height: 20px;
         line-height: 20px;
+        white-space:nowrap;
     }
 
     .bkg-level.bkg-active {

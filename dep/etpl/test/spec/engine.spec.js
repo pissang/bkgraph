@@ -4,7 +4,6 @@
     var readText = require( './readTextSync' );
     var mytpl = new etpl.Engine();
     var text = readText( 'engine.text.html' );
-    etpl.compile( text['get-tpl'] );
 
     etpl.addFilter( 'engine-upper', function ( source ) {
         return source.toUpperCase();
@@ -48,24 +47,7 @@
             }
             catch (ex) {
                 var msg = ex.message;
-                if ( /^target /i.test(msg) && /is exists/.test(msg) ) {
-                    expect(true).toBeTruthy();
-                }
-                else {
-                    expect(false).toBeTruthy();
-                }
-            }
-        });
-
-        it('compile master which exists should throw error', function() {
-            try{
-                etpl.compile(text['repeat-master-tpl']);
-                etpl.compile(text['repeat-master-tpl']);
-                expect(false).toBeTruthy();
-            }
-            catch (ex) {
-                var msg = ex.message;
-                if ( /^master /i.test(msg) && /is exists/.test(msg) ) {
+                if ( /^target exists/i.test(msg) ) {
                     expect(true).toBeTruthy();
                 }
                 else {
@@ -87,6 +69,25 @@
             mytpl.config({
                 commandOpen: '<!--',
                 commandClose: '-->'
+            });
+        });
+
+        it('"config" method can setup command syntax', function() {
+            mytpl.config({
+                commandSyntax: /^\s*(\/)?([a-z]+)\s?([\s\S]*)$/,
+                commandOpen: '<%',
+                commandClose: '%>',
+                variableOpen: '{{',
+                variableClose: '}}'
+            });
+            var render = mytpl.compile(text['custom-syntax']);
+            expect(render()).toEqual(text['expect-custom-syntax']);
+            mytpl.config({
+                commandSyntax: /^\s*(\/)?([a-z]+)\s*(?::([\s\S]*))?$/,
+                commandOpen: '<!--',
+                commandClose: '-->',
+                variableOpen: '${',
+                variableClose: '}'
             });
         });
 
@@ -127,13 +128,13 @@
 
             mytpl.compile(text['custom-filter-tpl']);
             expect(mytpl.render('engineCustomFilterTarget',data)).toEqual(text['expect-custom-filter-html']);
-            
+
             mytpl.config({
                 defaultFilter: ''
             });
             mytpl.compile(text['custom-filter-tpl2']);
             expect(mytpl.render('engineCustomFilterTarget2',data)).toEqual(text['expect-custom-filter-raw']);
-            
+
             mytpl.config({
                 defaultFilter: 'html'
             });
@@ -147,10 +148,6 @@
             mytpl.compile(text['repeat-tpl-ignore-first']);
             mytpl.compile(text['repeat-tpl-ignore-second']);
             expect(mytpl.render('engineRepeatIgnoreTarget')).toEqual('ignore');
-            
-            mytpl.compile(text['repeat-master-tpl-ignore-first']);
-            mytpl.compile(text['repeat-master-tpl-ignore-second']);
-            expect(mytpl.render('engineRepeatIgnoreMasterTarget')).toEqual('ignore erik');
 
             mytpl.config({
                 namingConflict: 'error'
@@ -165,10 +162,6 @@
             mytpl.compile(text['repeat-tpl-override-first']);
             mytpl.compile(text['repeat-tpl-override-second']);
             expect(mytpl.render('engineRepeatOverrideTarget')).toEqual('override');
-            
-            mytpl.compile(text['repeat-master-tpl-override-first']);
-            mytpl.compile(text['repeat-master-tpl-override-second']);
-            expect(mytpl.render('engineRepeatOverrideMasterTarget')).toEqual('override erik');
 
             mytpl.config({
                 namingConflict: 'error'
@@ -190,10 +183,10 @@
 
         it('"render" method returns the same value as renderer call', function() {
             var renderer = mytpl.compile(text['variable-tpl']);
-            var data = { 
-                info: { 
-                    name:'etpl', 
-                    contributor: 'errorrik' 
+            var data = {
+                info: {
+                    name:'etpl',
+                    contributor: 'errorrik'
                 }
             };
             expect(renderer(data)).toEqual(mytpl.render('engineVariableTarget',data));
@@ -204,21 +197,6 @@
             var data = eval(text['data']);
             var dataGetter = eval(text['data-getter'])
             expect(renderer(data)).toEqual(renderer(dataGetter));
-        });
-
-        it('"get" method should return the target content', function() {
-            expect(etpl.get('engineGetSimpleTarget'))
-                .toEqual(text['expect-engineGetSimpleTarget']);
-        });
-
-        it('"get" method should return the target content which had mixed imports', function() {
-            expect(etpl.get('engineGetImportTarget'))
-                .toEqual(text['expect-engineGetImportTarget']);
-        });
-
-        it('"get" method should return the target content which had applied master', function() {
-            expect(etpl.get('engineGetMasterTarget'))
-                .toEqual(text['expect-engineGetMasterTarget']);
         });
 
         it('"addFilter" method can add a filter function', function() {
@@ -239,5 +217,5 @@
             expect(etpl.parse).toBe(etpl.compile);
         });
     });
-    
+
 })();

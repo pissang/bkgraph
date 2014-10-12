@@ -12,21 +12,14 @@ define(function (require) {
     var HeaderBar = require('./component/HeaderBar');
     var etpl = require('etpl');
     var jsonp = require('./util/jsonp');
+    var util = require('./util/util');
 
     var http = require('zrender/tool/http');
 
     // etpl truncate
-    etpl.addFilter('truncate', function (str, len, tail) {
-        if (str.length > len) {
-            tail = tail == null ? '…' : tail;
-            return str.substring(0, len - tail.length) + tail;
-        }
-        return str;
-    });
-    // etpl trun
-    etpl.addFilter('trim', function (str) {
-        return str.replace(/^\s+|\s+$/g, '');
-    });
+    etpl.addFilter('truncate', util.truncate);
+    // etpl trim
+    etpl.addFilter('trim', util.trim);
 
     // var TUPU_URL = 'http://nj02-wd-knowledge45-ssd1l.nj02.baidu.com:8866/api/tupu';
 

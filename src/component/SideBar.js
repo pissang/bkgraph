@@ -82,6 +82,12 @@ define(function (require) {
 
         this._scrollbar.scrollTo(0);
         this._scrollbar.resize();
+
+        // TODO
+        var $relationName = Sizzle('.bkg-relation-name span', this.el)[0];
+        if ($relationName) {
+            $relationName.style.top = - util.getHeight($relationName) - 10 + 'px';
+        }
     };
 
     /**

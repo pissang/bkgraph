@@ -14,33 +14,22 @@
 <!-- target: engineRepeatOverrideTarget -->ignore
 ::repeat-tpl-override-second::
 <!-- target: engineRepeatOverrideTarget -->override
-::repeat-master-tpl::
-<!-- master: engineRepeatMaster -->default engine
-::repeat-master-tpl-ignore-first::
-<!-- master: engineRepeatIgnoreMaster -->ignore <!--contentplaceholder:name-->
-::repeat-master-tpl-ignore-second::
-<!-- master: engineRepeatIgnoreMaster -->override <!--contentplaceholder:name--><!-- target: engineRepeatIgnoreMasterTarget( master = engineRepeatIgnoreMaster ) --><!--content:name-->erik<!--/content-->
-::repeat-master-tpl-override-first::
-<!-- master: engineRepeatOverrideMaster -->ignore <!--contentplaceholder:name-->
-::repeat-master-tpl-override-second::
-<!-- target: engineRepeatOverrideMasterTarget( master = engineRepeatOverrideMaster ) --><!--content:name-->erik<!--/content-->
-<!-- master: engineRepeatOverrideMaster -->override <!--contentplaceholder:name-->
 ::data-tpl::
 <!-- target: engineDataTarget -->Hello ${info.name} by ${info.contributor.name}[${info.contributor.email}]!
 ::strip-tpl::
-<!-- target: engineStripTarget -->  
+<!-- target: engineStripTarget -->
     <ul>
-    <!-- for: ${persons} as ${person}, ${index} -->  
-        <!-- if: ${index} > 0 -->  
+    <!-- for: ${persons} as ${person}, ${index} -->
+        <!-- if: ${index} > 0 -->
         <li>${person}</li>
-        <!-- /if -->  
-    <!-- /for -->  
+        <!-- /if -->
+    <!-- /for -->
     </ul>
-<!-- target: engineStripTargetIf -->  
+<!-- target: engineStripTargetIf -->
 <!-- var: lang = 1--><!-- if: ${lang} -->
 lang
 <!-- /if -->
-<!-- target: engineStripTargetSimple -->  
+<!-- target: engineStripTargetSimple -->
 Hello World!
 ::strip-data::
 ({persons:['erik', 'firede', 'leeight']})
@@ -66,9 +55,9 @@ lang
 ::data::
 ({
     info: {
-        name: 'etpl', 
+        name: 'etpl',
         contributor: {
-            name:'errorrik', 
+            name:'errorrik',
             email:'errorrik@gmail.com'
         }
     }
@@ -87,6 +76,18 @@ lang
         }
     }
 })
+::custom-syntax::
+<% var arr = new Array(5) %>
+<% for {{arr}} as {{item}}, {{index}} %><li<% if {{index}} % 2 %> class="odd"<% /if %>>{{index}}</li>
+<% /for %>
+::expect-custom-syntax::
+
+<li>0</li>
+<li class="odd">1</li>
+<li>2</li>
+<li class="odd">3</li>
+<li>4</li>
+
 ::custom-options::
 <% target: engineCustomTarget %><!-- import: a -->
 ::expect-default::
@@ -111,31 +112,6 @@ Hello {{name}}! Hello {{name | engine-upper}}! Hello {{name | engine-upper2( {{y
 
 Hello etpl! Hello ETPL! Hello Etpl!
 Hello Etpl!
-::get-tpl::
-<!-- target: engineGetSimpleTarget -->Hello etpl!
-<!-- target: engineGetImportTarget -->
-<div><!--import: engineGetSimpleTarget --></div>
-<!-- target: engineGetMasterTarget(master=engineGetMaster) -->
-<!-- content: header -->header by target
-<!-- master: engineGetMaster -->
-<header><!-- contentplaceholder: header -->my header<!-- /contentplaceholder --></header>
-<div><!--import: engineGetSimpleTarget --></div>
-<footer><!-- contentplaceholder: footer -->my footer<!-- /contentplaceholder --></footer>
-::expect-engineGetSimpleTarget::
-Hello etpl!
-
-::expect-engineGetImportTarget::
-
-<div>Hello etpl!
-</div>
-
-::expect-engineGetMasterTarget::
-
-<header>header by target
-</header>
-<div>Hello etpl!
-</div>
-<footer>my footer</footer>
 ::expect-custom-filter-raw::
 Hello <b>etpl</b>!
 ::expect-custom-filter-html::

@@ -119,7 +119,15 @@ define(function (require) {
                 sy0 = scale[1];
             }
 
-            zrRefresh.call(this);
+            zrRefresh.apply(this, arguments);
+        }
+
+        // 不显示hover层
+        var layers = zr.painter.getLayers();
+        for (var z in layers) {
+            if (z === 'hover') {
+                layers[z].dom.parentNode.removeChild(layers[z].dom);
+            }
         }
     };
 
@@ -129,8 +137,6 @@ define(function (require) {
         this.el.style.height = h + 'px';
 
         this._zr.resize();
-
-        this._zr.refresh();
     };
 
     GraphMain.prototype.setData = function (data) {
@@ -988,8 +994,8 @@ define(function (require) {
         })
 
         nodeEntity.bind('click', function () {
+            self.showEntityDetail(node);
             if (self._lastClickNode !== node) {
-                self.showEntityDetail(node);
                 self._lastClickNode = node;
                 self._syncOutTipEntities();
                 self.highlightNodeAndAdjeceny(node);
@@ -1005,6 +1011,7 @@ define(function (require) {
 
     GraphMain.prototype._createEdgeEntity = function (e) {
         var edgeEntity;
+        var zr = this._zr;
         if (e.node1.entity && e.node2.entity) {
             if (e.isExtra) {
                 edgeEntity = new ExtraEdgeEntity({
@@ -1026,6 +1033,14 @@ define(function (require) {
             edgeEntity.bind('click', function () {
                 this.showRelationDetail(e);
             }, this);
+            edgeEntity.bind('mouseover', function () {
+                edgeEntity.animateTextPadding(zr, 300, 12);
+                edgeEntity.highlightLabel();
+            });
+            edgeEntity.bind('mouseout', function () {
+                edgeEntity.animateTextPadding(zr, 300, 5);
+                edgeEntity.lowlightLabel();
+            });
 
             e.entity = edgeEntity;
 

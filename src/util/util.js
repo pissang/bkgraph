@@ -99,6 +99,28 @@ define(function (require) {
                 clearTimeout(timeout);
                 timeout = setTimeout(later, wait);
             }
+        },
+
+        truncate: function (str, len, tail) {
+            if (str.length > len) {
+                tail = tail == null ? '…' : tail;
+                return str.substring(0, len - tail.length) + tail;
+            }
+            return str;
+        },
+
+        trim: function (str) {
+            return str.replace(/^\s+|\s+$/g, '');
+        },
+
+        getHeight: function (el) {
+            var rect = el.getBoundingClientRect();
+            return rect.height;
+        },
+
+        getWidth: function (el) {
+            var rect = el.getBoundingClientRect();
+            return rect.width;
         }
     }
 
