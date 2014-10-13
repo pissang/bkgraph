@@ -26,7 +26,7 @@ define(function (require) {
         this._kgraph = kg;
 
         var el = this.el;
-        el.className = 'bkg-searchbar';
+        el.className = 'bkg-searchbar hidden';
 
         // 使用空数据
         this.render(data);

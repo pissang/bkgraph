@@ -25,10 +25,11 @@ define(function (require) {
     SideBar.prototype.type = 'SIDEBAR';
 
     SideBar.prototype.initialize = function (kg, rawData) {
-        this.el.className = 'bkg-sidebar';
+        this.el.className = 'bkg-sidebar hidden';
 
         this._$viewport = document.createElement('div');
         this._$viewport.className = 'bkg-sidebar-viewport';
+        this.el.appendChild(this._$viewport);
 
         this._$content = document.createElement('div');
         this._$content.className = 'bkg-sidebar-content';
@@ -36,9 +37,7 @@ define(function (require) {
 
         this._$toggleBtn = document.createElement('div');
         this._$toggleBtn.className = 'bkg-toggle';
-        this._$toggleBtn.innerHTML = '隐<br />藏<br />';
-
-        this.el.appendChild(this._$viewport);
+        this._$toggleBtn.innerHTML = '显<br />示<br />';
         this.el.appendChild(this._$toggleBtn);
 
         this._scrollbar = new ScrollBar(this._$content);
@@ -46,16 +45,7 @@ define(function (require) {
         this._kgraph = kg;
 
         // 默认显示主要实体
-        var mainEntity;
-        for (var i = 0; i < rawData.entities.length; i++) {
-            if (+rawData.entities[i].layerCounter === 0) {
-                mainEntity = rawData.entities[i];
-            }
-        }
-        // 使用空数据
-        this.render(mainEntity);
-
-        this.hide();
+        this.render(rawData.mainEntity);
 
         var headerBar = kg.getComponentByType('HEADERBAR');
         if (headerBar) {

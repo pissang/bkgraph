@@ -11,7 +11,7 @@ define(function (require) {
         ShapeBase.call(this, opts);
     }
 
-    LabelCurve.prototype.type = 'labelline';
+    LabelCurve.prototype.type = 'labelcurve';
 
     LabelCurve.prototype.brush = function (ctx, isHighlight) {
         var style = this.style;
@@ -26,6 +26,7 @@ define(function (require) {
         }
 
         ctx.save();
+        this.doClip(ctx);
         this.setContext(ctx, style);
         // 设置transform
         this.setTransform(ctx);

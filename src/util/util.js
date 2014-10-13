@@ -1,5 +1,7 @@
 define(function (require) {
-
+    
+    var supportCanvas = document.createElement('canvas').getContext;
+    
     var util = {
         indexOf: function (array, value) {
             if (array.indexOf) {
@@ -47,7 +49,7 @@ define(function (require) {
             if (window.getComputedStyle) {
                 style = window.getComputedStyle(el, null);
             }
-            else if (docment.documentElement.currentStyle) {
+            else if (document.documentElement.currentStyle) {
                 style = el.currentStyle;
             }
             if (name) {
@@ -121,6 +123,10 @@ define(function (require) {
         getWidth: function (el) {
             var rect = el.getBoundingClientRect();
             return rect.width;
+        },
+
+        supportCanvas: function () {
+            return supportCanvas;
         }
     }
 

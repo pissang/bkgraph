@@ -275,7 +275,6 @@
   line-height: 30px;
   margin: 0px 0px 0px 5px;
   font-weight: normal;
-  text-decoration: underline;
 }
 .bkg-sidebar .bkg-entity-detail,
 .bkg-sidebar .bkg-relation-detail {
@@ -410,7 +409,7 @@
   text-decoration: underline;
 }
 .bkg-sidebar .bkg-news li.bkg-news-item .bkg-news-source {
-  float: right;
+  float: left;
   color: #9bd1fe;
 }
 .bkg-sidebar .bkg-news li.bkg-news-item .bkg-news-source:hover {
@@ -422,7 +421,7 @@
   height: 20px;
 }
 .bkg-sidebar .bkg-news li.bkg-news-item .bkg-news-publish-time {
-  float: left;
+  float: right;
 }
 .bkg-sidebar .bkg-works li {
   float: left;

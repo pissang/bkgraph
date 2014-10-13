@@ -18,6 +18,9 @@ define(function (require) {
 
     var CircleShape = require('zrender/shape/Circle');
 
+    var Cycle = require('./Cycle');
+
+    var util = require('../util/util');
     var intersect = require('../util/intersect');
 
     var EPSILON = 1e-2;
@@ -164,8 +167,6 @@ define(function (require) {
         var noPosition = false;
         for (var i = 0; i < data.entities.length; i++) {
             var entity = data.entities[i];
-            // 数据修正
-            entity.layerCounter = +entity.layerCounter;
             var n = graph.addNode(entity.ID, entity);
             var r = diff > 0 ?
                 (entity.hotValue - min) * (this.maxRadius - this.minRadius) / diff + this.minRadius
@@ -249,7 +250,18 @@ define(function (require) {
             })
         }
 
+
         this.render();
+        
+        var circles = this._findCircles('男友,女友,前男友,前女友,妻子,老婆,丈夫,老公,绯闻,暧昧,情敌'.split(','));
+        for (var i = 0; i < circles.length; i++) {
+            this.highlightCircle(circles[i]);
+        }
+
+        // 刚打开时的展开动画
+        if (util.supportCanvas()) {
+            this._entryAnimation();
+        }
     };
 
     GraphMain.prototype.render = function () {
@@ -262,10 +274,12 @@ define(function (require) {
         this._root = new Group();
         zr.addGroup(this._root);
 
-        // 补边使用bundle优化性能
-        this._extraEdgeBundle = new ExtraEdgeBundleEntity();
-        this._extraEdgeBundle.initialize(zr);
-        this._root.addChild(this._extraEdgeBundle.el);
+        // 补边使用bundle优化性能, IE8不使用
+        if (util.supportCanvas()) {
+            this._extraEdgeBundle = new ExtraEdgeBundleEntity();
+            this._extraEdgeBundle.initialize(zr);
+            this._root.addChild(this._extraEdgeBundle.el);
+        }
 
         // 所有实体都在 zlevel-1 层
         graph.eachNode(function (n) {
@@ -502,10 +516,14 @@ define(function (require) {
      */
     GraphMain.prototype.unhoverNode = function (node) {
         if (node._isHover) {
-            node.entity.stopActiveAnimation(this._zr);
-            node.entity.animateRadius(
-                this._zr, node.layout.size, 500
-            );
+            if (util.supportCanvas()) {
+                node.entity.stopActiveAnimation(this._zr);
+                node.entity.animateRadius(
+                    this._zr, node.layout.size, 500
+                );
+            } else {
+                node.entity.setRadius(node.layout.size);
+            }
 
             node.entity.lowlight();
 
@@ -524,10 +542,14 @@ define(function (require) {
         node._isHover = true;
 
         // Hover 实体放大
-        node.entity.animateRadius(
-            this._zr, node.layout.size * 1.2, 500
-        );
-        node.entity.startActiveAnimation(this._zr);
+        if (util.supportCanvas()) {
+            node.entity.animateRadius(
+                this._zr, node.layout.size * 1.2, 500
+            );
+            node.entity.startActiveAnimation(this._zr);
+        } else {
+            node.entity.setRadius(node.layout.size * 1.2);
+        }
 
         node.entity.highlight();
     }
@@ -589,8 +611,8 @@ define(function (require) {
             }
 
             e.entity.highlight();
-            if (newEntity) {
-                this._growNodeEntity(other, node, Math.random() * 500);
+            if (newEntity && util.supportCanvas()) {
+                this._growNodeAnimation(other, node, Math.random() * 500);
             }
 
             other._isHighlight = true;
@@ -659,6 +681,34 @@ define(function (require) {
     }
 
     /**
+     * 
+     */
+    GraphMain.prototype.highlightCircle = function (cycle) {
+        var len = cycle.nodes.length;
+        for (var i = 0; i < len; i++) {
+            var n1 = cycle.nodes[i];
+            var n2 = cycle.nodes[(i + 1) % len];
+
+            var e = this._graph.getEdge(n1, n2) || this._graph.getEdge(n2, n1);
+            if (!n1.entity) {
+                this._createNodeEntity(n1);
+            }
+            if (!n2.entity) {
+                this._createNodeEntity(n2);
+            }
+            if (!e.entity) {
+                this._createEdgeEntity(e);
+            }
+
+            this.highlightNode(n1);
+            this.highlightNode(n2);
+            e.entity.highlight();
+        }
+        this._zr.refreshNextFrame();
+        this._syncHeaderBarExplorePercent();
+    }
+
+    /**
      * 在边栏中显示实体详细信息
      */
     GraphMain.prototype.showEntityDetail = function (n) {
@@ -693,7 +743,7 @@ define(function (require) {
             sideBar.setData(data, true);
             sideBar.show();
         }
-     }
+    }
 
     /**
      * 移动视图到指定的实体位置
@@ -820,7 +870,9 @@ define(function (require) {
                 e.canCollapse = false;
                 e.entity = null;
 
-                this._extraEdgeBundle.removeEdge(e);
+                if (util.supportCanvas()) {
+                    this._extraEdgeBundle.removeEdge(e);
+                }
             }
         }, this);
 
@@ -842,7 +894,10 @@ define(function (require) {
 
             this._createNodeEntity(other);
             this._createEdgeEntity(e);
-            this._growNodeEntity(other, node, Math.random() * 500);
+
+            if (util.supportCanvas()) {
+                this._growNodeAnimation(other, node, Math.random() * 500);
+            }
         }
 
         this._syncHeaderBarExplorePercent();
@@ -875,6 +930,82 @@ define(function (require) {
         var nodes = this._graph.nodes;
         return (this._nodeEntityCount - this._baseEntityCount) / (nodes.length - this._baseEntityCount);
     };
+
+    GraphMain.prototype._findCircles = function (keywords) {
+        function matchRelation (name) {
+            for (var i = 0; i < keywords.length; i++) {
+                if (name.indexOf(keywords[i]) >= 0) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        var cycles = Cycle.findFromGraph(this._graph);
+        var matchCircles = [];
+
+        for (var j = 0; j < cycles.length; j++) {
+            var cycle = cycles[j];
+
+            // 最多三条边
+            if (cycle.nodes.length > 3) {
+                continue;
+            }
+            // var len = cycle.nodes.length;
+            // for (var i = 0; i < len; i++) {
+            //     var n1 = cycle.nodes[i];
+            //     var n2 = cycle.nodes[(i + 1) % len];
+
+            //     var e = this._graph.getEdge(n1, n2) || this._graph.getEdge(n2, n1);
+            //     if (e && matchRelation(e.data.relationName)) {
+            //         continue;
+            //     }
+            //     break;
+            // }
+            // // 环中所有边都符合关键词
+            // if (i == cycle.nodes.length) {
+            //     matchCircles.push(cycle);
+            // }
+
+            matchCircles.push(cycle);
+            // console.log(cycle.nodes.map(function (a) {return a.data.name}));
+        }
+
+        return matchCircles;
+    }
+
+    /**
+     * 刚进入时的动画效果
+     */
+    GraphMain.prototype._entryAnimation = function (cb) {
+        var zr = this._zr;
+        var self = this;
+        var clipShape = new CircleShape({
+            style: {
+                x: zr.getWidth() / 2,
+                y: zr.getHeight() / 2,
+                r: 70
+            }
+        });
+        this._root.clipShape = clipShape;
+        this._root.modSelf();
+        zr.refreshNextFrame();
+
+        zr.animation.animate(clipShape.style)
+            .when(3000, {
+                r: 1500
+            })
+            .during(function () {
+                self._root.modSelf();
+                zr.refreshNextFrame();
+            })
+            .done(function () {
+                self._root.clipShape = null;
+                cb && cb();
+            })
+            .delay(500)
+            .start();
+    }
 
     /**
      * 同步节点的屏外提示
@@ -943,7 +1074,7 @@ define(function (require) {
         }
     }
 
-    GraphMain.prototype._growNodeEntity = function (toNode, fromNode, delay) {
+    GraphMain.prototype._growNodeAnimation = function (toNode, fromNode, delay) {
         var zr = this._zr;
         var e = this._graph.getEdge(fromNode.id, toNode.id);
         var self = this;
@@ -1019,8 +1150,9 @@ define(function (require) {
                     targetEntity: e.node2.entity,
                     label: e.data.relationName
                 });
-
-                this._extraEdgeBundle.addEdge(e);
+                if (util.supportCanvas()) {
+                    this._extraEdgeBundle.addEdge(e);
+                }
             } else {
                 edgeEntity = new EdgeEntity({
                     sourceEntity: e.node1.entity,
@@ -1034,11 +1166,15 @@ define(function (require) {
                 this.showRelationDetail(e);
             }, this);
             edgeEntity.bind('mouseover', function () {
-                edgeEntity.animateTextPadding(zr, 300, 12);
+                if (util.supportCanvas()) {
+                    edgeEntity.animateTextPadding(zr, 300, 12);
+                }
                 edgeEntity.highlightLabel();
             });
             edgeEntity.bind('mouseout', function () {
-                edgeEntity.animateTextPadding(zr, 300, 5);
+                if (util.supportCanvas()) {
+                    edgeEntity.animateTextPadding(zr, 300, 5);
+                }
                 edgeEntity.lowlightLabel();
             });
 

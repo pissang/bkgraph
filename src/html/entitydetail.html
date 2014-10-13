@@ -1,14 +1,22 @@
 <div class="bkg-entity-detail">
-    <img class="bkg-person-pic" src="${imageSquare}" />
-    <div class="bkg-person-info">
-        <h4>${name}</h4>
-        <p><b>出生:</b> ${birthDate|raw}</p>
-        <p>
-            <b>简介:</b> ${introduction.content|truncate(30)}
-            <a href="${sourceUrl}" class="bkg-more" target="_blank">更多>></a>
-        </p>
+    <div class="bkg-entity-detail-title">
+        <h3>${name}信息名片</h3>
     </div>
-    <div style="clear:both;"></div>
+    <div class="bkg-sidebar-module bkg-person-info">
+        <div class="bkg-module-title">
+            <div class="bkg-circle"></div>
+            <h4>基本信息 百度百科</h4>
+        </div>
+        <img class="bkg-person-pic" src="${imageSquare}" />
+        <div class="bkg-person-description">
+            <p><b>出生:</b> ${birthDate|raw}</p>
+            <p>
+                <b>简介:</b> ${introduction.content|truncate(65)}
+                <a href="${sourceUrl}" class="bkg-more" target="_blank">更多>></a>
+            </p>
+        </div>
+        <div style="clear:both;"></div>
+    </div>
     <!-- if: ${news} -->
     <!-- import: sidebarNews -->
     <!-- /if -->
@@ -18,4 +26,5 @@
     <!-- if: ${representativeWork} -->
     <!-- import: sidebarWorks -->
     <!-- /if -->
+    <div style="clear:both;"></div>
 </div>

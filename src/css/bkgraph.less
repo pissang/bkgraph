@@ -225,37 +225,35 @@
     left: 0px;
     top: 0px;
     bottom: 0px;
-    width: 310px;
-    background-color: #1d4b7a;
+    width: 338px;
+    background-color: #043362;
     color: white;
     
-    -webkit-transition: left 0.5s ease-in-out;
-       -moz-transition: left 0.5s ease-in-out;
-        -ms-transition: left 0.5s ease-in-out;
-         -o-transition: left 0.5s ease-in-out;
-            transition: left 0.5s ease-in-out;
+    -webkit-transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+       -moz-transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        -ms-transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+         -o-transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
 
-    font-size: 12px;
+    font-size: 13px;
     line-height: 20px;
 
     .bkg-sidebar-viewport {
         box-sizing: border-box;
     }
-
+    
     .bkg-sidebar-content {
-        margin-left: 10px;
-        margin-right: 10px;
-        left: 0px;
-        right: 0px;
+        width: 100%;
     }
 
     a {
-        color: #0595ce;
+        color: #02c0fe;
         text-decoration: none;
         padding: 1px 3px;
+        line-height: 15px;
 
         &:hover {
-            background-color: #0595ce;
+            background-color: #02c0fe;
             color: white;
             border-radius: 3px;
         }
@@ -267,7 +265,24 @@
     }
 
     &.hidden {
-        left: -305px;
+        left: -325px;
+    }
+
+    .bkg-entity-detail-title {
+        text-align: center;
+        position: relative;
+        top: -11px;
+        h3 {
+            color: #9bd1fe;
+            background-color: #043362;
+            font-size: 18px;
+
+            display: inline-block;
+            padding: 0px 20px;
+            margin: 0px;
+
+            line-height: 22px;
+        }
     }
 
     .bkg-sidebar-viewport {
@@ -278,40 +293,58 @@
     .bkg-sidebar-module {
 
         margin-top: 20px;
+        margin-bottom: 10px;
 
-        h4.bkg-title {
-            color: #9bd1fe;
-            margin: 8px 0px;
-            font-size: 16px;
+        padding-left: 11px;
+        box-sizing: border-box;
 
-            padding-left: 28px;
-            background-repeat: no-repeat;
-            background-position: 0px 50%;
-            line-height: 30px;
+        .bkg-module-title {
+            margin: 0px 0px 12px -11px;
+
+            .bkg-circle {
+                width: 10px;
+                height: 10px;
+                border-radius: 5px;
+                margin-left: -5px;
+                display: inline-block;
+                background-color: #0e90fe;
+            }
+
+            h4 {
+                color: #02c0fe;
+                font-size: 18px;
+                display: inline-block;
+                line-height: 30px;
+                margin: 0px 0px 0px 5px;
+                font-weight: normal;
+                text-decoration: underline;
+            }
         }
+    
+        // Disable margin collapsing
+        display: inline-block;
     }
     
-    .bkg-entity-detail {
-        overflow-x: hidden;
+    .bkg-entity-detail,
+    .bkg-relation-detail {
+        margin-top: 30px;
+        margin-left: 10px;
+        margin-right: 10px;
 
-        height: 100%;
-
+        border-left: 1px solid #1c7bcc;
+        border-top: 1px solid #1c7bcc;
+    }
+    
+    /**人物基本信息模块**/
+    .bkg-person-info {
         .bkg-person-pic {
-            width: 100px;
-            margin-top: 30px;
-
+            width: 91px;
+            height: 124px;
             float: left;
         }
 
-        .bkg-person-info {
-            margin-top: 28px;
-            margin-left: 110px;
-
-            h4 {
-                color: #9bd1fe;
-                margin: 0px;
-                font-size: 14px;
-            }
+        .bkg-person-description {
+            margin-left: 113px;
 
             p {
                 margin: 4px 0px;
@@ -391,10 +424,6 @@
 
     /******* 微博模块 ***********/
     .bkg-weibo {
-        h4 {
-            background-image: url(../img/sidebar/weibo.png);
-        }
-
         .bkg-weibo-info {
             .bkg-left {
                 float: left;
@@ -420,7 +449,7 @@
         }
 
         .bkg-latest-weibo-time {
-            color: #02c0fe;
+            color: #9bd1fe;
         }
 
         .bkg-latest-weibo-comment {
@@ -434,77 +463,58 @@
 
     /******* 新闻模块 ***********/
     .bkg-news {
-    
-        h4 {
-            background-image: url(../img/sidebar/news.png);
-        }
-
-        li {
+        li.bkg-news-item {
             
-            h5 {
+            margin-bottom: 12px;
+            position: relative;
+            
+            .bkg-circle {
+                width: 6px;
+                height: 6px;
+                border-radius: 3px;
+                display: inline-block;
+                background-color: #0e90fe;
+
+                left: -14px;
+                position: absolute;
+                top: 10px;
+            }
+
+            .bkg-news-title {
+                display: inline-block;
+
                 color: white;
-                font-weight: normal;
-                margin: 0px;
-            }
 
-            .bkg-news-pic {
-                float: left;
-                width: 100px;
-                height: 75px;
-                overflow: hidden;
-
-                img {
-                    height: 75px;
+                &:hover {
+                    background: transparent;
+                    color: white;
+                    text-decoration: underline;
                 }
             }
+    
+            .bkg-news-source {
+                float: right;
+                color: #9bd1fe;
 
-            .bkg-news-detail {
-                margin-left: 120px;
-                margin-top: -4px;
+                &:hover {
+                    color: white;
+                }
+            }
 
-                .bkg-news-source {
-                    // margin-top: 5px;
-                }
-                .bkg-news-publish-time {
-                    float: right;
-                    margin-right: 10px;
-                }
+            .bkg-news-tail {
+                color: #9bd1fe;
+                line-height: 20px;
+                height: 20px;
             }
 
             .bkg-news-publish-time {
-                color: #02c0fe;
-            }
-
-            .bkg-news-simple {
-                margin-top: 6px;
-
-                .bkg-news-title {
-                    width: 130px;
-                    display: inline-block;
-
-                    color: white;
-
-                    &:hover {
-                        background: transparent;
-                        color: white;
-                        text-decoration: underline;
-                    }
-                }
-
-                .bkg-news-publish-time {
-                    float: right;
-                    margin-right: 10px;
-                }
+                float: left;;
             }
         }
     }
     
     /** 作品模块 */
     .bkg-works {
-        h4 {
-            background-image: url(../img/sidebar/works.png);
-        }
-
         li {
             float: left;
             text-align: center;
@@ -535,7 +545,7 @@
         width: 20px;
         height: 84px;
         position: absolute;
-        right: -19px;
+        right: -20px;
         top: 50%;
         margin-top: -42px;
         background-image: url(../img/sidebar/toggle-btn.png);
@@ -724,17 +734,17 @@
     .bkg-scrollbar-bar-y {
         top: 0px;
         bottom: 0px;
-        width: 10px;
+        width: 5px;
         right: 0px;
         position: absolute;
     }
 
     .bkg-scrollbar-button {
         position: absolute;
-        width: 10px;
+        width: 5px;
         left: 0px;
-        background-color: #837AE0;
+        background-color: #d5ebff;
         border-radius: 4px;
-        opacity: 0.3;
+        opacity: 0.6;
     }
 }

@@ -1,12 +1,16 @@
 <!doctype html>
 <html>
     <head>
-        <meta charset="utf-8">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <link rel="stylesheet" type="text/css" href="./css/index.css" />
-        <link rel="stylesheet/less" type="text/css" href="./css/bkgraph.less" />
+        <link rel="stylesheet" type="text/css" href="./css/bkgraph.css" />
+        <!-- <link rel="stylesheet/less" type="text/css" href="./css/bkgraph.less" /> -->
         <script src="../dep/esl.js"></script>
+        <!--
         <script src="../dep/less.min.js"></script>
+        -->
+
     </head>
     <body>
         <div id='viewport'></div>
@@ -38,15 +42,14 @@
                 var name = window.location.hash.slice(1);
                 name = name || '杨幂';
                 name += '_f';
-
                 var g = bkg.init('viewport', name, function (g) {
                     var graphMain = g.getComponentByType('GRAPH');
                     g.addComponent(new bkg.SideBar());
                     g.addComponent(new bkg.HeaderBar());
                     g.addComponent(new bkg.SearchBar());
-                    setTimeout(function () {
-                        g.getComponentByType('SEARCHBAR').hide();
-                    }, 500);
+                    // setTimeout(function () {
+                    //     g.getComponentByType('SEARCHBAR').hide();
+                    // }, 500);
                 });
 
                 window.onresize = function () {

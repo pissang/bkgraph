@@ -70,12 +70,7 @@ define(function (require) {
     };
 
     HeaderBar.prototype.setData = function (data) {
-        var mainEntity;
-        for (var i = 0; i < data.entities.length; i++) {
-            if (+data.entities[i].layerCounter === 0) {
-                mainEntity = data.entities[i];
-            }
-        }
+        var mainEntity = data.mainEntity;
         for (var i = 0; i < levels.length - 1; i++) {
             levels[i].interval = levels[i + 1].position - levels[i].position;
         }

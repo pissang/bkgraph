@@ -21,7 +21,7 @@ define(function (require) {
     // etpl trim
     etpl.addFilter('trim', util.trim);
 
-    // var TUPU_URL = 'http://nj02-wd-knowledge45-ssd1l.nj02.baidu.com:8866/api/tupu';
+    var TUPU_URL = 'http://cq01-ps-dev377.cq01.baidu.com:8087/api/graph/v1';
 
     /**
      * @alias bkgraph~BKGraph
@@ -40,34 +40,55 @@ define(function (require) {
         this._root = null;
 
 
-        if (typeof(data) === 'string') {
+        if (typeof(data) === 'string' || typeof(data) === 'number') {
                 
             var self = this;
 
             // jsonp(TUPU_URL, {
-            //     query: data
-            // }, 'callback', function (res) {
-            //     if (res.errorCode === 200) {             
-            //         self._rawData = res.data;
+            //     id: data
+            // }, 'callback', function (data) {   
+            //     data = self._fixData(data);
+            //     self._rawData = data;
 
-            //         self.initialize(res.data);
+            //     self.initialize(data);
 
-            //         onsuccess && onsuccess(this);
-            //     }
+            //     onsuccess && onsuccess(self);
             // });
             http.get('../mock/person/' + data, function (data) {
-                data = JSON.parse(data);
+                if (typeof(JSON) !== 'undefined' && JSON.parse) {
+                    data = JSON.parse(data);
+                } else {
+                    data = eval('(' + data + ')');
+                }
+                data = self._fixData(data);
                 self._rawData = data;
                 self.initialize(data);
                 onsuccess && onsuccess(self);
             });
         } else {
+            data = self._fixData(data);
+
             this._rawData = data;
 
             this.initialize(data);
 
             onsuccess && onsuccess(this);
         }
+    }
+
+    BKGraph.prototype._fixData = function (data) {
+        for (var i = 0; i < data.entities.length; i++) {
+            var entity = data.entities[i];
+            // 数据修正
+            entity.layerCounter = entity.layerCounter || 0;
+            entity.layerCounter = parseInt(entity.layerCounter);
+
+            if (entity.layerCounter === 0) {
+                data.mainEntity = entity;
+            }
+        }
+
+        return data;
     }
 
     BKGraph.prototype.getRawData = function () {
@@ -77,10 +98,8 @@ define(function (require) {
     BKGraph.prototype.initialize = function (data) {
         this._root = document.createElement('div');
         this._root.className = 'bkg-viewport';
-        this._root.style = {
-            position: 'relative',
-            overflow: 'hidden'
-        }
+        this._root.style.position = 'relative';
+        this._root.style.overflow = 'hidden';
 
         this._container.appendChild(this._root);
         this.resize();
