@@ -1,8 +1,6 @@
 @charset 'UTF-8';
 /** Graph Viewport */
 .bkg-viewport {
-  background-image: url(../img/bg.jpg);
-  background-size: 100% 100%;
   position: relative;
   font-family: arial, 'Hiragino Sans GB', 'Microsoft Yahei', '微软雅黑', '宋体', Tahoma, Arial, Helvetica, STHeiti;
   overflow: hidden;
@@ -17,6 +15,13 @@
 .bkg-viewport li {
   list-style: none;
 }
+.bkg-bg-layer {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 5000px;
+  height: 5000px;
+}
 .bkg-graph {
   position: absolute;
   right: 0px;
@@ -27,6 +32,26 @@
   -ms-transition: right 0.5s cubic-bezier(0.23, 1, 0.32, 1);
   -o-transition: right 0.5s cubic-bezier(0.23, 1, 0.32, 1);
   transition: right 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.bkg-graph .bkg-graph-zr {
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+}
+.bkg-graph .bkg-graph-bg {
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+  background-image: url(../img/bg.png);
+  background-size: 1px 100%;
+  background-repeat: repeat-x;
+}
+.bkg-graph .bkg-graph-bg .bkg-bg-layer {
+  background-image: url(../img/star.png);
 }
 /** 搜索栏 */
 .bkg-searchbar {
@@ -265,7 +290,7 @@
   display: inline-block;
 }
 .bkg-sidebar .bkg-sidebar-module .bkg-module-title {
-  margin: 0px 0px 12px -11px;
+  margin: 0px 0px 6px -11px;
 }
 .bkg-sidebar .bkg-sidebar-module .bkg-module-title .bkg-circle {
   width: 10px;
@@ -421,8 +446,8 @@
 }
 .bkg-sidebar .bkg-news li.bkg-news-item .bkg-news-tail {
   color: #9bd1fe;
-  line-height: 20px;
-  height: 20px;
+  line-height: 18px;
+  height: 18px;
 }
 .bkg-sidebar .bkg-news li.bkg-news-item .bkg-news-source {
   float: right;

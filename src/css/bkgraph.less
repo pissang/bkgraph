@@ -1,8 +1,6 @@
 @charset 'UTF-8';
 /** Graph Viewport */
 .bkg-viewport {
-    background-image: url(../img/bg.jpg);
-    background-size: 100% 100%;
     position: relative;
     font-family: arial, 'Hiragino Sans GB', 'Microsoft Yahei', '微软雅黑', '宋体', Tahoma, Arial, Helvetica, STHeiti;
     overflow: hidden;
@@ -21,6 +19,15 @@
     }
 }
 
+.bkg-bg-layer {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+
+    width: 5000px;
+    height: 5000px;
+}
+
 .bkg-graph {
     position: absolute;
     right: 0px;
@@ -32,6 +39,30 @@
         -ms-transition: right 0.5s cubic-bezier(0.23, 1, 0.32, 1);
          -o-transition: right 0.5s cubic-bezier(0.23, 1, 0.32, 1);
             transition: right 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+
+    .bkg-graph-zr {
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        top: 0px;
+        bottom: 0px;
+    }
+
+    .bkg-graph-bg {
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        top: 0px;
+        bottom: 0px;
+        background-image: url(../img/bg.png);
+        background-size: 1px 100%;
+        background-repeat: repeat-x;
+
+        .bkg-bg-layer {
+            background-image: url(../img/star.png);
+            opacity: 0.5;
+        }
+    }
 }
 
 /** 搜索栏 */
@@ -271,7 +302,7 @@
     }
 
     &.hidden {
-        left: -335px;
+        left: -338px;
     }
 
     .bkg-entity-detail-title {
@@ -298,15 +329,13 @@
     }
 
     .bkg-sidebar-module {
-
-        margin-top: 20px;
-        margin-bottom: 10px;
+        margin-bottom: 25px;
 
         padding-left: 11px;
         box-sizing: border-box;
 
         .bkg-module-title {
-            margin: 0px 0px 12px -11px;
+            margin: 0px 0px 6px -11px;
 
             .bkg-circle {
                 width: 10px;
@@ -327,19 +356,29 @@
                 text-decoration: underline;
             }
         }
-    
-        // Disable margin collapsing
-        display: inline-block;
     }
     
     .bkg-entity-detail,
     .bkg-relation-detail {
-        margin-top: 30px;
-        margin-left: 10px;
-        margin-right: 10px;
+        margin: 30px 10px 30px 10px;
 
         border-left: 1px solid #1c7bcc;
         border-top: 1px solid #1c7bcc;
+        position: relative;
+    }
+
+    .bkg-detail-bottom {
+        clear: both;
+        margin-bottom: -25px;
+        height: 0px;
+    }
+
+    .bkg-detail-bottom-line {
+        width: 10px;
+        height: 1px;
+        background-color: #1c7bcc;
+        position: absolute;
+        bottom: 0px;
     }
     
     /**人物基本信息模块**/
@@ -472,7 +511,7 @@
     .bkg-news {
         li.bkg-news-item {
             
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             position: relative;
             
             .bkg-circle {
@@ -505,8 +544,8 @@
     
             .bkg-news-tail {
                 color: #9bd1fe;
-                line-height: 20px;
-                height: 20px;
+                margin-top: 1px;
+                height: 18px;
             }
 
             .bkg-news-source {
@@ -529,11 +568,13 @@
         li {
             float: left;
             text-align: center;
-            margin-right: 8px;
+            margin-right: 9px;
+            font-size: 13px;
+            width: 67px;
 
             img {
-                width: 60px;
-                height: 78px;
+                width: 67px;
+                height: 87px;
             }
         }
 

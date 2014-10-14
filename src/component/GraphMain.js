@@ -16,6 +16,8 @@ define(function (require) {
     var OutTipEntity = require('../entity/OutTip');
     var ExtraEdgeBundleEntity = require('../entity/ExtraEdgeBundle');
 
+    var Parallax = require('../util/Parallax');
+
     var CircleShape = require('zrender/shape/Circle');
 
     var Cycle = require('./Cycle');
@@ -70,6 +72,8 @@ define(function (require) {
         this._baseEntityCount = 0;
 
         this._firstShowEntityDetail = true;
+
+        this._parallax = null;
     };
 
     GraphMain.prototype.type = 'GRAPH';
@@ -83,7 +87,17 @@ define(function (require) {
         el.style.width = kg.getWidth() + 'px';
         el.style.height = kg.getHeight() + 'px';
 
-        this._zr = zrender.init(el);
+        this._initBG();
+        this._initZR();
+    };
+
+    GraphMain.prototype._initZR = function () {
+        $zrContainer = document.createElement('div');
+        $zrContainer.className = 'bkg-graph-zr';
+
+        this.el.appendChild($zrContainer);
+
+        this._zr = zrender.init($zrContainer);
 
         var zrRefresh = this._zr.painter.refresh;
         var self = this;
@@ -123,6 +137,10 @@ define(function (require) {
                 y0 = position[1];
                 sx0 = scale[0];
                 sy0 = scale[1];
+
+                if (self._parallax) {
+                    self._parallax.moveTo(x0 / sx0, y0 / sy0);
+                }
             }
 
             zrRefresh.apply(this, arguments);
@@ -135,7 +153,23 @@ define(function (require) {
                 layers[z].dom.parentNode.removeChild(layers[z].dom);
             }
         }
-    };
+    }
+
+    GraphMain.prototype._initBG = function () {
+
+        var $bg = document.createElement('div');
+        $bg.className = 'bkg-graph-bg';
+
+        this.el.appendChild($bg);
+
+        // $bg.innerHTML = '<div class="bkg-bg-layer"></div>';
+        // this._parallax = new Parallax($bg);
+
+        // this._parallax.scaleBase = 0.35;
+        // this._parallax.scaleStep = 0.5;
+
+        // this._parallax.setOffset(2000, 2000);
+    }
 
     GraphMain.prototype.resize = function (w, h) {
 

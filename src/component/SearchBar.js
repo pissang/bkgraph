@@ -6,8 +6,8 @@ define(function (require) {
     var util = require('../util/util');
     var Sizzle = require('Sizzle');
 
-    var renderPersonList = etpl.compile(require('text!../html/personlist.html'));
-    var renderSearchbar = etpl.compile(require('text!../html/searchbar.html'));
+    var renderPersonList = etpl.compile(require('text!../html/personList.html'));
+    var renderSearchbar = etpl.compile(require('text!../html/searchBar.html'));
 
     var SearchBar = function () {
 

@@ -8,9 +8,9 @@ define(function (require) {
 
     var ScrollBar = require('../util/ScrollBar');
 
-    etpl.compile(require('text!../html/sidebarmodule.html'));
-    var renderEntityDetail = etpl.compile(require('text!../html/entitydetail.html'));
-    var renderRelationDetail = etpl.compile(require('text!../html/relationdetail.html'));
+    etpl.compile(require('text!../html/sideBarModule.html'));
+    var renderEntityDetail = etpl.compile(require('text!../html/entityDetail.html'));
+    var renderRelationDetail = etpl.compile(require('text!../html/relationDetail.html'));
 
     var SideBar = function () {
         
