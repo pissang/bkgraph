@@ -1,4 +1,5 @@
 <!-- target: personlist -->
+<!-- if: ${entities.length} -->
 <ul>
     <!-- for: ${entities} as ${entity}-->
     <li class="bkg-person" data-bkg-entity-id="${entity.ID}">
@@ -7,3 +8,8 @@
     </li>
     <!-- /for -->
 </ul>
+<!-- else -->
+<ul>
+    <li class="bkg-empty">暂时没在TA的人脉圈中找到这个人哟~</li>
+</ul>
+<!-- /if -->

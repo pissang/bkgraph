@@ -94,7 +94,7 @@ define(function (require) {
             util.removeClass(this._$levels[i], 'bkg-active');
         }
         for (var i = 0; i < levels.length; i++) {
-            if (levels[i].position <= percent && levels[i + 1].position > percent) {
+            if (levels[i].position <= percent && (!levels[i+1] || levels[i + 1].position > percent)) {
                 util.addClass(this._$levels[i], 'bkg-active');
             }
         }

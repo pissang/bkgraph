@@ -12,6 +12,8 @@ define(function (require) {
     var v = vec2.create();
     var v1 = vec2.create();
     var v2 = vec2.create();
+    var min = vec2.create();
+    var max = vec2.create();
 
     var EdgeEntity = function (opts) {
         
@@ -195,17 +197,12 @@ define(function (require) {
 
     EdgeEntity.prototype.isInsideRect = function (rect) {
         var style = this.el.style;
-        return isPointInRect(style.xStart, style.yStart, rect)
-            || isPointInRect(style.xEnd, style.yEnd, rect);
-    }
+        vec2.set(v1, style.xEnd, style.yEnd);
+        vec2.set(v2, style.xStart, style.yStart);
 
-    function isPointInRect(x, y, rect) {
-        return !(
-            x > rect.x + rect.width
-            || y > rect.y + rect.height
-            || x < rect.x
-            || y < rect.y
-        );
+        vec2.min(min, v1, v2);
+        vec2.max(max, v1, v2);
+        return !(max[0] < rect.x || max[1] < rect.y || min[0] > (rect.x + rect.width) || min[1] > (rect.y + rect.height));
     }
 
     zrUtil.inherits(EdgeEntity, Entity);

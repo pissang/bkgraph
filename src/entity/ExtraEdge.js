@@ -12,9 +12,11 @@ define(function (require) {
     var intersect = require('../util/intersect');
 
     var vec2 = require('zrender/tool/vector');
-    var v = vec2.create();
     var v1 = vec2.create();
     var v2 = vec2.create();
+    var v3 = vec2.create();
+    var min = vec2.create();
+    var max = vec2.create();
 
     function lerp(x0, x1, t) {
         return x0 * (1 - t) + x1 * t;
@@ -102,11 +104,13 @@ define(function (require) {
 
     ExtraEdgeEntity.prototype.highlight = function () {
         this.hidden = false;
+        this.el.zlevel = 3;
         this._isHighlight = true;
     };
 
     ExtraEdgeEntity.prototype.lowlight = function () {
         this.hidden = true;
+        this.el.zlevel = 0;
         this._isHighlight = false;
     };
 
@@ -195,18 +199,16 @@ define(function (require) {
 
     ExtraEdgeEntity.prototype.isInsideRect = function (rect) {
         var style = this.el.style;
-        return isPointInRect(style.xStart, style.yStart, rect)
-            || isPointInRect(style.cpX1, style.cpY1, rect)
-            || isPointInRect(style.xEnd, style.yEnd, rect);
-    }
+        vec2.set(v2, style.cpX1, style.cpY1);
+        vec2.set(v3, style.xEnd, style.yEnd);
+        vec2.set(min, style.xStart, style.yStart);
+        vec2.set(max, style.xStart, style.yStart);
 
-    function isPointInRect(x, y, rect) {
-        return !(
-            x > rect.x + rect.width
-            || y > rect.y + rect.height
-            || x < rect.x
-            || y < rect.y
-        );
+        vec2.min(min, min, v2);
+        vec2.min(min, min, v3);
+        vec2.max(max, max, v2);
+        vec2.max(max, max, v3);
+        return !(max[0] < rect.x || max[1] < rect.y || min[0] > (rect.x + rect.width) || min[1] > (rect.y + rect.height));
     }
 
     zrUtil.inherits(ExtraEdgeEntity, Entity);

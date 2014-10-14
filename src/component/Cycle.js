@@ -5,59 +5,53 @@ define (function (require) {
         this.nodes = [];
     }
 
-    Cycle.findFromGraph = function (graph) {
+    Cycle.findFromGraph = function (graph, maxCycleDepth) {
 
         for (var i = 0; i < graph.nodes.length; i++) {
             graph.nodes[i].__visited = false;
+            graph.nodes[i].__ignore = false;
         }
-        var node0 = graph.nodes[0];
-        node0.__stack = [node0];
 
+        var stack = [];
         var cycles = [];
-        var depthFirstTraverse = function (current, fromNode) {
+
+        var depthFirstTraverse = function (current, mainNode, depth) {
+            if (depth + 1 > maxCycleDepth) {
+                return;
+            }
+            stack.push(current);
             for (var i = 0; i < current.edges.length; i++) {
                 var e = current.edges[i];
                 var other = e.node1 === current ? e.node2 : e.node1;
-                if (other === fromNode) {
+                // 忽略已经完成查找的节点
+                if (other.__ignore) {
                     continue;
                 }
-                if (other.__visited) { // Have a cycle
-                    var cycle = new Cycle();
-                    // Find Least common ancestor
-                    for (var k = 0; k < Math.min(other.__stack.length, current.__stack.length); k++) {
-                        var n1 = other.__stack[i];
-                        var n2 = current.__stack[i];
-                        if (n1 !== n2) {
-                            break;
-                        }
-                    }
-                    k --;
-                    for (var j = k; j < other.__stack.length; j++) {
-                        cycle.nodes.push(other.__stack[j]);
-                    }
-                    for (var j = current.__stack.length - 1; j >= k + 1; j--) {
-                        cycle.nodes.push(current.__stack[j]);
-                    }
-                    if (cycle.nodes.length > 2) {
+                if (other.__visited) {
+                    if (other === mainNode && stack.length > 2 && stack.length <= maxCycleDepth) {
+                        // Have a cycle
+                        var cycle = new Cycle();
+                        cycle.nodes = stack.slice();
                         cycles.push(cycle);
                     }
                 } else {
-                    other.__stack = current.__stack.slice();
-                    other.__stack.push(other);
-
                     other.__visited = true;
-                    depthFirstTraverse(other, current);
+                    depthFirstTraverse(other, mainNode, depth + 1);
                 }
-
             }
+            stack.pop();
         }
 
-        depthFirstTraverse(node0);
-
-        // 清理数据
         for (var i = 0; i < graph.nodes.length; i++) {
-            graph.nodes[i].__stack = null;
+            for (var j = 0; j < graph.nodes.length; j++) {
+                graph.nodes[j].__visited = false;
+            }
+            stack = [];
+            graph.nodes[i].__visited = true;
+            depthFirstTraverse(graph.nodes[i], graph.nodes[i], 0);
+            graph.nodes[i].__ignore = true;
         }
+
         return cycles;
     }
 

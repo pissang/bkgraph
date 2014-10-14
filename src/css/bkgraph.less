@@ -4,7 +4,7 @@
     background-image: url(../img/bg.jpg);
     background-size: 100% 100%;
     position: relative;
-    font-family: "Microsoft YaHei";
+    font-family: arial, 'Hiragino Sans GB', 'Microsoft Yahei', '微软雅黑', '宋体', Tahoma, Arial, Helvetica, STHeiti;
     overflow: hidden;
 
     a {
@@ -27,11 +27,11 @@
     top: 0px;
     bottom: 0px;
 
-    -webkit-transition: right 0.5s ease-in-out;
-       -moz-transition: right 0.5s ease-in-out;
-        -ms-transition: right 0.5s ease-in-out;
-         -o-transition: right 0.5s ease-in-out;
-            transition: right 0.5s ease-in-out;
+    -webkit-transition: right 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+       -moz-transition: right 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        -ms-transition: right 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+         -o-transition: right 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            transition: right 0.5s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 /** 搜索栏 */
@@ -216,6 +216,12 @@
                 font-weight: normal;
             }
         }
+
+        li.bkg-empty {
+            height: 85px;
+            line-height: 85px;
+            color: white;
+        }
     }
 }
 
@@ -265,7 +271,7 @@
     }
 
     &.hidden {
-        left: -325px;
+        left: -335px;
     }
 
     .bkg-entity-detail-title {
@@ -282,6 +288,7 @@
             margin: 0px;
 
             line-height: 22px;
+            font-weight: normal;
         }
     }
 
@@ -344,7 +351,7 @@
         }
 
         .bkg-person-description {
-            margin-left: 113px;
+            margin-left: 102px;
 
             p {
                 margin: 4px 0px;
@@ -395,7 +402,7 @@
             text-align: center;
         }
         .bkg-relation-site {
-            background-color: #1d4b7a;
+            background-color: #043362;
             color: #2ab7ed;
             line-height: 20px;
             padding: 0px 10px;
@@ -404,7 +411,7 @@
             border-radius: 5px;
 
             &:hover {
-                color: #1d4b7a;
+                color: #043362;
                 background-color: #2ab7ed;
             }
         }
@@ -477,7 +484,7 @@
 
                 left: -14px;
                 position: absolute;
-                top: 10px;
+                top: 6px;
             }
 
             .bkg-news-title {
@@ -491,7 +498,17 @@
                     text-decoration: underline;
                 }
             }
+
+            .bkg-news-summary {
+                color: #D6ECFF;
+            }
     
+            .bkg-news-tail {
+                color: #9bd1fe;
+                line-height: 20px;
+                height: 20px;
+            }
+
             .bkg-news-source {
                 float: right;
                 color: #9bd1fe;
@@ -499,12 +516,6 @@
                 &:hover {
                     color: white;
                 }
-            }
-
-            .bkg-news-tail {
-                color: #9bd1fe;
-                line-height: 20px;
-                height: 20px;
             }
 
             .bkg-news-publish-time {

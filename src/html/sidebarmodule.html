@@ -10,12 +10,11 @@
         <!-- for: ${news} as ${new}, ${index} -->
         <li class="bkg-news-item">
             <div class="bkg-circle"></div>
-            <!-- if: ${index} == 0 -->
-            ${new.summary}
-            <!-- else -->
             <a href="${new.url}" target="_blank" class="bkg-news-title">
             ${new.title|truncate(20)}
             </a>
+            <!-- if: ${index} == 0 -->
+            <p class="bkg-news-summary">${new.summary}</p>
             <!-- /if-->
             <div class="bkg-news-tail">
                 <a class="bkg-news-source" href="${new.url}" target="_blank">${new.source}</a>
@@ -40,7 +39,7 @@
         </div>
     </div>
     <div class="bkg-latest-weibo">
-        <p class="bkg-latest-weibo-content">${weibo.latestWeibo|trim}<a href="${weibo.latestWeiboUrl}">查看全文</a></p>
+        <p class="bkg-latest-weibo-content">${weibo.latestWeibo|trim}<a href="${weibo.latestWeiboUrl}" target="_blank">查看全文</a></p>
         <div class="bkg-latest-weibo-info">
             <span class="bkg-latest-weibo-time" target="_blank">${weibo.latestWeiboTime}</span>
             <a class="bkg-latest-weibo-comment" href="${weibo.latestWeiboUrl}" target="_blank">${weibo.latestWeiboComment}</a>
