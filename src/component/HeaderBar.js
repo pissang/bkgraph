@@ -38,6 +38,12 @@ define(function (require) {
         if (sideBar) {
             sideBar.el.style.top = this.el.clientHeight + 'px';
         }
+
+        var self = this;
+        var $wbShareBtn = Sizzle('.bkg-share', this.el)[0];
+        util.addEventListener($wbShareBtn, 'click', function (e) {
+            self.weiboShare(e);
+        });
     };
 
     HeaderBar.prototype.setData = function (data) {
@@ -69,6 +75,38 @@ define(function (require) {
                 util.addClass(this._$levels[i], 'bkg-active');
             }
         }
+    }
+
+    HeaderBar.prototype.weiboShare = function (e) {
+        var _$levels = this._$levels;
+        var index = -1;
+        for(var i = 0, len = _$levels.length; i < len; i++) {
+            if(Sizzle.matchesSelector(_$levels[i], '.bkg-active')) {
+                index = i;
+            }
+        }
+        if(index < 0) return;
+
+        var _param = {
+            url: document.URL,
+            appkey: '',
+            ralateUid: '', //关联用户的id，自动@
+            title: levels[index].content,
+            pic: '',
+            language: 'zh_cn'
+        }
+        var paramArr = [];
+        for(var i in _param) {
+            if(_param[i]) {
+                paramArr.push(i + '=' + encodeURIComponent(_param[i]));
+            }
+        }
+        var url = "http://service.weibo.com/share/share.php?" + paramArr.join('&');
+        var height = 100;
+        var width = 400;
+        var left = (screen.width - width) / 2;
+        var top = (screen.height - height) / 2;
+        window.open(url, 'newwindow', 'height=' + height + ',width=' + width + ',left=' + left + ',top=' + top); 
     }
 
     zrUtil.inherits(HeaderBar, Component);

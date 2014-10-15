@@ -21,7 +21,7 @@ define(function (require) {
     // etpl trim
     etpl.addFilter('trim', util.trim);
 
-    var TUPU_URL = 'http://cq01-ps-dev377.cq01.baidu.com:8087/api/graph/v1';
+    var TUPU_URL = 'http://cq01-ps-dev377.cq01.baidu.com:8087/tupu/api/graph/v1';
 
     /**
      * @alias bkgraph~BKGraph
