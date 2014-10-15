@@ -52,6 +52,7 @@
 }
 .bkg-graph .bkg-graph-bg .bkg-bg-layer {
   background-image: url(../img/star.png);
+  opacity: 0.5;
 }
 /** 搜索栏 */
 .bkg-searchbar {
@@ -174,7 +175,6 @@
   left: 0px;
   top: 0px;
   /** 图片不换行 */
-
   white-space: nowrap;
   -webkit-transition: left 0.5s ease-in-out;
   -moz-transition: left 0.5s ease-in-out;
@@ -231,13 +231,9 @@
   font-size: 13px;
   line-height: 20px;
   /**人物基本信息模块**/
-
   /******* 微博模块 ***********/
-
   /******* 新闻模块 ***********/
-
   /** 作品模块 */
-
 }
 .bkg-sidebar .bkg-sidebar-viewport {
   box-sizing: border-box;
@@ -261,7 +257,7 @@
   margin: 0px;
 }
 .bkg-sidebar.hidden {
-  left: -335px;
+  left: -338px;
 }
 .bkg-sidebar .bkg-entity-detail-title {
   text-align: center;
@@ -283,11 +279,9 @@
   height: 100%;
 }
 .bkg-sidebar .bkg-sidebar-module {
-  margin-top: 20px;
-  margin-bottom: 10px;
+  margin-bottom: 25px;
   padding-left: 11px;
   box-sizing: border-box;
-  display: inline-block;
 }
 .bkg-sidebar .bkg-sidebar-module .bkg-module-title {
   margin: 0px 0px 6px -11px;
@@ -311,11 +305,22 @@
 }
 .bkg-sidebar .bkg-entity-detail,
 .bkg-sidebar .bkg-relation-detail {
-  margin-top: 30px;
-  margin-left: 10px;
-  margin-right: 10px;
+  margin: 30px 10px 30px 10px;
   border-left: 1px solid #1c7bcc;
   border-top: 1px solid #1c7bcc;
+  position: relative;
+}
+.bkg-sidebar .bkg-detail-bottom {
+  clear: both;
+  margin-bottom: -25px;
+  height: 0px;
+}
+.bkg-sidebar .bkg-detail-bottom-line {
+  width: 10px;
+  height: 1px;
+  background-color: #1c7bcc;
+  position: absolute;
+  bottom: 0px;
 }
 .bkg-sidebar .bkg-person-info .bkg-person-pic {
   width: 91px;
@@ -419,7 +424,7 @@
   margin-right: 10px;
 }
 .bkg-sidebar .bkg-news li.bkg-news-item {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   position: relative;
 }
 .bkg-sidebar .bkg-news li.bkg-news-item .bkg-circle {
@@ -446,7 +451,7 @@
 }
 .bkg-sidebar .bkg-news li.bkg-news-item .bkg-news-tail {
   color: #9bd1fe;
-  line-height: 18px;
+  margin-top: 1px;
   height: 18px;
 }
 .bkg-sidebar .bkg-news li.bkg-news-item .bkg-news-source {
@@ -462,11 +467,13 @@
 .bkg-sidebar .bkg-works li {
   float: left;
   text-align: center;
-  margin-right: 8px;
+  margin-right: 9px;
+  font-size: 13px;
+  width: 67px;
 }
 .bkg-sidebar .bkg-works li img {
-  width: 60px;
-  height: 78px;
+  width: 67px;
+  height: 87px;
 }
 .bkg-sidebar .bkg-works a {
   color: white;
