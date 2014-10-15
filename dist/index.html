@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
         <link rel="stylesheet" type="text/css" href="./css/index.css" />
         <link rel="stylesheet" type="text/css" href="./css/bkgraph.css" />
     </head>
@@ -12,9 +13,9 @@
         <script>
             var name = window.location.hash.slice(1);
             name = name || '杨幂';
-            name += '_f';
+            document.title = name + '人物关系图谱';
 
-            var g = bkgraph.init('viewport', name, function (g) {
+            var g = bkgraph.init('viewport', name + '_f', function (g) {
                 g.addComponent(new bkgraph.SideBar());
                 g.addComponent(new bkgraph.SearchBar());
                 g.addComponent(new bkgraph.HeaderBar());

@@ -162,13 +162,13 @@ define(function (require) {
 
         this.el.appendChild($bg);
 
-        // $bg.innerHTML = '<div class="bkg-bg-layer"></div>';
-        // this._parallax = new Parallax($bg);
+        $bg.innerHTML = '<div class="bkg-bg-layer"></div>';
+        this._parallax = new Parallax($bg);
 
-        // this._parallax.scaleBase = 0.35;
-        // this._parallax.scaleStep = 0.5;
+        this._parallax.scaleBase = 0.4;
+        this._parallax.scaleStep = 0.5;
 
-        // this._parallax.setOffset(2000, 2000);
+        this._parallax.setOffset(2000, 2000);
     }
 
     GraphMain.prototype.resize = function (w, h) {
@@ -291,9 +291,9 @@ define(function (require) {
         
         this._loadStorage();
 
-        var circles = this._findCircles('男友,女友,好友,妻子,老婆,丈夫,老公,绯闻,暧昧,情敌,对象,干爹,真爱,夫妻,情侣,不和,私生子'.split(','));
+        var circles = this._findCircles('男友,女友,好友,妻子,老婆,丈夫,老公,绯闻,暧昧,情敌,对象,干爹,真爱,夫妻,情侣,不和,私生子,艳照门,前夫,前妻'.split(','));
         for (var i = 0; i < circles.length; i++) {
-            this.highlightCircle(circles[i]);
+            this._highlightCircle(circles[i]);
         }
 
         // 刚打开时的展开动画
@@ -431,7 +431,7 @@ define(function (require) {
         ];
         // forceLayout.gravity = 0.8;
         forceLayout.scaling = 12;
-        forceLayout.coolDown = 0.99;
+        forceLayout.coolDown = 0.99999;
         // forceLayout.enableAcceleration = false;
         forceLayout.maxSpeedIncrease = 100;
         // 这个真是不好使
@@ -458,6 +458,7 @@ define(function (require) {
         // });
         
         forceLayout.init(graph, false);
+        forceLayout.temperature = 0.02;
         this._layouting = true;
         var self = this;
 
@@ -476,7 +477,7 @@ define(function (require) {
             }
             self._updateNodePositions();   
 
-            if (forceLayout.temperature < 0.01) {
+            if (forceLayout.temperature < 0.0001) {
                 self.stopForceLayout();
                 cb && cb.call(self);
             }
@@ -722,9 +723,9 @@ define(function (require) {
     }
 
     /**
-     * 
+     * 默认显示所有圈子
      */
-    GraphMain.prototype.highlightCircle = function (cycle) {
+    GraphMain.prototype._highlightCircle = function (cycle) {
         var len = cycle.nodes.length;
         for (var i = 0; i < len; i++) {
             var n1 = cycle.nodes[i];
@@ -740,10 +741,11 @@ define(function (require) {
             if (!e.entity) {
                 this._createEdgeEntity(e);
             }
-
-            this.highlightNode(n1);
-            this.highlightNode(n2);
-            e.entity.highlight();
+            n1.entity.setStyle('color', '#58bb00');
+            n2.entity.setStyle('color', '#58bb00');
+            e.entity.setStyle('color', '#58bb00');
+            e.entity.setStyle('lineWidth', 2.5);
+            e.entity.setStyle('hidden', false);
         }
         this._zr.refreshNextFrame();
         this._syncHeaderBarExplorePercent();
@@ -929,14 +931,20 @@ define(function (require) {
             var other = e.node1 === node ? e.node2 : e.node1;
 
             // 不出补边
-            if (e.isExtra || other.entity) {
+            if (e.isExtra) {
                 continue;
             }
-
-            this._createNodeEntity(other);
-            this._createEdgeEntity(e);
-
-            if (util.supportCanvas()) {
+            var newNodeEntity = false;
+            if (!other.entity) {
+                newNodeEntity = true;
+                this._createNodeEntity(other);
+            }
+            if (!e.entity) {
+                this._createEdgeEntity(e);
+            }
+            // 在节点是新展开的情况下才显示展开动画
+            // 有可能节点在其它节点展开的时候已经绘制，但是边没补上
+            if (util.supportCanvas() && newNodeEntity) {
                 this._growNodeAnimation(other, node, Math.random() * 500);
             }
         }
@@ -1065,6 +1073,7 @@ define(function (require) {
                 }
                 break;
             }
+            // console.log(cycle.nodes.map(function(n) {return n.data.name}));
             // 环中所有边都符合关键词
             if (i == cycle.nodes.length) {
                 matchCircles.push(cycle);
@@ -1120,7 +1129,10 @@ define(function (require) {
             return;
         }
         var headerBar = this._kgraph.getComponentByType('HEADERBAR');
-        var top = headerBar.el.clientHeight;
+        var top = 0;
+        if (headerBar) {
+            top = headerBar.el.clientHeight;
+        }
         var right = -parseInt(util.getStyle(this.el, 'right'));
 
         var lineRectIntersectPoint = vec2.create();
@@ -1189,15 +1201,20 @@ define(function (require) {
         e.entity.animateLength(zr, 300, Math.random() * 300, fromNode.entity, function () {
             toNode.entity.animateRadius(zr, radius, 500, function () {
                 self._animating = false;
+                // 方便计算边的顶点
+                fromNode.entity.radius = fromNode.layout.size;
+                toNode.entity.radius = toNode.layout.size;
+                e.entity.update();
             })
         });
     };
 
-    GraphMain.prototype._createNodeEntity = function (node) {
+    GraphMain.prototype._createNodeEntity = function (node, style) {
         var nodeEntity = new NodeEntity({
             radius: node.layout.size,
             label: node.data.name,
-            image: node.data.image
+            image: node.data.image,
+            style: style
         });
         nodeEntity.initialize(this._zr);
 
@@ -1245,7 +1262,7 @@ define(function (require) {
         return nodeEntity;
     };
 
-    GraphMain.prototype._createEdgeEntity = function (e) {
+    GraphMain.prototype._createEdgeEntity = function (e, style) {
         var edgeEntity;
         var zr = this._zr;
         if (e.node1.entity && e.node2.entity) {
@@ -1253,7 +1270,8 @@ define(function (require) {
                 edgeEntity = new ExtraEdgeEntity({
                     sourceEntity: e.node1.entity,
                     targetEntity: e.node2.entity,
-                    label: e.data.relationName
+                    label: e.data.relationName,
+                    style: style
                 });
                 if (util.supportCanvas()) {
                     this._extraEdgeBundle.addEdge(e);

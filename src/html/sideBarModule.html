@@ -1,3 +1,9 @@
+<!-- target: sidebarModuleTitle -->
+<div class="bkg-module-title">
+    <div class="bkg-circle"></div>
+    <h4>${sidebarModuleName}</h4>
+</div>
+
 <!-- target: sidebarNews -->
 <div class="bkg-news bkg-sidebar-module">
     <div class="bkg-module-title">
@@ -17,7 +23,7 @@
             <p class="bkg-news-summary">${new.summary}</p>
             <!-- /if-->
             <div class="bkg-news-tail">
-                <a class="bkg-news-source" href="${new.url}" target="_blank">${new.source}</a>
+                <span class="bkg-news-source">${new.source}</span>
                 <span class="bkg-news-publish-time">${new.publishTime|truncate(10, '')}</span>
             </div>
         </li>
@@ -27,10 +33,7 @@
 
 <!-- target: sidebarWeibo -->
 <div class="bkg-weibo bkg-sidebar-module">
-    <div class="bkg-module-title">
-        <div class="bkg-circle"></div>
-        <h4>新浪微博</h4>
-    </div>
+    <!-- use: sidebarModuleTitle(sidebarModuleName="新浪微博") -->
     <div class="bkg-weibo-info">
         <img class="bkg-left" src="${weibo.image}" alt="">
         <div class="bkg-right">
@@ -51,10 +54,7 @@
 
 <!-- target: sidebarWorks -->
 <div class="bkg-works bkg-sidebar-module">
-    <div class="bkg-module-title">
-        <div class="bkg-circle"></div>
-        <h4>主要代表作品</h4>
-    </div>
+    <!-- use: sidebarModuleTitle(sidebarModuleName="主要代表作品") -->
     <ul>
     <!-- for: ${representativeWork} as ${work}, ${idx} -->
         <li>

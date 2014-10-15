@@ -23,7 +23,7 @@ define(function (require) {
 
         this.style = {
             color: '#0e90fe',
-            opacity: 0.15
+            opacity: 0.2
         }
         if (opts.style) {
             zrUtil.merge(this.style, opts.style);

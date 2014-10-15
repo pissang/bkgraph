@@ -30,11 +30,13 @@ define(function (require) {
 
         this.style = {
             color: '#0e90fe',
-            labelColor: '#0e90fe'
+            labelColor: '#0e90fe',
+            lineWidth: 1
         };
         this.highlightStyle = {
             color: '#f9dd05',
-            labelColor: '#f9dd05'
+            labelColor: '#f9dd05',
+            lineWidth: 1
         };
         if (opts.style) {
             zrUtil.merge(this.style, opts.style)
@@ -46,8 +48,8 @@ define(function (require) {
         var self = this;
         this.el = new LabelLineShape({
             style: {
-                lineWidth: 1,
-                opacity: this.style.opacity,
+                lineWidth: this.style.lineWidth,
+                opacity: 1,
                 color: this.style.color,
                 strokeColor: this.style.color,
                 text: util.truncate(this.label, 6),
@@ -82,6 +84,21 @@ define(function (require) {
         this.el.modSelf();
     };
 
+    EdgeEntity.prototype.setStyle = function (name, value) {
+        this.style[name] = value;
+        switch (name) {
+            case 'color':
+                this.el.style.strokeColor = value;
+                this.el.style.color = value;
+                break;
+            case 'lineWidth':
+                this.el.style.lineWidth = value;
+                break;
+        }
+
+        this.el.modSelf();
+    }
+
     EdgeEntity.prototype.highlight = function () {
         this.el.style.color = this.highlightStyle.color;
         this.el.style.strokeColor = this.highlightStyle.color;
@@ -95,7 +112,6 @@ define(function (require) {
         this.el.style.color = this.style.color;
         this.el.style.strokeColor = this.style.color;
         this.el.zlevel = 0;
-        this.el.style.opacity = 0.7;
 
         this.el.modSelf();
 
@@ -132,6 +148,7 @@ define(function (require) {
         }
         // 显示全文
         this.el.style.text = this.label;
+        this.el.zlevel = 3;
         this.el.modSelf();
     };
     EdgeEntity.prototype.lowlightLabel = function () {
@@ -140,6 +157,7 @@ define(function (require) {
         }
         // 隐藏多余文字
         this.el.style.text = util.truncate(this.label, 6);
+        this.el.zlevel = 0;
         this.el.modSelf();
     };
 
@@ -165,14 +183,14 @@ define(function (require) {
         var p1 = sourceEntity.el.position;
         var p2 = targetEntity.el.position;
 
-        // vec2.sub(v, p1, p2);
-        // vec2.normalize(v, v);
+        vec2.sub(v, p1, p2);
+        vec2.normalize(v, v);
 
-        // vec2.scaleAndAdd(v1, p1, v, -sourceEntity.radius);
-        // vec2.scaleAndAdd(v2, p2, v, targetEntity.radius);
+        vec2.scaleAndAdd(v1, p1, v, -sourceEntity.radius);
+        vec2.scaleAndAdd(v2, p2, v, targetEntity.radius);
         
-        vec2.copy(v1, p1);
-        vec2.copy(v2, p2);
+        // vec2.copy(v1, p1);
+        // vec2.copy(v2, p2);
 
         var line = this.el;
     }

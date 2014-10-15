@@ -37,13 +37,13 @@ define(function (require) {
 
         this.style = {
             color: '#0e90fe',
-            opacity: 0.15,
-            labelColor: 'white'
+            opacity: 0.8,
+            hidden: true
         };
         this.highlightStyle = {
             color: '#f9dd05',
             opacity: 1,
-            labelColor: '#f9dd05'
+            hidden: false
         };
         if (opts.style) {
             zrUtil.merge(this.style, opts.style)
@@ -62,9 +62,9 @@ define(function (require) {
                 cpX1: 0,
                 cpY1: 0,
                 lineWidth: 1,
-                opacity: this.highlightStyle.opacity,
-                color: this.highlightStyle.color,
-                strokeColor: this.highlightStyle.color,
+                opacity: this.style.opacity,
+                color: this.style.color,
+                strokeColor: this.style.color,
                 text: util.truncate(this.label, 10),
                 textFont: '12px 微软雅黑',
                 textPadding: 5
@@ -102,15 +102,40 @@ define(function (require) {
         this.el.modSelf();
     };
 
+    ExtraEdgeEntity.prototype.setStyle = function (name, value) {
+        this.style[name] = value;
+        switch (name) {
+            case 'color':
+                this.el.style.strokeColor = value;
+                this.el.style.color = value;
+                break;
+            case 'lineWidth':
+                this.el.style.lineWidth = value;
+                break;
+            case 'hidden':
+                this.hidden = value;
+        }
+    }
+
     ExtraEdgeEntity.prototype.highlight = function () {
-        this.hidden = false;
+        this.hidden = this.highlightStyle.hidden;
         this.el.zlevel = 3;
+        this.el.style.color = this.highlightStyle.color;
+        this.el.style.strokeColor = this.highlightStyle.color;
+        this.el.style.opacity = this.highlightStyle.opacity;
+        this.el.modSelf();
+
         this._isHighlight = true;
     };
 
     ExtraEdgeEntity.prototype.lowlight = function () {
-        this.hidden = true;
+        this.hidden = this.style.hidden;
         this.el.zlevel = 0;
+        this.el.style.color = this.style.color;
+        this.el.style.strokeColor = this.style.color;
+        this.el.style.opacity = this.style.opacity;
+        this.el.modSelf();
+
         this._isHighlight = false;
     };
 
@@ -166,9 +191,9 @@ define(function (require) {
 
     ExtraEdgeEntity.prototype.highlightLabel = EdgeEntity.prototype.highlightLabel;
     
-    ExtraEdgeEntity.prototype.lowlightLabel = EdgeEntity.prototype.highlightLabel;
+    ExtraEdgeEntity.prototype.lowlightLabel = EdgeEntity.prototype.lowlightLabel;
 
-    ExtraEdgeEntity.prototype.animateTextPadding = EdgeEntity.prototype.animateTextPadding
+    ExtraEdgeEntity.prototype.animateTextPadding = EdgeEntity.prototype.animateTextPadding;
 
     ExtraEdgeEntity.prototype._setCurvePoints = function (p1, p2, inv) {
         var sourceEntity = this.sourceEntity;

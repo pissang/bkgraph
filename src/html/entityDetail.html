@@ -1,6 +1,6 @@
 <div class="bkg-entity-detail">
     <div class="bkg-entity-detail-title">
-        <h3>${name}信息名片</h3>
+        <h3>${name}名片</h3>
     </div>
     <div class="bkg-sidebar-module bkg-person-info">
         <div class="bkg-module-title">
@@ -9,9 +9,11 @@
         </div>
         <img class="bkg-person-pic" src="${imageSquare}" />
         <div class="bkg-person-description">
-            <p><b>出生:</b> ${birthDate|raw}</p>
+            <!-- if: ${birthDate} -->
+            <p><b>出生:</b> ${birthDate}</p>
+            <!-- /if -->
             <p>
-                <b>简介:</b> ${introduction.content|truncate(72)}
+                <b>简介:</b> ${introduction.content|truncate(68)}
                 <a href="${sourceUrl}" class="bkg-more" target="_blank">更多>></a>
             </p>
         </div>

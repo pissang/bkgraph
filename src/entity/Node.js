@@ -144,7 +144,23 @@ define(function (require) {
         this.el.modSelf();
     }
 
-    NodeEntity.prototype.highlight = function (zr) {
+    // TODO STYLE BINDING
+    NodeEntity.prototype.setStyle = function (name, value) {
+        this.style[name] = value;
+        switch (name) {
+            case 'color':
+                this._outlineShape.style.strokeColor = value;
+                this._labelShape.style.color = zrColor.alpha(this.style.color, 0.8);
+                break;
+            case 'lineWidth':
+                this._outlineShape.style.lineWidth = value;
+                break;
+        }
+
+        this.el.modSelf();
+    }
+
+    NodeEntity.prototype.highlight = function () {
         this._outlineShape.style.strokeColor = this.highlightStyle.color;
         this._outlineShape.style.lineWidth = this.highlightStyle.lineWidth;
         this._labelShape.style.color = zrColor.alpha(this.highlightStyle.color, 0.8);
@@ -157,7 +173,7 @@ define(function (require) {
         this.el.modSelf();
     }
 
-    NodeEntity.prototype.lowlight = function (zr) {
+    NodeEntity.prototype.lowlight = function () {
         this._outlineShape.style.strokeColor = this.style.color;
         this._outlineShape.style.lineWidth = this.style.lineWidth;
         this._labelShape.style.color = zrColor.alpha(this.style.color, 0.8);

@@ -38,9 +38,10 @@
             ], function (bkg, data) {
                 
                 var name = window.location.hash.slice(1);
-                name = name || '杨幂';
-                name += '_f';
-                var g = bkg.init('viewport', name, function (g) {
+                name = name || '谢霆锋';
+                document.title = name + '人物关系图谱';
+
+                var g = bkg.init('viewport', name + '_f', function (g) {
                     var graphMain = g.getComponentByType('GRAPH');
                     g.addComponent(new bkg.SideBar());
                     g.addComponent(new bkg.HeaderBar());

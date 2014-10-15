@@ -64,6 +64,8 @@ define(function (require) {
     };
 
     ScrollBar.prototype._onMouseMove = function (e) {
+        e.preventDefault && e.preventDefault();
+
         this._thumbTop += e.screenY - this._sy;
 
         this._thumbTop = Math.max(this._thumbTop, 0);
