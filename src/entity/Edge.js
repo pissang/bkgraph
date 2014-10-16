@@ -208,9 +208,9 @@ define(function (require) {
         ) / 20 + 3;
     }
 
-    EdgeEntity.prototype.intersectRect = function (rect, out) {
+    EdgeEntity.prototype.intersectRect = function (rect) {
 
-        return intersect.lineRect(this.el.style, rect, out);
+        return intersect.lineRect(this.el.style, rect);
     }
 
     EdgeEntity.prototype.isInsideRect = function (rect) {

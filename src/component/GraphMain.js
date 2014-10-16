@@ -249,7 +249,7 @@ define(function (require) {
             var e = graph.addEdge(relation.fromID, relation.toID, relation);
             e.layout = {
                 // 边权重
-                weight: w * 8 / Math.pow(e.node1.data.layerCounter + 1, 1)
+                weight: w * 12 / Math.pow(e.node1.data.layerCounter + 1, 1)
                 // weight: e.node1.data.layerCounter === 0 ? 200 : w
             };
         }
@@ -291,7 +291,7 @@ define(function (require) {
         
         this._loadStorage();
 
-        var circles = this._findCircles('男友,女友,好友,妻子,老婆,丈夫,老公,绯闻,暧昧,情敌,对象,干爹,真爱,夫妻,情侣,不和,私生子,艳照门,前夫,前妻'.split(','));
+        var circles = this._findCircles('男友,女友,妻子,老婆,丈夫,老公,绯闻,暧昧,情敌,对象,干爹,真爱,夫妻,情侣,不和,私生子,艳照门,前夫,前妻'.split(','));
         for (var i = 0; i < circles.length; i++) {
             this._highlightCircle(circles[i]);
         }
@@ -1135,7 +1135,6 @@ define(function (require) {
         }
         var right = -parseInt(util.getStyle(this.el, 'right'));
 
-        var lineRectIntersectPoint = vec2.create();
         var layer0 = this._zr.painter.getLayer(0);
         var rect = {
             x: -layer0.position[0] / layer0.scale[0],
@@ -1156,7 +1155,19 @@ define(function (require) {
                 continue;
             }
             if (!other.entity.isInsideRect(rect)) {
-                var side = e.entity.intersectRect(rect, lineRectIntersectPoint);
+                // 找出边与屏幕边缘的所有相交点，然后取于other最近的相交点
+                var points = e.entity.intersectRect(rect);
+                var min = Infinity;
+                var point;
+                var side;
+                for (var k = 0; k < points.length; k++) {
+                    var dist = vec2.dist(points[k].point, other.entity.el.position)
+                    if (dist < min) {
+                        dist = min;
+                        point = points[k].point;
+                        side = points[k].side;
+                    }
+                }
                 if (side) {
                     if (!other._outTipEntity) {
                         other._outTipEntity = new OutTipEntity({
@@ -1166,7 +1177,7 @@ define(function (require) {
                         this._root.addChild(other._outTipEntity.el);   
                     }
                     var p = other._outTipEntity.el.position;
-                    vec2.copy(p, lineRectIntersectPoint);
+                    vec2.copy(p, point);
                     switch (side) {
                         case 'top':
                             break;

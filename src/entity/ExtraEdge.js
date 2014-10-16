@@ -217,9 +217,9 @@ define(function (require) {
         inv = inv || 1;
     }
 
-    ExtraEdgeEntity.prototype.intersectRect = function (rect, out) {
+    ExtraEdgeEntity.prototype.intersectRect = function (rect) {
 
-        return intersect.curveRect(this.el.style, rect, out);
+        return intersect.curveRect(this.el.style, rect);
     }
 
     ExtraEdgeEntity.prototype.isInsideRect = function (rect) {

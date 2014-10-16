@@ -48,35 +48,41 @@ define(function (require) {
 
         // Intersect with top
         var x = lineXAtY(x0, y0, x1, y1, rect.y);
+        var out = [];
         if (x >= rect.x && x <= rect.x + rect.width) {
-            out[0] = x;
-            out[1] = rect.y;
-            return 'top';
+            out.push({
+                point: [x, rect.y],
+                side: 'top'
+            });
         }
         // Intersect with left
         var y = lineYAtX(x0, y0, x1, y1, rect.x);
         if (y >= rect.y && y <= rect.y + rect.height) {
-            out[0] = rect.x;
-            out[1] = y;
-            return 'left';
+            out.push({
+                point: [rect.x, y],
+                side: 'left'
+            });
         }
         // Intersect with bottom
         var x = lineXAtY(x0, y0, x1, y1, rect.y + rect.height);
         if (x >= rect.x && x <= rect.x + rect.width) {
-            out[0] = x;
-            out[1] = rect.y + rect.height;
-            return 'bottom';
+            out.push({
+                point: [x, rect.y + rect.height],
+                side: 'bottom'
+            });
         }
         // Intersect with right
         var y = lineYAtX(x0, y0, x1, y1, rect.x + rect.width);
         if (y >= rect.y && y <= rect.y + rect.height) {
-            out[0] = rect.x + rect.width;
-            out[1] = y;
-            return 'right';
+            out.push({
+                point: [rect.x + rect.width, y],
+                side: 'right'
+            });
         }
+        return out;
     };
 
-    var curveRect = function (curve, rect, out) {
+    var curveRect = function (curve, rect) {
         var x0 = curve.xStart;
         var y0 = curve.yStart;
         var x1 = curve.cpX1;
@@ -86,32 +92,38 @@ define(function (require) {
 
         // Intersect with top
         var x = curveXAtY(x0, y0, x1, y1, x2, y2, rect.y);
+        var out = [];
         if (x >= rect.x && x <= rect.x + rect.width) {
-            out[0] = x;
-            out[1] = rect.y;
-            return 'top';
+            out.push({
+                point: [x, rect.y],
+                side: 'top'
+            });
         }
         // Intersect with left
         var y = curveYAtX(x0, y0, x1, y1, x2, y2, rect.x);
         if (y >= rect.y && y <= rect.y + rect.height) {
-            out[0] = rect.x;
-            out[1] = y;
-            return 'left';
+            out.push({
+                point: [rect.x, y],
+                side: 'left'
+            });
         }
         // Intersect with bottom
         var x = curveXAtY(x0, y0, x1, y1, x2, y2, rect.y + rect.height);
         if (x >= rect.x && x <= rect.x + rect.width) {
-            out[0] = x;
-            out[1] = rect.y + rect.height;
-            return 'bottom';
+            out.push({
+                point: [x, rect.y + rect.height],
+                side: 'bottom'
+            });
         }
         // Intersect with right
         var y = curveYAtX(x0, y0, x1, y1, x2, y2, rect.x + rect.width);
         if (y >= rect.y && y <= rect.y + rect.height) {
-            out[0] = rect.x + rect.width;
-            out[1] = y;
-            return 'right';
+            out.push({
+                point: [rect.x + rect.width, y],
+                side: 'right'
+            });
         }
+        return out;
     }
 
     return {
