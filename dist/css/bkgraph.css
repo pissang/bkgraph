@@ -267,7 +267,7 @@
 .bkg-sidebar .bkg-entity-detail-title h3 {
   color: #9bd1fe;
   background-color: #043362;
-  font-size: 18px;
+  font-size: 22px;
   display: inline-block;
   padding: 0px 20px;
   margin: 0px;
@@ -303,6 +303,13 @@
   font-weight: normal;
   text-decoration: underline;
 }
+.bkg-sidebar .bkg-sidebar-module .bkg-module-title a {
+  color: #02c0fe;
+}
+.bkg-sidebar .bkg-sidebar-module .bkg-module-title a:hover {
+  background: transparent;
+  color: #02c0fe;
+}
 .bkg-sidebar .bkg-entity-detail,
 .bkg-sidebar .bkg-relation-detail {
   margin: 30px 10px 30px 10px;
@@ -312,7 +319,6 @@
 }
 .bkg-sidebar .bkg-detail-bottom {
   clear: both;
-  margin-bottom: -25px;
   height: 0px;
 }
 .bkg-sidebar .bkg-detail-bottom-line {
@@ -334,12 +340,11 @@
   margin: 4px 0px;
 }
 .bkg-sidebar .bkg-relation-detail .bkg-relation-description {
-  margin-top: 20px;
   position: relative;
 }
 .bkg-sidebar .bkg-relation-detail .bkg-relation-description img {
-  width: 100px;
-  height: 100px;
+  width: 91px;
+  height: 124px;
 }
 .bkg-sidebar .bkg-relation-detail .bkg-relation-entity-from {
   float: left;
@@ -349,7 +354,7 @@
 }
 .bkg-sidebar .bkg-relation-detail .bkg-relation-name {
   position: absolute;
-  top: 50px;
+  top: 60%;
   left: 50%;
   width: 80px;
   height: 5px;
@@ -363,37 +368,6 @@
   top: -30px;
   font-size: 12px;
 }
-.bkg-sidebar .bkg-relation-detail .bkg-relation-source {
-  margin: 30px -10px 0px -10px;
-  font-size: 14px;
-  background-color: #20619e;
-  height: 3px;
-  text-align: center;
-}
-.bkg-sidebar .bkg-relation-detail .bkg-relation-site {
-  background-color: #043362;
-  color: #2ab7ed;
-  line-height: 20px;
-  padding: 0px 10px;
-  position: relative;
-  top: -8px;
-  border-radius: 5px;
-}
-.bkg-sidebar .bkg-relation-detail .bkg-relation-site:hover {
-  color: #043362;
-  background-color: #2ab7ed;
-}
-.bkg-sidebar .bkg-relation-detail .bkg-relation-baidu {
-  height: 30px;
-  padding: 0px 10px;
-  border-radius: 15px;
-  background-color: #2374be;
-  border: 5px solid #1d4b7a;
-  box-sizing: border-box;
-  color: white;
-  position: relative;
-  top: -15px;
-}
 .bkg-sidebar .bkg-weibo .bkg-weibo-info .bkg-left {
   float: left;
 }
@@ -403,6 +377,12 @@
 .bkg-sidebar .bkg-weibo .bkg-weibo-info h5 {
   margin: 0px;
   font-size: 14px;
+}
+.bkg-sidebar .bkg-weibo .bkg-weibo-info .bkg-weibo-v {
+  background-image: url(../img/sidebar/v.png);
+  width: 16px;
+  height: 13px;
+  display: inline-block;
 }
 .bkg-sidebar .bkg-weibo .bkg-weibo-info p {
   margin: 5px 0px;
@@ -457,9 +437,6 @@
 .bkg-sidebar .bkg-news li.bkg-news-item .bkg-news-source {
   float: right;
   color: #9bd1fe;
-}
-.bkg-sidebar .bkg-news li.bkg-news-item .bkg-news-source:hover {
-  color: white;
 }
 .bkg-sidebar .bkg-news li.bkg-news-item .bkg-news-publish-time {
   float: left;
@@ -528,15 +505,19 @@
 .bkg-headerbar .bkg-share {
   position: absolute;
   top: 16px;
-  right: 25px;
+  right: 15px;
   border-radius: 4px;
-  background-color: #8ec8f7;
+  background-color: #8EC8F7;
   color: #295280;
   display: inline-block;
   cursor: pointer;
   text-align: center;
   font-size: 14px;
-  padding: 3px 10px;
+  padding: 2px 10px 2px 28px;
+  background-image: url(../img/headerbar/sina.png);
+  background-repeat: no-repeat;
+  background-position: 3px 50%;
+  line-height: 20px;
 }
 .bkg-headerbar .bkg-share:hover {
   color: #8ec8f7;
@@ -605,40 +586,40 @@
   color: #ffffff;
 }
 .bkg-headerbar .bkg-level-0 .bkg-level-icon {
-  background-image: url('../img/headerbar/僵尸粉2.png');
+  background-image: url('../img/headerbar/jiangshifen2.png');
 }
 .bkg-headerbar .bkg-level-0.bkg-active .bkg-level-icon {
-  background-image: url('../img/headerbar/僵尸粉1.png');
+  background-image: url('../img/headerbar/jiangshifen1.png');
 }
 .bkg-headerbar .bkg-level-1 .bkg-level-icon {
-  background-image: url('../img/headerbar/初级粉2.png');
+  background-image: url('../img/headerbar/chujifen2.png');
 }
 .bkg-headerbar .bkg-level-1.bkg-active .bkg-level-icon {
-  background-image: url('../img/headerbar/初级粉1.png');
+  background-image: url('../img/headerbar/chujifen1.png');
 }
 .bkg-headerbar .bkg-level-2 .bkg-level-icon {
-  background-image: url('../img/headerbar/中级粉2.png');
+  background-image: url('../img/headerbar/zhongjifen2.png');
 }
 .bkg-headerbar .bkg-level-2.bkg-active .bkg-level-icon {
-  background-image: url('../img/headerbar/中级粉1.png');
+  background-image: url('../img/headerbar/zhongjifen1.png');
 }
 .bkg-headerbar .bkg-level-3 .bkg-level-icon {
-  background-image: url('../img/headerbar/高级粉2.png');
+  background-image: url('../img/headerbar/gaojifen2.png');
 }
 .bkg-headerbar .bkg-level-3.bkg-active .bkg-level-icon {
-  background-image: url('../img/headerbar/高级粉1.png');
+  background-image: url('../img/headerbar/gaojifen1.png');
 }
 .bkg-headerbar .bkg-level-4 .bkg-level-icon {
-  background-image: url('../img/headerbar/顶级粉2.png');
+  background-image: url('../img/headerbar/dingjifen2.png');
 }
 .bkg-headerbar .bkg-level-4.bkg-active .bkg-level-icon {
-  background-image: url('../img/headerbar/顶级粉1.png');
+  background-image: url('../img/headerbar/dingjifen1.png');
 }
 .bkg-headerbar .bkg-level-5 .bkg-level-icon {
-  background-image: url('../img/headerbar/私生粉2.png');
+  background-image: url('../img/headerbar/sishengfen2.png');
 }
 .bkg-headerbar .bkg-level-5.bkg-active .bkg-level-icon {
-  background-image: url('../img/headerbar/私生粉1.png');
+  background-image: url('../img/headerbar/sishengfen1.png');
 }
 /**滚动条*/
 .bkg-scrollbar-viewport {
