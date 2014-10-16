@@ -16,7 +16,7 @@
         <!-- for: ${news} as ${new}, ${index} -->
         <li class="bkg-news-item">
             <div class="bkg-circle"></div>
-            <a href="${new.url}" target="_blank" class="bkg-news-title">
+            <a href="${new.url}" target="_blank" class="bkg-news-title" title="${new.title}">
             ${new.title|truncate(20)}
             </a>
             <!-- if: ${index} == 0 -->
@@ -80,5 +80,5 @@
 
 <!-- target: sidebarRelationNews(master=sidebarNews) -->
 <!-- block: newsModuleTitle -->
-<h4 class="bkg-title"> ${fromEntity.name} 和 ${toEntity.name} 的最新动态</h4>
+<h4 class="bkg-title"><a href="${newsRedir}" target="_blank">${fromEntity.name} 和 ${toEntity.name} 的最新动态</a></h4>
 <!-- /block -->

@@ -24,6 +24,7 @@ define(function (require) {
 
     var util = require('../util/util');
     var intersect = require('../util/intersect');
+    var config = require('../config');
 
     var EPSILON = 1e-2;
     var isAroundZero = function (val) {
@@ -311,7 +312,7 @@ define(function (require) {
         
         // this._loadStorage();
 
-        var circles = this._findCircles('男友,女友,妻子,老婆,丈夫,老公,绯闻,暧昧,情敌,对象,干爹,真爱,夫妻,情侣,不和,私生子,艳照门,前夫,前妻'.split(','));
+        var circles = this._findCircles(config.circleKeywords.split(','));
         for (var i = 0; i < circles.length; i++) {
             this._highlightCircle(circles[i]);
         }
