@@ -29,6 +29,8 @@ define(function (require) {
 
         this.image = opts.image || '';
 
+        this.draggable = opts.draggable || false;
+
         this.style = {
             color: '#0e90fe',
             lineWidth: 3,
@@ -48,6 +50,8 @@ define(function (require) {
 
         this._animatingCircles = [];
     }
+
+    var events = ['mouseover', 'mouseout', 'click', 'dragstart', 'dragend', 'dragenter', 'dragover'];
 
     NodeEntity.prototype.initialize = function (zr) {
         var self = this;
@@ -69,16 +73,21 @@ define(function (require) {
             z: 10,
             zlevel: 1,
             clickable: true,
-            onmouseover: function () {
-                self.dispatch('mouseover');
-            },
-            onmouseout: function () {
-                self.dispatch('mouseout');
-            },
-            onclick: function () {
-                self.dispatch('click');
+            draggable: this.draggable,
+            drift: function (dx, dy) {
+                self.el.position[0] += dx;
+                self.el.position[1] += dy;
             }
         });
+
+        function createEventHandler(name) {
+            return function () {
+                self.dispatch(name);
+            }
+        }
+        for (var i = 0; i < events.length; i++) {
+            outlineShape['on' + events[i]] = createEventHandler(events[i]);
+        }
 
         var image = new Image();
         image.onload = function () {
@@ -138,11 +147,16 @@ define(function (require) {
         this.el.scale[0] = this.el.scale[1] = this.radius / baseRadius;
     }
 
+    NodeEntity.prototype.setDraggable = function (draggable) {
+        this.draggable = draggable;
+        this._outlineShape.draggable = draggable;
+    };
+
     NodeEntity.prototype.setRadius = function (r) {
         this.radius = r;
         this.el.scale[0] = this.el.scale[1] = r / baseRadius;
         this.el.modSelf();
-    }
+    };
 
     // TODO STYLE BINDING
     NodeEntity.prototype.setStyle = function (name, value) {

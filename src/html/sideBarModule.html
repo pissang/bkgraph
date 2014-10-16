@@ -9,7 +9,7 @@
     <div class="bkg-module-title">
         <div class="bkg-circle"></div>
         <!-- block: newsModuleTitle -->
-        <h4 class="bkg-title">最新动态</h4>
+        <h4 class="bkg-title"><a href="${newsRedir}" target="_blank">最新动态</a></h4>
         <!-- /block -->
     </div>
     <ul>
@@ -33,11 +33,19 @@
 
 <!-- target: sidebarWeibo -->
 <div class="bkg-weibo bkg-sidebar-module">
-    <!-- use: sidebarModuleTitle(sidebarModuleName="新浪微博") -->
+    <div class="bkg-module-title">
+        <div class="bkg-circle"></div>
+        <h4><a href="${weibo.latestWeiboUrl}" target="_blank">新浪微博</a></h4>
+    </div>
     <div class="bkg-weibo-info">
         <img class="bkg-left" src="${weibo.image}" alt="">
         <div class="bkg-right">
-            <h5>${weibo.name}</h5>
+            <h5>
+                ${weibo.name}
+                <!-- if ${certification} === 'Plus V' -->
+                <span class="bkg-weibo-v"></span>
+                <!-- /if -->
+            </h5>
             <p>粉丝: ${weibo.fans}&nbsp;&nbsp;微博: ${weibo.weiboNum}</p>
         </div>
     </div>
@@ -54,7 +62,10 @@
 
 <!-- target: sidebarWorks -->
 <div class="bkg-works bkg-sidebar-module">
-    <!-- use: sidebarModuleTitle(sidebarModuleName="主要代表作品") -->
+    <div class="bkg-module-title">
+        <div class="bkg-circle"></div>
+        <h4><a href="${representativeWorkRedir}" target="_blank">主要代表作品</a></h4>
+    </div>
     <ul>
     <!-- for: ${representativeWork} as ${work}, ${idx} -->
         <li>

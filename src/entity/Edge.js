@@ -121,13 +121,11 @@ define(function (require) {
     EdgeEntity.prototype.animateLength = function (zr, time, delay, fromEntity, cb) {
         this._computeLinePoints(v1, v2);
         var self = this;
+        this.el.style.xStart = this.el.style.xEnd = v1[0];
+        this.el.style.yStart = this.el.style.yEnd = v1[1];
+        this.el.modSelf();
+        zr.refreshNextFrame();
         this.addAnimation('length', zr.animation.animate(this.el.style))
-            .when(0, {
-                xStart: v1[0],
-                yStart: v1[1],
-                xEnd: v1[0],
-                yEnd: v1[1]
-            })
             .when(time || 1000, {
                 xStart: v1[0],
                 yStart: v1[1],
@@ -138,6 +136,7 @@ define(function (require) {
                 self.el.modSelf();
                 zr.refreshNextFrame();
             })
+            .delay(delay)
             .done(cb)
             .start();
     };

@@ -3,15 +3,18 @@
         <h3>${fromEntity.name}&${toEntity.name}</h3>
     </div>
     <div class="bkg-relation-description bkg-sidebar-module">
-        <!-- use: sidebarModuleTitle(sidebarModuleName="最新合作电影 "+${relationSite}) -->
+        <div class="bkg-module-title">
+            <div class="bkg-circle"></div>
+            <h4><a href="${relationUrl}" target="_blank">关系描述 来源${relationSite}</a></h4>
+        </div>
         <div class="bkg-relation-entity-from">
-            <img src="${fromEntity.imageSquare}" alt="">
+            <img src="${fromEntity.imageIcon}" alt="">
         </div>
         <div class="bkg-relation-name">
             <span>${relationName}</span>
         </div>
         <div class="bkg-relation-entity-to">
-            <img src="${toEntity.imageSquare}" alt="">
+            <img src="${toEntity.imageIcon}" alt="">
         </div>
         <div style="clear:both"></div>
     </div>

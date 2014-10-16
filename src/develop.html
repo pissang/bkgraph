@@ -41,6 +41,7 @@
                 var name = window.location.hash.slice(1);
                 var g = bkg.init('viewport', name, function (g) {
                     var graphMain = g.getComponentByType('GRAPH');
+                    graphMain.enableDrag();
 
                     g.addComponent(new bkg.SideBar());
                     g.addComponent(new bkg.SearchBar());
@@ -66,11 +67,17 @@
                         // window.open(window.URL.createObjectURL(blob));
                     }
                     document.getElementById('force-layout').onclick = function () {
-                        layouting ? 
-                            graphMain.stopForceLayout()
-                            : graphMain.startForceLayout(function () {
+                        if (layouting) {
+                            graphMain.stopForceLayout();
+                            this.innerHTML = '开始布局';
+                        } else {
+                            this.innerHTML = '停止布局';
+                            var self = this;
+                            graphMain.startForceLayout(function () {
+                                self.innerHTML = '开始布局';
                                 layouting = false;
                             });
+                        }
                         layouting = !layouting;
                     }
                 });

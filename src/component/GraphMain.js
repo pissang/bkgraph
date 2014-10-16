@@ -43,6 +43,8 @@ define(function (require) {
         this.minRelationWeight = 30;
         this.maxRelationWeight = 40;
 
+        this.draggable = false;
+
         this._kgraph = null;
         
         this._zr = null;
@@ -90,6 +92,24 @@ define(function (require) {
         this._initBG();
         this._initZR();
     };
+
+    GraphMain.prototype.enableDrag = function () {
+        this.draggable = true;
+        this._graph.eachNode(function (n) {
+            if (n.entity) {
+                n.entity.setDraggable(true);
+            }
+        });
+    };
+
+    GraphMain.prototype.disableDrag = function () {
+        this.draggable = false;
+        this._graph.eachNode(function (n) {
+            if (n.entity) {
+                n.entity.setDraggable(false);
+            }
+        });
+    }
 
     GraphMain.prototype._initZR = function () {
         $zrContainer = document.createElement('div');
@@ -289,7 +309,7 @@ define(function (require) {
 
         this.render();
         
-        this._loadStorage();
+        // this._loadStorage();
 
         var circles = this._findCircles('男友,女友,妻子,老婆,丈夫,老公,绯闻,暧昧,情敌,对象,干爹,真爱,夫妻,情侣,不和,私生子,艳照门,前夫,前妻'.split(','));
         for (var i = 0; i < circles.length; i++) {
@@ -320,23 +340,30 @@ define(function (require) {
         }
 
         // 所有实体都在 zlevel-1 层
-        graph.eachNode(function (n) {
-            if (n.data.layerCounter > 2) {
-                return;
-            }
-            this._baseEntityCount++;
-            this._createNodeEntity(n);
-        }, this);
-
         // 所有边都在 zlevel-0 层
         graph.eachEdge(function (e) {
             if (
-                e.node1.data.layerCounter > 2 ||
-                e.node2.data.layerCounter > 2
+                e.node1.data.layerCounter <= 2 &&
+                e.node2.data.layerCounter <= 2
             ) {
-                return;
+                if (!e.isExtra) {
+                    if (!e.node1.entity) {
+                        this._baseEntityCount++;
+                        this._createNodeEntity(e.node1);
+                    }
+                    if (!e.node2.entity) {
+                        // 第二层控制显示 20% 的数量
+                        if (e.node2.data.layerCounter == 2 && Math.random() < 0.5) {
+                            this._baseEntityCount++;
+                            this._createNodeEntity(e.node2);
+                        } else if (e.node2.data.layerCounter < 2) {
+                            this._baseEntityCount++;
+                            this._createNodeEntity(e.node2)
+                        }
+                    }
+                }
+                this._createEdgeEntity(e);
             }
-            this._createEdgeEntity(e);
         }, this);
 
         zr.render();
@@ -442,23 +469,24 @@ define(function (require) {
         });
 
         // 在边上加入顶点防止重叠实体与边发生重叠
+        // TODO 效果不好
         var edgeNodes = [];
-        // graph.eachEdge(function (e) {
-        //     var n = graph.addNode(e.id, e);
-        //     var p = vec2.create();
-        //     vec2.add(p, e.node1.layout.position, e.node2.layout.position);
-        //     vec2.scale(p, p, 0.5);
-        //     n.layout = {
-        //         position: p,
-        //         mass: 0,
-        //         radius: 10
-        //     };
-        //     edgeNodes.push(n);
-        //     n.isEdgeNode = true;
-        // });
+        graph.eachEdge(function (e) {
+            var n = graph.addNode(e.id, e);
+            var p = vec2.create();
+            vec2.add(p, e.node1.layout.position, e.node2.layout.position);
+            vec2.scale(p, p, 0.5);
+            n.layout = {
+                position: p,
+                mass: 2,
+                size: 30
+            };
+            edgeNodes.push(n);
+            n.isEdgeNode = true;
+        });
         
-        forceLayout.init(graph, false);
-        forceLayout.temperature = 0.02;
+        forceLayout.init(graph, true);
+        forceLayout.temperature = 0.04;
         this._layouting = true;
         var self = this;
 
@@ -636,22 +664,28 @@ define(function (require) {
                 continue;
             }
 
-            var newEntity = false;
+            var newNodeEntity = false;
+            var newEdgeEntity = false;
             if (!other.entity) {
                 // 动态添加
                 this._createNodeEntity(other);
-                newEntity = true;
+                newNodeEntity = true;
             }
             other.entity.highlight();
 
             if (!e.entity) {
                 // 动态添加
                 this._createEdgeEntity(e);
+                newEdgeEntity = true;
             }
 
             e.entity.highlight();
-            if (newEntity && util.supportCanvas()) {
-                this._growNodeAnimation(other, node, Math.random() * 500);
+            if (util.supportCanvas()) {
+                if (newNodeEntity) {
+                    this._growNodeAnimation(other, node, Math.random() * 500);
+                } else if (newEdgeEntity) {
+                    e.entity.animateLength(zr, 300, 0, node.entity);
+                }
             }
 
             other._isHighlight = true;
@@ -1192,6 +1226,10 @@ define(function (require) {
                             break;
                     }
                     other._outTipEntity.el.modSelf();
+                } else if (other._outTipEntity) {
+                    // 边与屏幕边缘没有交点
+                    this._root.removeChild(other._outTipEntity.el);
+                    other._outTipEntity = null;
                 }
             } else if (other._outTipEntity) {
                 this._root.removeChild(other._outTipEntity.el);
@@ -1209,7 +1247,7 @@ define(function (require) {
         toNode.entity.setRadius(1);
         this._animating = true;
         zr.refreshNextFrame();
-        e.entity.animateLength(zr, 300, Math.random() * 300, fromNode.entity, function () {
+        e.entity.animateLength(zr, 300, 0, fromNode.entity, function () {
             toNode.entity.animateRadius(zr, radius, 500, function () {
                 self._animating = false;
                 // 方便计算边的顶点
@@ -1221,11 +1259,13 @@ define(function (require) {
     };
 
     GraphMain.prototype._createNodeEntity = function (node, style) {
+        var zr = this._zr;
         var nodeEntity = new NodeEntity({
             radius: node.layout.size,
             label: node.data.name,
             image: node.data.image,
-            style: style
+            style: style,
+            draggable: this.draggable
         });
         nodeEntity.initialize(this._zr);
 
@@ -1249,12 +1289,11 @@ define(function (require) {
                 self.unhoverNode(node);
                 //  回复到高亮状态
                 if (node._isHighlight) {
-                    node.entity.highlight(self._zr);
+                    node.entity.highlight();
                 }
             }
             self._lastHoverNode = null;
-        })
-
+        });
         nodeEntity.bind('click', function () {
             self.showEntityDetail(node);
             if (self._lastClickNode !== node) {
@@ -1264,7 +1303,25 @@ define(function (require) {
 
                 self._activeNode = node;
             }
-        })
+        });
+        nodeEntity.bind('dragstart', function () {
+            node.layout.fixed = true;
+            util.addEventListener(document.body, 'mousemove', onDrag);
+        });
+        nodeEntity.bind('dragend', function () {
+            node.layout.fixed = false;
+            util.removeEventListener(document.body, 'mousemove', onDrag);
+        });
+
+        var onDrag = function () {
+            for (var i = 0; i < node.edges.length; i++) {
+                if (node.edges[i].entity) {
+                    node.edges[i].entity.update();
+                }
+            }
+            vec2.copy(node.layout.position, node.entity.el.position);
+            zr.refreshNextFrame();
+        }
 
         node.entity = nodeEntity;
         this._root.addChild(nodeEntity.el);
@@ -1351,7 +1408,7 @@ define(function (require) {
             headerBarComponent.setExplorePercent(this.getExplorePercent());
         }
 
-        this._saveStorage();
+        // this._saveStorage();
     }
 
     GraphMain.prototype._culling = function () {
