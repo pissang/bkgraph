@@ -10,6 +10,7 @@ define(function (require) {
     var SearchBar = require('./component/SearchBar');
     var SideBar = require('./component/SideBar');
     var HeaderBar = require('./component/HeaderBar');
+    var KeyboardControl = require('./component/KeyboardControl');
     var etpl = require('etpl');
     var jsonp = require('./util/jsonp');
     var util = require('./util/util');
@@ -193,7 +194,7 @@ define(function (require) {
         SideBar: SideBar,
         ZoomControl: ZoomControl,
         PanControl: PanControl,
-
+        KeyboardControl: KeyboardControl,
         HeaderBar: HeaderBar,
 
         init: init

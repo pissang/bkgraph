@@ -112,6 +112,11 @@ define(function (require) {
         });
     }
 
+    GraphMain.prototype.refresh = function () {
+        this._syncOutTipEntities();
+        this._zr.refreshNextFrame();
+    }
+
     GraphMain.prototype._initZR = function () {
         $zrContainer = document.createElement('div');
         $zrContainer.className = 'bkg-graph-zr';
@@ -128,7 +133,6 @@ define(function (require) {
         this._max = [zr.getWidth() / 2, zr.getHeight() / 2];
         var x0 = 0, y0 = 0, sx0 = 0, sy0 = 0;
         zr.painter.refresh = function () {
-            self._culling();
             // 同步所有层的位置
             var layers = zr.painter.getLayers();
             var layer0 = layers[0];
@@ -164,6 +168,8 @@ define(function (require) {
                 }
             }
 
+            self._culling();
+            
             zrRefresh.apply(this, arguments);
         }
 
@@ -198,6 +204,8 @@ define(function (require) {
         this.el.style.height = h + 'px';
 
         this._zr.resize();
+
+        this._syncOutTipEntities();
     };
 
     GraphMain.prototype.setData = function (data) {
@@ -354,7 +362,7 @@ define(function (require) {
                     }
                     if (!e.node2.entity) {
                         // 第二层控制显示 20% 的数量
-                        if (e.node2.data.layerCounter == 2 && Math.random() < 0.5) {
+                        if (e.node2.data.layerCounter == 2 && Math.random() < 1) {
                             this._baseEntityCount++;
                             this._createNodeEntity(e.node2);
                         } else if (e.node2.data.layerCounter < 2) {
@@ -789,7 +797,7 @@ define(function (require) {
     /**
      * 在边栏中显示实体详细信息
      */
-    GraphMain.prototype.showEntityDetail = function (n) {
+    GraphMain.prototype.showEntityDetail = function (n, showSidebar) {
         var graph = this._graphLayout;
         if (typeof(n) === 'string') {
             n = graph.getNodeById(n);
@@ -798,10 +806,10 @@ define(function (require) {
         var sideBar = this._kgraph.getComponentByType('SIDEBAR');
         if (sideBar) {
             sideBar.setData(n.data);
-            if (this._firstShowEntityDetail) {
+
+            if (showSidebar) {
                 sideBar.show();
             }
-            this._firstShowEntityDetail = false;
         }
     }
 
@@ -867,48 +875,88 @@ define(function (require) {
     };
 
     GraphMain.prototype.moveLeft = function (cb) {
-        if (!zr) {
-            return;
-        }
+        var zr = this._zr;
         var layer = zr.painter.getLayer(0);
         var newPos = Array.prototype.slice.call(layer.position);
         newPos[0] += zr.getWidth() * 0.6;
 
-        hierarchy.moveTo(newPos[0], newPos[1], cb);
+        this.moveTo(newPos[0], newPos[1], cb);
     };
 
     GraphMain.prototype.moveRight = function (cb) {
-        if (!zr) {
-            return;
-        }
+        var zr = this._zr;
         var layer = zr.painter.getLayer(0);
         var newPos = Array.prototype.slice.call(layer.position);
         newPos[0] -= zr.getWidth() * 0.6;
 
-        hierarchy.moveTo(newPos[0], newPos[1], cb);
+        this.moveTo(newPos[0], newPos[1], cb);
     };
 
     GraphMain.prototype.moveTop = function (cb) {
-        if (!zr) {
-            return;
-        }
+        var zr = this._zr;
         var layer = zr.painter.getLayer(0);
         var newPos = Array.prototype.slice.call(layer.position);
-        newPos[1] += zr.getHeight() * 0.3;
+        newPos[1] += zr.getHeight() * 0.6;
 
-        hierarchy.moveTo(newPos[0], newPos[1], cb);
+        this.moveTo(newPos[0], newPos[1], cb);
     };
 
     GraphMain.prototype.moveDown = function (cb) {
-        if (!zr) {
-            return;
-        }
+        var zr = this._zr;
         var layer = zr.painter.getLayer(0);
         var newPos = Array.prototype.slice.call(layer.position);
-        newPos[1] -= zr.getHeight() * 0.3;
+        newPos[1] -= zr.getHeight() * 0.6;
 
-        hierarchy.moveTo(newPos[0], newPos[1], cb);
+        this.moveTo(newPos[0], newPos[1], cb);
     };
+
+    GraphMain.prototype.zoomIn = function () {
+        var zr = this._zr;
+        var layer = zr.painter.getLayer(0);
+        layer.__zoom = layer.__zoom || 1;
+        this.zoomTo(layer.__zoom * 1.3);
+    };
+
+    GraphMain.prototype.zoomOut = function () {
+        var zr = this._zr;
+        var layer = zr.painter.getLayer(0);
+        layer.__zoom = layer.__zoom || 1;
+        this.zoomTo(layer.__zoom / 1.3);
+    };
+
+    GraphMain.prototype.zoomTo = function (zoom, cb) {
+        var zr = this._zr;
+        var cx = zr.getWidth() / 2;
+        var cy = zr.getHeight() / 2;
+        var layer = zr.painter.getLayer(0);
+        layer.__zoom = layer.__zoom || 1;
+        zoom = Math.min(Math.max(zoom, 0.5), 1.5);
+
+        var zoomScale = zoom / layer.__zoom;
+
+        var newScale = Array.prototype.slice.call(layer.scale);
+        var newPos = Array.prototype.slice.call(layer.position);
+        newPos[0] -= (cx - newPos[0]) * (zoomScale - 1);
+        newPos[1] -= (cy - newPos[1]) * (zoomScale - 1);
+        newScale[0] *= zoomScale;
+        newScale[1] *= zoomScale;
+
+        zr.animation.clear();
+        zr.animation.animate(layer)
+            .when(800, {
+                position: newPos,
+                scale: newScale,
+                __zoom: zoom
+            })
+            .during(function() {
+                layer.dirty = true;
+                zr.refreshNextFrame();
+            })
+            .done(function() {
+                cb && cb();
+            })
+            .start('CubicInOut');
+    }
 
     GraphMain.prototype.uncollapse = function () {
         var zr = this._zr;
@@ -1164,9 +1212,15 @@ define(function (require) {
             return;
         }
         var headerBar = this._kgraph.getComponentByType('HEADERBAR');
+        var searchBar = this._kgraph.getComponentByType('SEARCHBAR');
         var top = 0;
+        var bottom = 0;
         if (headerBar) {
             top = headerBar.el.clientHeight;
+        }
+        if (searchBar) {
+            var bottom = parseInt(util.getStyle(searchBar.el, 'bottom'));
+            bottom += searchBar.el.clientHeight;
         }
         var right = -parseInt(util.getStyle(this.el, 'right'));
 
@@ -1175,7 +1229,7 @@ define(function (require) {
             x: -layer0.position[0] / layer0.scale[0],
             y: (-layer0.position[1] + top)/ layer0.scale[1],
             width: (zr.getWidth() - right) / layer0.scale[0],
-            height: (zr.getHeight() - top) / layer0.scale[1]
+            height: (zr.getHeight() - top - bottom) / layer0.scale[1]
         }
 
         for (var i = 0; i < node.edges.length; i++) {
@@ -1296,7 +1350,11 @@ define(function (require) {
             self._lastHoverNode = null;
         });
         nodeEntity.bind('click', function () {
-            self.showEntityDetail(node);
+            self.showEntityDetail(node, self._firstShowEntityDetail);
+            if (self._firstShowEntityDetail) {
+                self._firstShowEntityDetail = false;
+            }
+
             if (self._lastClickNode !== node) {
                 self._lastClickNode = node;
                 self._syncOutTipEntities();

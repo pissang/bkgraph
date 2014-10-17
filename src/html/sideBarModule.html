@@ -19,9 +19,6 @@
             <a href="${new.url}" target="_blank" class="bkg-news-title" title="${new.title}">
             ${new.title|truncate(20)}
             </a>
-            <!-- if: ${index} == 0 -->
-            <p class="bkg-news-summary">${new.summary}</p>
-            <!-- /if-->
             <div class="bkg-news-tail">
                 <span class="bkg-news-source">${new.source}</span>
                 <span class="bkg-news-publish-time">${new.publishTime|truncate(10, '')}</span>

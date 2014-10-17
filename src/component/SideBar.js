@@ -87,12 +87,19 @@ define(function (require) {
         if (util.hasClass(this.el, 'hidden')) {
             util.removeClass(this.el, 'hidden');
 
+            // 图谱部分右移
             var graphMain = this._kgraph.getComponentByType('GRAPH');
             if (graphMain) {
                 graphMain.el.style.right = -this.el.clientWidth + 'px';
             }
 
             this._$toggleBtn.innerHTML = '隐<br />藏<br /><';
+
+            // 搜索栏自动隐藏
+            var searchBar = this._kgraph.getComponentByType('SEARCHBAR');
+            if (searchBar) {
+                searchBar.hide();
+            }
         }
     };
 

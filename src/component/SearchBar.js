@@ -67,6 +67,11 @@ define(function (require) {
     SearchBar.prototype.hide = function () {
         util.addClass(this.el, 'hidden');
         this._$toggleBtn.innerHTML = '显 示';
+
+        // var graphMain = this._kgraph.getComponentByType('GRAPH');
+        // if (graphMain) {
+        //     graphMain.refresh();
+        // }
     }
 
     /**
@@ -75,6 +80,11 @@ define(function (require) {
     SearchBar.prototype.show = function () {
         util.removeClass(this.el, 'hidden');
         this._$toggleBtn.innerHTML = '隐 藏';
+        
+        // var graphMain = this._kgraph.getComponentByType('GRAPH');
+        // if (graphMain) {
+        //     graphMain.refresh();
+        // }
     }
 
     /**
@@ -164,6 +174,7 @@ define(function (require) {
         var graphMain = this._kgraph.getComponentByType('GRAPH');
         if (graphMain) {
             graphMain.highlightNodeToMain(id);
+            graphMain.showEntityDetail(id);
             graphMain.moveToEntity(id);
         }
     }

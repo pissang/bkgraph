@@ -95,6 +95,8 @@ define(function (require) {
             imageShape.modSelf();
             zr.refreshNextFrame();
         }
+        // TODO
+        // image.crossOrigin = 'anonymous';
         image.src = this.image;
 
         var imageShape = new ImageShape({
