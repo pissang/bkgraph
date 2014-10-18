@@ -592,14 +592,14 @@ define(function (require) {
      */
     GraphMain.prototype.unhoverNode = function (node) {
         if (node._isHover) {
-            if (util.supportCanvas()) {
+            // if (util.supportCanvas()) {
                 node.entity.stopActiveAnimation(this._zr);
                 node.entity.animateRadius(
                     this._zr, node.layout.size, 500
                 );
-            } else {
-                node.entity.setRadius(node.layout.size);
-            }
+            // } else {
+            //     node.entity.setRadius(node.layout.size);
+            // }
 
             node.entity.lowlight();
 
@@ -618,14 +618,14 @@ define(function (require) {
         node._isHover = true;
 
         // Hover 实体放大
-        if (util.supportCanvas()) {
+        // if (util.supportCanvas()) {
             node.entity.animateRadius(
                 this._zr, node.layout.size * 1.2, 500
             );
             node.entity.startActiveAnimation(this._zr);
-        } else {
-            node.entity.setRadius(node.layout.size * 1.2);
-        }
+        // } else {
+        //     node.entity.setRadius(node.layout.size * 1.2);
+        // }
 
         node.entity.highlight();
     }

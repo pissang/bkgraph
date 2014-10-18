@@ -15,11 +15,15 @@ define(function (require) {
 
         this._kgraph = kg;
 
-        var $root = kg.getRoot();
+        // PENDING
+        var graphMain = kg.getComponentByType('GRAPH');
+        if (!graphMain) {
+            return;
+        }
         var self = this;
         // 为了支持keydown事件
-        $root.setAttribute('tabindex', 0);
-        util.addEventListener($root, 'keydown', function (e) {
+        graphMain.el.setAttribute('tabindex', 0);
+        util.addEventListener(graphMain.el, 'keydown', function (e) {
             var graphMain = kg.getComponentByType('GRAPH');
             switch(e.keyCode) {
                 case 87: //w
@@ -42,7 +46,6 @@ define(function (require) {
                     // log('zhishitupumoveright', 'keyboard');
                     graphMain.moveRight();
                     break;
-
                 case 81: //Q
                     graphMain.zoomOut();
                     break;

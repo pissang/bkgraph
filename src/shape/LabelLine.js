@@ -3,6 +3,7 @@ define(function (require) {
     var ShapeBase = require('zrender/shape/Base');
     var LineShape = require('zrender/shape/Line');
     var zrUtil = require('zrender/tool/util');
+    var area = require('zrender/tool/area');
 
     var LabelLine = function (opts) {
         ShapeBase.call(this, opts);
@@ -59,8 +60,8 @@ define(function (require) {
         var x = cx;
         var y = cy;
 
-        var width = ctx.measureText(text).width;
-        var height = ctx.measureText('国').width;
+        var width = area.getTextWidth(text, style.textFont);
+        var height = area.getTextWidth('国', style.textFont);
         if (angle < 0.2 || angle > 2.94) {
             y -= r + textPadding;
             x -= width / 2;

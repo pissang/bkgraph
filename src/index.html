@@ -4,10 +4,12 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <link rel="stylesheet" type="text/css" href="./css/index.css" />
-        <!-- <link rel="stylesheet" type="text/css" href="./css/bkgraph.css" /> -->
-        <link rel="stylesheet/less" type="text/css" href="./css/bkgraph.less" />
+        <link rel="stylesheet" type="text/css" href="./css/bkgraph.css" />
+        <!-- <link rel="stylesheet/less" type="text/css" href="./css/bkgraph.less" /> -->
         <script src="../dep/esl.js"></script>
+        <!--
         <script src="../dep/less.min.js"></script>
+    -->
 
     </head>
     <body>
@@ -19,6 +21,7 @@
                     _: '../dep/lodash',
                     Sizzle: '../dep/sizzle',
                     mock: '../mock'
+                    // 'zrender/dep/excanvas': '../../zrender/extension/flashcanvas/src/flashcanvas'
                 },
                 packages: [
                     {
@@ -33,10 +36,12 @@
                     }
                 ]
             });
+            // window.FlashCanvasOptions = {
+            //     swfPath: "asset/flashcanvas.swf"
+            // };
             require([
                 'bkgraph'
             ], function (bkg, data) {
-                
                 var name = window.location.hash.slice(1);
                 name = name || '谢霆锋';
                 document.title = name + '人物关系图谱';

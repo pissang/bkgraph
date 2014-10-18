@@ -76,7 +76,7 @@ define(function (require) {
         // TODO
         var $relationName = Sizzle('.bkg-relation-name span', this.el)[0];
         if ($relationName) {
-            $relationName.style.top = - util.getHeight($relationName) - 10 + 'px';
+            $relationName.style.top = - $relationName.clientHeight - 10 + 'px';
         }
     };
 

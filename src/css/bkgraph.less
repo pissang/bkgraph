@@ -110,6 +110,7 @@
             padding-left: 15px;
 
             float: left;
+            line-height: 37px;
         }
 
         .bkg-search-btn {
@@ -444,6 +445,7 @@
                 position: relative;
                 top: -30px;
                 font-size: 13px;
+                display: inline-block;
             }
         }
     }
@@ -769,6 +771,9 @@
 /**滚动条*/
 .bkg-scrollbar-viewport {
     overflow: hidden;
+    &:focus {
+        outline: none;
+    }
 
     .bkg-scrollbar-content {
         position: absolute;

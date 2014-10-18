@@ -19,6 +19,7 @@ define(function (require) {
         this._onMouseMove = util.bind(this._onMouseMove, this);
         this._onMouseUp = util.bind(this._onMouseUp, this);
         this._onMouseScroll = util.bind(this._onMouseScroll, this);
+        this._onKeyDown = util.bind(this._onKeyDown, this);
 
         this._init();
 
@@ -34,6 +35,8 @@ define(function (require) {
         util.addClass(this._$viewport, 'bkg-scrollbar-viewport');
         util.addClass(this._$content, 'bkg-scrollbar-content');
 
+        this._$viewport.setAttribute('tabindex', 0);
+
         this._$scrollButton = document.createElement('div');
         this._$scrollButton.className = 'bkg-scrollbar-button';
         this._$scrollBar = document.createElement('div');
@@ -46,6 +49,7 @@ define(function (require) {
 
         util.addEventListener(this._$viewport, 'mousewheel', this._onMouseScroll);
         util.addEventListener(this._$viewport, 'DOMMouseScroll', this._onMouseScroll);
+        util.addEventListener(this._$viewport, 'keydown', this._onKeyDown);
 
         this.resize();
     };
@@ -88,13 +92,21 @@ define(function (require) {
         this.scrollTo(this._scroll - delta);
     }
 
+    ScrollBar.prototype._onKeyDown = function (e) {
+        switch(e.keyCode) {
+            case 38: //up arrow
+                this.scrollTo(this._scroll - 100);
+                break;
+            case 40: //down arrow
+                this.scrollTo(this._scroll + 100);
+                break;
+        }
+    }
+
     ScrollBar.prototype.scrollTo = function (scroll) {
         scroll = Math.max(0, scroll);
 
-        var max = this._contentHeight - this._viewportHeight;
-        if (max < 0) {
-            return;
-        }
+        var max = Math.max(this._contentHeight - this._viewportHeight, 0);
         scroll = Math.min(scroll, max);
 
         this._scroll = scroll;
@@ -102,7 +114,7 @@ define(function (require) {
         this._$content.style.top = -scroll + 'px';
 
         this._thumbTop = (this._scrollBarHeight - this._scrollButtonHeight) * scroll / max;
-        this._$scrollButton.style.top = this._thumbTop + 'px';
+        this._$scrollButton.style.top = (this._thumbTop || 0) + 'px';
     };
 
     ScrollBar.prototype.resize = function () {
@@ -111,6 +123,7 @@ define(function (require) {
 
         if (this._viewportHeight > this._contentHeight) {
             this._$scrollBar.style.display = 'none';
+            this.scrollTo(0);
             return;
         } else {
             this._$scrollBar.style.display = 'block';

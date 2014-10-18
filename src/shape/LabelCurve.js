@@ -4,6 +4,7 @@ define(function (require) {
     var LineShape = require('zrender/shape/Line');
     var zrUtil = require('zrender/tool/util');
     var curveTool = require('zrender/tool/curve');
+    var area = require('zrender/tool/area');
 
     var LabelLineShape = require('./LabelLine');
 
@@ -60,8 +61,8 @@ define(function (require) {
         ctx.textBaseline = 'middle';
         ctx.fillText(text, x, y);
 
-        var width = ctx.measureText(text).width;
-        var height = ctx.measureText('国').width;
+        var width = area.getTextWidth(text, style.textFont);
+        var height = area.getTextWidth('国', style.textFont);
         // 顺便保存rect
         this.__rect = {
             x: cx - r * 2,

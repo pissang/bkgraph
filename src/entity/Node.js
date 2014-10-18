@@ -9,6 +9,8 @@ define(function (require) {
     var zrColor = require('zrender/tool/color');
     var vec2 = require('zrender/tool/vector');
 
+    var util = require('../util/util');
+
     var baseRadius = 50;
 
     var defaultImage = new Image;

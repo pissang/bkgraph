@@ -76,7 +76,7 @@ define(function (require) {
                 el.classList.remove(className);
             }
             else {
-                el.className.replace(className, '');
+                el.className = el.className.replace(className, '');
             }
         },
 
@@ -113,16 +113,6 @@ define(function (require) {
 
         trim: function (str) {
             return str.replace(/^\s+|\s+$/g, '');
-        },
-
-        getHeight: function (el) {
-            var rect = el.getBoundingClientRect();
-            return rect.height;
-        },
-
-        getWidth: function (el) {
-            var rect = el.getBoundingClientRect();
-            return rect.width;
         },
 
         supportCanvas: function () {
