@@ -159,7 +159,7 @@ define(function (require) {
 
         this._updateSlider();
 
-        log('searchinput', name);
+        bkgLog('searchinput', name);
     }
 
     /**
@@ -172,7 +172,7 @@ define(function (require) {
             graphMain.showEntityDetail(id);
             graphMain.moveToEntity(id);
 
-            log('searchclick', id);
+            bkgLog('searchclick', id);
         }
     }
 

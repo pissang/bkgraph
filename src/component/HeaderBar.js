@@ -4,6 +4,7 @@ define(function (require) {
     var zrUtil = require('zrender/tool/util');
     var etpl = require('etpl');
     var util = require('../util/util');
+    var bkgLog = require('../util/log');
     var Sizzle = require('Sizzle');
 
     var renderHeaderBar = etpl.compile(require('text!../html/headerBar.html'));
@@ -79,25 +80,24 @@ define(function (require) {
 
     HeaderBar.prototype.weiboShare = function (e) {
         var _$levels = this._$levels;
-        var index = -1;
-        for(var i = 0, len = _$levels.length; i < len; i++) {
-            if(Sizzle.matchesSelector(_$levels[i], '.bkg-active')) {
-                index = i;
+        for (var idx = 0, len = _$levels.length; idx < len; idx++) {
+            if (Sizzle.matchesSelector(_$levels[idx], '.bkg-active')) {
+                break;
             }
         }
-        if(index < 0) return;
+        if(idx < 0) return;
 
         var _param = {
             url: document.URL,
             appkey: '',
             ralateUid: '', //关联用户的id，自动@
-            title: levels[index].content,
+            title: levels[idx].content,
             pic: '',
             language: 'zh_cn'
         }
         var paramArr = [];
-        for(var i in _param) {
-            if(_param[i]) {
+        for (var i in _param) {
+            if (_param[i]) {
                 paramArr.push(i + '=' + encodeURIComponent(_param[i]));
             }
         }
@@ -107,6 +107,9 @@ define(function (require) {
         var left = (screen.width - width) / 2;
         var top = (screen.height - height) / 2;
         window.open(url, 'newwindow', 'height=' + height + ',width=' + width + ',left=' + left + ',top=' + top); 
+
+        // Log weibo level
+        bkgLog('weibo', idx.toString());
     }
 
     zrUtil.inherits(HeaderBar, Component);

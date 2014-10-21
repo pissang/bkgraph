@@ -4,6 +4,9 @@
     position: relative;
     font-family: arial, 'Hiragino Sans GB', 'Microsoft Yahei', '微软雅黑', '宋体', Tahoma, Arial, Helvetica, STHeiti;
     overflow: hidden;
+    background-image: url(../img/bg.png);
+    background-size: 1px 100%;
+    background-repeat: repeat;
 
     a {
         color: white;
@@ -58,9 +61,6 @@
         right: 0px;
         top: 0px;
         bottom: 0px;
-        background-image: url(../img/bg.png);
-        background-size: 1px 100%;
-        background-repeat: repeat-x;
 
         .bkg-bg-layer {
             background-image: url(../img/star.png);
@@ -711,6 +711,7 @@
         position: relative;
 
     }
+    
     .bkg-explore-percent-bar-inner {
         width: 0px;
         height: 100%;
@@ -724,6 +725,7 @@
              -o-transition: width 0.5s ease-in-out;
                 transition: width 0.5s ease-in-out;
     }
+
     .bkg-explore-percent-prefix {
         position: absolute;
         left: -100px;
@@ -835,5 +837,37 @@
         background-color: #d5ebff;
         border-radius: 4px;
         opacity: 0.6;
+    }
+}
+
+/* 加载动画 */
+.bkg-loading {
+    position: absolute;
+    z-index: 10;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+
+    .bkg-loading-animation {
+        width: 180px;
+        height: 240px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        margin-left: -90px;
+        margin-top: -120px;
+
+        background-repeat: no-repeat;
+        background-image: url(../img/loading.png);
+    }
+
+    .bkg-loading-tip {
+        position: absolute;
+        bottom: -40px;
+        color: white;
+        font-size: 20px;
+        width: 100%;
+        text-align: center;
     }
 }

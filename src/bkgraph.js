@@ -4,6 +4,11 @@
 // TODO Entity zlevel的管理
 define(function (require) {
 
+    if (typeof(console) !== 'undefined' && console.log) {
+        console.log(require('text!./util/asciiEcharts'));
+        console.log('\n\n\n%chttp://echarts.baidu.com', 'font-size:14px;');
+    }
+
     var GraphMain = require('./component/GraphMain');
     var PanControl = require('./component/PanControl');
     var ZoomControl = require('./component/ZoomControl');
@@ -11,6 +16,7 @@ define(function (require) {
     var SideBar = require('./component/SideBar');
     var HeaderBar = require('./component/HeaderBar');
     var KeyboardControl = require('./component/KeyboardControl');
+    var Loading = require('./component/Loading');
     var etpl = require('etpl');
     var jsonp = require('./util/jsonp');
     var util = require('./util/util');
@@ -38,8 +44,18 @@ define(function (require) {
 
         this._height = 0;
 
-        this._root = null;
+        this._root = document.createElement('div');
+        this._root.className = 'bkg-viewport';
+        this._root.style.position = 'relative';
+        this._root.style.overflow = 'hidden';
 
+        this._container.appendChild(this._root);
+
+        this.resize();
+
+        // 加载界面
+        var loading = new Loading();
+        this.addComponent(loading);
 
         if (typeof(data) === 'string' || typeof(data) === 'number') {
                 
@@ -63,6 +79,9 @@ define(function (require) {
                 }
                 data = self._fixData(data);
                 self._rawData = data;
+
+                self.removeComponent(loading);
+
                 self.initialize(data);
                 onsuccess && onsuccess(self);
             });
@@ -98,14 +117,6 @@ define(function (require) {
     }
 
     BKGraph.prototype.initialize = function (data) {
-        this._root = document.createElement('div');
-        this._root.className = 'bkg-viewport';
-        this._root.style.position = 'relative';
-        this._root.style.overflow = 'hidden';
-
-        this._container.appendChild(this._root);
-        this.resize();
-
         // Graph Component is defaultly included
         var graphMain = new GraphMain();
         this.addComponent(graphMain);
@@ -123,6 +134,15 @@ define(function (require) {
         }
         
         component.initialize(this, this._rawData);
+    }
+
+    BKGraph.prototype.removeComponent = function (component) {
+        this._components.splice(util.indexOf(this._components, component), 1);
+        if (component.el && component.el.nodeType === 1) {
+            this._root.removeChild(component.el);
+        }
+
+        component.dispose();
     }
 
     BKGraph.prototype.getComponentsAllByType = function (type) {

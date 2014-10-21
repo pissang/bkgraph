@@ -327,6 +327,7 @@ define(function (require) {
         // this._loadStorage();
 
         var circles = this._findCircles(config.circleKeywords.split(','));
+        this._circles = circles;
         for (var i = 0; i < circles.length; i++) {
             this._highlightCircle(circles[i]);
         }
