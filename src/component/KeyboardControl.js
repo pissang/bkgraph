@@ -9,7 +9,7 @@ define(function (require) {
         Component.call(this);
     }
 
-    KeyboardControl.prototype.type = 'SEARCHBAR';
+    KeyboardControl.prototype.type = 'KEYBOARDCONTROL';
 
     KeyboardControl.prototype.initialize = function (kg, data) {
 
