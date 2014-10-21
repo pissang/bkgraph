@@ -550,11 +550,12 @@
     /** 作品模块 */
     .bkg-works {
         li {
-            float: left;
             text-align: center;
-            margin-right: 9px;
+            margin: 0px 5px 10px 0px;
             font-size: 13px;
             width: 67px;
+            display: inline-block;
+            vertical-align: top;
 
             img {
                 width: 67px;
@@ -663,32 +664,37 @@
         height: @headerbar-height;
 
         font-size: 12px;
-
-        .bkg-explore-percent-bar { 
-            display: inline-block;
-            width: 600px;
-            height: 5px;
-            margin-top: @headerbar-height - 25;
-            border-radius: 4px;
-            background-color: #86c4f9;
-            position: relative;
-
-            .bkg-explore-percent-bar-inner {
-                width: 0px;
-                height: 100%;
-                border-radius: 4px;
-                background-color: white;
-                float: left;
-
-                -webkit-transition: width 0.5s ease-in-out;
-                   -moz-transition: width 0.5s ease-in-out;
-                    -ms-transition: width 0.5s ease-in-out;
-                     -o-transition: width 0.5s ease-in-out;
-                        transition: width 0.5s ease-in-out;
-            }
-        }
     }
     
+    .bkg-explore-percent-bar { 
+        display: inline-block;
+        width: 600px;
+        height: 5px;
+        margin-top: @headerbar-height - 25;
+        border-radius: 4px;
+        background-color: #86c4f9;
+        position: relative;
+
+    }
+    .bkg-explore-percent-bar-inner {
+        width: 0px;
+        height: 100%;
+        border-radius: 4px;
+        background-color: white;
+        float: left;
+
+        -webkit-transition: width 0.5s ease-in-out;
+           -moz-transition: width 0.5s ease-in-out;
+            -ms-transition: width 0.5s ease-in-out;
+             -o-transition: width 0.5s ease-in-out;
+                transition: width 0.5s ease-in-out;
+    }
+    .bkg-explore-percent-prefix {
+        position: absolute;
+        left: -100px;
+        font-size: 15px;
+    }
+
     .bkg-milestone {
         position: absolute;
         top: -2px;

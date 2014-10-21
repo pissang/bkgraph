@@ -66,7 +66,7 @@ define(function (require) {
                 color: this.style.color,
                 strokeColor: this.style.color,
                 text: util.truncate(this.label, 10),
-                textFont: '12px 微软雅黑',
+                textFont: '13px 微软雅黑',
                 textPadding: 5
             },
             z: 0,

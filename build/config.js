@@ -6,7 +6,9 @@
         'etpl': '../dep/etpl/src/main',
         'Sizzle': '../dep/sizzle',
         // 使用requirejs的text插件
-        'text': '../build/text'
+        'text': '../build/text',
+        // 使用flashcanvas
+        'zrender/dep/excanvas': '../../zrender/extension/flashcanvas/src/flashcanvas'
     },
     packages: [
         {

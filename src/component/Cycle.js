@@ -1,4 +1,6 @@
 define (function (require) {
+    
+    var util = require('../util/util');
 
     var Cycle = function () {
 
@@ -6,6 +8,7 @@ define (function (require) {
     }
 
     // TODO
+    // http://www.me.utexas.edu/~bard/IP/Handouts/cycles.pdf
     Cycle.findFromGraph = function (graph, maxCycleDepth) {
         var stack = [];
         var cycles = [];
@@ -18,7 +21,7 @@ define (function (require) {
             for (var i = 0; i < current.edges.length; i++) {
                 var e = current.edges[i];
                 var other = e.node1 === current ? e.node2 : e.node1;
-                if (stack.indexOf(other) >= 0) {    // Back edge
+                if (util.indexOf(stack, other) >= 0) {    // Back edge
                     if (other === startNode && stack.length > 2 && stack.length <= maxCycleDepth) {
                         // Have a cycle
                         var cycle = new Cycle();

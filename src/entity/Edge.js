@@ -31,18 +31,18 @@ define(function (require) {
         this.style = {
             color: '#0e90fe',
             labelColor: '#0e90fe',
-            lineWidth: 1
+            lineWidth: 0.7
         };
         this.highlightStyle = {
             color: '#f9dd05',
             labelColor: '#f9dd05',
-            lineWidth: 1
+            lineWidth: 1.5
         };
         if (opts.style) {
-            zrUtil.merge(this.style, opts.style)
+            zrUtil.merge(this.style, opts.style);
         }
         if (opts.highlightStyle) {
-            zrUtil.merge(this.highlightStyle, opts.highlightStyle)
+            zrUtil.merge(this.highlightStyle, opts.highlightStyle);
         }
 
         var self = this;
@@ -53,7 +53,7 @@ define(function (require) {
                 color: this.style.color,
                 strokeColor: this.style.color,
                 text: util.truncate(this.label, 6),
-                textFont: '12px 微软雅黑',
+                textFont: '13px 微软雅黑',
                 textPadding: 5
             },
             z: 0,
@@ -102,6 +102,7 @@ define(function (require) {
     EdgeEntity.prototype.highlight = function () {
         this.el.style.color = this.highlightStyle.color;
         this.el.style.strokeColor = this.highlightStyle.color;
+        this.el.style.lineWidth = this.highlightStyle.lineWidth;
         this.el.zlevel = 3;
         this.el.modSelf();
 
@@ -111,6 +112,7 @@ define(function (require) {
     EdgeEntity.prototype.lowlight = function () {
         this.el.style.color = this.style.color;
         this.el.style.strokeColor = this.style.color;
+        this.el.style.lineWidth = this.style.lineWidth;
         this.el.zlevel = 0;
 
         this.el.modSelf();

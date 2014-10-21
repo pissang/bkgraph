@@ -20,8 +20,8 @@
                     etpl: '../dep/etpl/src/main',
                     _: '../dep/lodash',
                     Sizzle: '../dep/sizzle',
-                    mock: '../mock'
-                    // 'zrender/dep/excanvas': '../../zrender/extension/flashcanvas/src/flashcanvas'
+                    mock: '../mock',
+                    'zrender/dep/excanvas': '../../zrender/extension/flashcanvas/src/flashcanvas'
                 },
                 packages: [
                     {
@@ -36,9 +36,9 @@
                     }
                 ]
             });
-            // window.FlashCanvasOptions = {
-            //     swfPath: "asset/flashcanvas.swf"
-            // };
+            window.FlashCanvasOptions = {
+                swfPath: "./"
+            };
             require([
                 'bkgraph'
             ], function (bkg, data) {

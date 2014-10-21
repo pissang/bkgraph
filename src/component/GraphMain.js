@@ -326,7 +326,7 @@ define(function (require) {
         }
 
         // 刚打开时的展开动画
-        if (util.supportCanvas()) {
+        if (config.enableAnimation) {
             this._entryAnimation();
         }
     };
@@ -342,7 +342,7 @@ define(function (require) {
         zr.addGroup(this._root);
 
         // 补边使用bundle优化性能, IE8不使用
-        if (util.supportCanvas()) {
+        if (config.enableAnimation) {
             this._extraEdgeBundle = new ExtraEdgeBundleEntity();
             this._extraEdgeBundle.initialize(zr);
             this._root.addChild(this._extraEdgeBundle.el);
@@ -592,7 +592,7 @@ define(function (require) {
      */
     GraphMain.prototype.unhoverNode = function (node) {
         if (node._isHover) {
-            // if (util.supportCanvas()) {
+            // if (config.enableAnimation) {
                 node.entity.stopActiveAnimation(this._zr);
                 node.entity.animateRadius(
                     this._zr, node.layout.size, 500
@@ -618,7 +618,7 @@ define(function (require) {
         node._isHover = true;
 
         // Hover 实体放大
-        // if (util.supportCanvas()) {
+        // if (config.enableAnimation) {
             node.entity.animateRadius(
                 this._zr, node.layout.size * 1.2, 500
             );
@@ -689,7 +689,7 @@ define(function (require) {
             }
 
             e.entity.highlight();
-            if (util.supportCanvas()) {
+            if (config.enableAnimation) {
                 if (newNodeEntity) {
                     this._growNodeAnimation(other, node, Math.random() * 500);
                 } else if (newEdgeEntity) {
@@ -996,7 +996,7 @@ define(function (require) {
                 e.canCollapse = false;
                 e.entity = null;
 
-                if (util.supportCanvas()) {
+                if (config.enableAnimation) {
                     this._extraEdgeBundle.removeEdge(e);
                 }
             }
@@ -1027,7 +1027,7 @@ define(function (require) {
             }
             // 在节点是新展开的情况下才显示展开动画
             // 有可能节点在其它节点展开的时候已经绘制，但是边没补上
-            if (util.supportCanvas() && newNodeEntity) {
+            if (config.enableAnimation && newNodeEntity) {
                 this._growNodeAnimation(other, node, Math.random() * 500);
             }
         }
@@ -1400,7 +1400,7 @@ define(function (require) {
                     label: e.data.relationName,
                     style: style
                 });
-                if (util.supportCanvas()) {
+                if (config.enableAnimation) {
                     this._extraEdgeBundle.addEdge(e);
                 }
             } else {
@@ -1416,13 +1416,13 @@ define(function (require) {
                 this.showRelationDetail(e);
             }, this);
             edgeEntity.bind('mouseover', function () {
-                if (util.supportCanvas()) {
+                if (config.enableAnimation) {
                     edgeEntity.animateTextPadding(zr, 300, 12);
                 }
                 edgeEntity.highlightLabel();
             });
             edgeEntity.bind('mouseout', function () {
-                if (util.supportCanvas()) {
+                if (config.enableAnimation) {
                     edgeEntity.animateTextPadding(zr, 300, 5);
                 }
                 edgeEntity.lowlightLabel();
