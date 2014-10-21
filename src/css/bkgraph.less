@@ -411,27 +411,40 @@
     
     .bkg-relation-detail {
         .bkg-relation-description {
+            /*没有关系摘要的暂时替代方案*/
+            margin-bottom: 15px;
+
             img {
                 width: 91px;
                 height: 124px;
             }
             h5 {
                 text-align: center;
-                margin: 2px 0px;
+                margin: 0px;
                 font-weight: normal;
                 font-size: 14px;
+                height: 22px;
+                line-height: 22px;
+                background-color: #000;
+                opacity: 0.8;
+                position: absolute;
+                left: 0px;
+                right: 0px;
+                bottom: 0px;
             }
             position: relative;
         }
         .bkg-relation-entity-from {
             float: left;
+            position: relative;
         }
         .bkg-relation-entity-to {
             float: right;
+            position: relative;
         }
         .bkg-relation-name {
             position: absolute;
-            top: 50%;
+            top: 60%;
             left: 50%;
             width: 80px;
             height: 5px;
@@ -446,6 +459,7 @@
                 top: -30px;
                 font-size: 13px;
                 display: inline-block;
+                line-height: 14px;
             }
         }
     }
@@ -494,14 +508,14 @@
             margin-right: 10px;
         }
     }
-
-    /******* 新闻模块 ***********/
-    .bkg-news {
-        li.bkg-news-item {
+    
+    /******* 新闻和脉络模块 ***********/
+    .bkg-news,
+    .bkg-mailuo {
+        li.bkg-item {
             
-            margin-bottom: 8px;
             position: relative;
-            
+
             .bkg-circle {
                 width: 6px;
                 height: 6px;
@@ -514,7 +528,7 @@
                 top: 6px;
             }
 
-            .bkg-news-title {
+            .bkg-title {
                 display: inline-block;
 
                 color: white;
@@ -525,11 +539,16 @@
                     text-decoration: underline;
                 }
             }
+        }
+    }
 
-            .bkg-news-summary {
-                color: #D6ECFF;
-            }
-    
+    /******* 新闻模块 ***********/
+    .bkg-news {
+        li.bkg-item {
+            
+            margin-bottom: 8px;
+            position: relative;
+
             .bkg-news-tail {
                 color: #9bd1fe;
                 margin-top: 1px;
@@ -541,8 +560,24 @@
                 color: #9bd1fe;
             }
 
-            .bkg-news-publish-time {
+            .bkg-publish-time {
                 float: left;;
+            }
+        }
+    }
+
+    /******* 关系脉络 ***********/
+    .bkg-mailuo {
+        li.bkg-item {
+
+            margin-bottom: 8px;
+
+            .bkg-publish-time {
+                display: inline-block;
+            }
+
+            .bkg-title {
+                margin-left: 20px;
             }
         }
     }

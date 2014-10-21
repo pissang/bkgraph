@@ -239,6 +239,8 @@
 
   /******* 微博模块 ***********/
 
+  /******* 新闻和脉络模块 ***********/
+
   /******* 新闻模块 ***********/
 
   /** 作品模块 */
@@ -419,11 +421,12 @@
   float: right;
   margin-right: 10px;
 }
-.bkg-sidebar .bkg-news li.bkg-news-item {
-  margin-bottom: 8px;
+.bkg-sidebar .bkg-news li.bkg-item,
+.bkg-sidebar .bkg-mailuo li.bkg-item {
   position: relative;
 }
-.bkg-sidebar .bkg-news li.bkg-news-item .bkg-circle {
+.bkg-sidebar .bkg-news li.bkg-item .bkg-circle,
+.bkg-sidebar .bkg-mailuo li.bkg-item .bkg-circle {
   width: 6px;
   height: 6px;
   border-radius: 3px;
@@ -433,28 +436,31 @@
   position: absolute;
   top: 6px;
 }
-.bkg-sidebar .bkg-news li.bkg-news-item .bkg-news-title {
+.bkg-sidebar .bkg-news li.bkg-item .bkg-title,
+.bkg-sidebar .bkg-mailuo li.bkg-item .bkg-title {
   display: inline-block;
   color: white;
 }
-.bkg-sidebar .bkg-news li.bkg-news-item .bkg-news-title:hover {
+.bkg-sidebar .bkg-news li.bkg-item .bkg-title:hover,
+.bkg-sidebar .bkg-mailuo li.bkg-item .bkg-title:hover {
   background: transparent;
   color: white;
   text-decoration: underline;
 }
-.bkg-sidebar .bkg-news li.bkg-news-item .bkg-news-summary {
-  color: #D6ECFF;
+.bkg-sidebar .bkg-news li.bkg-item {
+  margin-bottom: 8px;
+  position: relative;
 }
-.bkg-sidebar .bkg-news li.bkg-news-item .bkg-news-tail {
+.bkg-sidebar .bkg-news li.bkg-item .bkg-news-tail {
   color: #9bd1fe;
   margin-top: 1px;
   height: 18px;
 }
-.bkg-sidebar .bkg-news li.bkg-news-item .bkg-news-source {
+.bkg-sidebar .bkg-news li.bkg-item .bkg-news-source {
   float: right;
   color: #9bd1fe;
 }
-.bkg-sidebar .bkg-news li.bkg-news-item .bkg-news-publish-time {
+.bkg-sidebar .bkg-news li.bkg-item .bkg-publish-time {
   float: left;
 }
 .bkg-sidebar .bkg-works li {

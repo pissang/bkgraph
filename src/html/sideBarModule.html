@@ -6,22 +6,22 @@
 
 <!-- target: sidebarNews -->
 <div class="bkg-news bkg-sidebar-module">
+    <!-- block: newsModuleTitle -->
     <div class="bkg-module-title">
         <div class="bkg-circle"></div>
-        <!-- block: newsModuleTitle -->
-        <h4 class="bkg-title"><a href="${newsRedir}" target="_blank">最新动态</a></h4>
-        <!-- /block -->
+        <h4 class="bkg-title"><a href="${newsRedir}" title="最新动态" target="_blank">最新动态</a></h4>
     </div>
+    <!-- /block -->
     <ul>
-        <!-- for: ${news} as ${new}, ${index} -->
-        <li class="bkg-news-item">
+        <!-- for: ${news} as ${item}, ${index} -->
+        <li class="bkg-item">
             <div class="bkg-circle"></div>
-            <a href="${new.url}" target="_blank" class="bkg-news-title" title="${new.title}">
-            ${new.title|truncate(20)}
+            <a href="${item.url}" target="_blank" class="bkg-title" title="${item.title}">
+            ${item.title|truncate(20)}
             </a>
             <div class="bkg-news-tail">
-                <span class="bkg-news-source">${new.source}</span>
-                <span class="bkg-news-publish-time">${new.publishTime|truncate(10, '')}</span>
+                <span class="bkg-news-source">${item.source}</span>
+                <span class="bkg-publish-time">${item.publishTime|truncate(10, '')}</span>
             </div>
         </li>
         <!-- /for -->
@@ -32,7 +32,7 @@
 <div class="bkg-weibo bkg-sidebar-module">
     <div class="bkg-module-title">
         <div class="bkg-circle"></div>
-        <h4><a href="${weibo.latestWeiboUrl}" target="_blank">新浪微博</a></h4>
+        <h4><a href="${weibo.latestWeiboUrl}" title="新浪微博" target="_blank">新浪微博</a></h4>
     </div>
     <div class="bkg-weibo-info">
         <img class="bkg-left" src="${weibo.image}" alt="">
@@ -47,11 +47,11 @@
         </div>
     </div>
     <div class="bkg-latest-weibo">
-        <p class="bkg-latest-weibo-content">${weibo.latestWeibo|trim}<a href="${weibo.latestWeiboUrl}" target="_blank">查看全文</a></p>
+        <p class="bkg-latest-weibo-content">${weibo.latestWeibo|trim}<a href="${weibo.latestWeiboUrl}" target="_blank" title="查看全文">查看全文</a></p>
         <div class="bkg-latest-weibo-info">
             <span class="bkg-latest-weibo-time" target="_blank">${weibo.latestWeiboTime}</span>
-            <a class="bkg-latest-weibo-comment" href="${weibo.latestWeiboUrl}" target="_blank">${weibo.latestWeiboComment}</a>
-            <a class="bkg-latest-weibo-forward" href="${weibo.latestWeiboUrl}" target="_blank">${weibo.latestWeiboForward}</a>
+            <a class="bkg-latest-weibo-comment" href="${weibo.latestWeiboUrl}" target="_blank" title="评论">${weibo.latestWeiboComment}</a>
+            <a class="bkg-latest-weibo-forward" href="${weibo.latestWeiboUrl}" target="_blank" title="转发">${weibo.latestWeiboForward}</a>
         </div>
     </div>
     <div style="clear:both;"></div>
@@ -61,12 +61,12 @@
 <div class="bkg-works bkg-sidebar-module">
     <div class="bkg-module-title">
         <div class="bkg-circle"></div>
-        <h4><a href="${representativeWorkRedir}" target="_blank">主要代表作品</a></h4>
+        <h4><a href="${representativeWorkRedir}" title="主要代表作品" target="_blank">主要代表作品</a></h4>
     </div>
     <ul>
     <!-- for: ${representativeWork} as ${work}, ${idx} -->
         <li>
-            <a href="${work.movieRedir}" target="_blank">
+            <a href="${work.movieRedir}" target="_blank" title="${work.movieName}">
                 <img src="${work.movieImage}" alt="" />
                 <span class="bkg-work-title">${work.movieName}</span>
             </a>
@@ -77,5 +77,28 @@
 
 <!-- target: sidebarRelationNews(master=sidebarNews) -->
 <!-- block: newsModuleTitle -->
-<h4 class="bkg-title"><a href="${newsRedir}" target="_blank">${fromEntity.name} 和 ${toEntity.name} 的最新动态</a></h4>
+<div class="bkg-module-title">
+    <div class="bkg-circle"></div>
+    <h4 class="bkg-title"><a href="${newsRedir}" title="${fromEntity.name} 和 ${toEntity.name} 的最新动态" target="_blank">${fromEntity.name} 和 ${toEntity.name} 的最新动态</a></h4>
+</div>
 <!-- /block -->
+
+<!-- 没有关系摘要的暂时替代方案 -->
+<!-- target: sidebarRelationNews2(master=sidebarNews) -->
+<!-- block: newsModuleTitle -->
+<!-- /block -->
+
+<!-- target: sidebarMailuo -->
+<div class="bkg-mailuo bkg-sidebar-module">
+    <ul>
+        <!-- for: ${eventMaiLuo} as ${item}, ${index} -->
+        <li class="bkg-item">
+            <div class="bkg-circle"></div>
+            <span class="bkg-publish-time">${item.publishTime}</span>
+            <a href="${item.url}" target="_blank" class="bkg-title" title="${item.title}">
+            ${item.title|truncate(15)}
+            </a>
+        </li>
+        <!-- /for -->
+    </ul>
+</div>

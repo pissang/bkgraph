@@ -7,6 +7,7 @@ define(function (require) {
     var TreeLayout = require('echarts/layout/Tree');
     var zrUtil = require('zrender/tool/util');
     var Group = require('zrender/Group');
+    var CircleShape = require('zrender/shape/Circle');
     var Component = require('./Component');
     var vec2 = require('zrender/tool/vector');
 
@@ -17,13 +18,12 @@ define(function (require) {
     var ExtraEdgeBundleEntity = require('../entity/ExtraEdgeBundle');
 
     var Parallax = require('../util/Parallax');
-
-    var CircleShape = require('zrender/shape/Circle');
+    var bkgLog = require('../util/log');
+    var util = require('../util/util');
+    var intersect = require('../util/intersect');
 
     var Cycle = require('./Cycle');
 
-    var util = require('../util/util');
-    var intersect = require('../util/intersect');
     var config = require('../config');
 
     var EPSILON = 1e-2;
@@ -51,9 +51,11 @@ define(function (require) {
         this._zr = null;
 
         // Graph for rendering
+        // 包含补边
         this._graph = null;
 
         // Graph for layouting
+        // 不包含补边（补边不影响布局
         this._graphLayout = null;
 
         this._layouting = false;
@@ -62,6 +64,7 @@ define(function (require) {
 
         this._root = null;
 
+        // 中心节点
         this._mainNode = null;
 
         this._lastClickNode = null;
@@ -71,7 +74,9 @@ define(function (require) {
         // 当前关注的节点, 可能是点击，也可能是搜索定位
         this._activeNode = null;
 
+        // 图中所有的节点数
         this._nodeEntityCount = 0;
+        // 第一次展现的节点数，用于计算用户探索的百分比
         this._baseEntityCount = 0;
 
         this._firstShowEntityDetail = true;
@@ -113,7 +118,6 @@ define(function (require) {
     }
 
     GraphMain.prototype.refresh = function () {
-        this._syncOutTipEntities();
         this._zr.refreshNextFrame();
     }
 
@@ -133,12 +137,13 @@ define(function (require) {
         this._max = [zr.getWidth() / 2, zr.getHeight() / 2];
         var x0 = 0, y0 = 0, sx0 = 0, sy0 = 0;
         zr.painter.refresh = function () {
-            // 同步所有层的位置
+            // 默认只对第一层开启拖拽和缩放，所以需要手动同步所有层的位移和缩放
             var layers = zr.painter.getLayers();
             var layer0 = layers[0];
             if (layer0) {
                 var position = layer0.position;
                 var scale = layer0.scale;
+                // 限制拖拽的范围
                 position[0] = Math.max(-self._max[0] * scale[0] + zr.getWidth() - 500, position[0]);
                 position[1] = Math.max(-self._max[1] * scale[1] + zr.getHeight() - 300, position[1]);
                 position[0] = Math.min(-self._min[0] * scale[0] + 300, position[0]);
@@ -163,6 +168,7 @@ define(function (require) {
                 sx0 = scale[0];
                 sy0 = scale[1];
 
+                // 背景的视差移动
                 if (self._parallax) {
                     self._parallax.moveTo(x0 / sx0, y0 / sy0);
                 }
@@ -545,6 +551,9 @@ define(function (require) {
         this._layouting = false;
     }
 
+    /**
+     * 除了当前激活(点击或者在搜索栏里选择)外的节点，所有节点移除hover特效
+     */
     GraphMain.prototype.unhoverAll = function () {
         var zr = this._zr;
         var graph = this._graph;
@@ -623,7 +632,8 @@ define(function (require) {
                 this._zr, node.layout.size * 1.2, 500
             );
             node.entity.startActiveAnimation(this._zr);
-        // } else {
+        // }
+        // else {
         //     node.entity.setRadius(node.layout.size * 1.2);
         // }
 
@@ -651,7 +661,7 @@ define(function (require) {
     }
 
     /**
-     * 高亮节点与邻接节点, 点击的时候出发
+     * 高亮节点与邻接节点, 点击触发
      */
     GraphMain.prototype.highlightNodeAndAdjeceny = function (node) {
         if (typeof(node) === 'string') {
@@ -692,7 +702,8 @@ define(function (require) {
             if (config.enableAnimation) {
                 if (newNodeEntity) {
                     this._growNodeAnimation(other, node, Math.random() * 500);
-                } else if (newEdgeEntity) {
+                }
+                else if (newEdgeEntity) {
                     e.entity.animateLength(zr, 300, 0, node.entity);
                 }
             }
@@ -707,7 +718,7 @@ define(function (require) {
     };
 
     /**
-     * 高亮节点与主节点的关系路径
+     * 高亮节点与主节点的关系路径, 在搜索栏里选择触发
      */
     GraphMain.prototype.highlightNodeToMain = function (node) {
         if (typeof(node) === 'string') {
@@ -724,7 +735,7 @@ define(function (require) {
 
         this.lowlightAll();
 
-        // 这里把图当做树来做了
+        // 这里把图当做树来遍历了
         var current = node;
         var nodes = [current];
         while (current) {
@@ -776,9 +787,11 @@ define(function (require) {
 
             var e = this._graph.getEdge(n1, n2) || this._graph.getEdge(n2, n1);
             if (!n1.entity) {
+                this._baseEntityCount++;
                 this._createNodeEntity(n1);
             }
             if (!n2.entity) {
+                this._baseEntityCount++;
                 this._createNodeEntity(n2);
             }
             if (!e.entity) {
@@ -1006,9 +1019,13 @@ define(function (require) {
         zr.refreshNextFrame();
     }
 
+    /**
+     * hover节点的时候展开未展开的节点
+     */
     GraphMain.prototype.expandNode = function (node) {
         var zr = this._zr;
 
+        var logTitle = [];
         for (var i = 0; i < node.edges.length; i++) {
             var e = node.edges[i];
             var other = e.node1 === node ? e.node2 : e.node1;
@@ -1021,6 +1038,8 @@ define(function (require) {
             if (!other.entity) {
                 newNodeEntity = true;
                 this._createNodeEntity(other);
+
+                logTitle.push(other.id, other.data.layerCounter);
             }
             if (!e.entity) {
                 this._createEdgeEntity(e);
@@ -1031,6 +1050,8 @@ define(function (require) {
                 this._growNodeAnimation(other, node, Math.random() * 500);
             }
         }
+
+        bkgLog('expand', logTitle.join(','));
 
         this._syncHeaderBarExplorePercent();
         zr.refreshNextFrame();
@@ -1058,6 +1079,9 @@ define(function (require) {
         return res;
     };
 
+    /**
+     * 计算返回当前用户探索百分比
+     */
     GraphMain.prototype.getExplorePercent = function () {
         var nodes = this._graph.nodes;
         return (this._nodeEntityCount - this._baseEntityCount) / (nodes.length - this._baseEntityCount);
@@ -1336,6 +1360,8 @@ define(function (require) {
             if (self._lastHoverNode !== node) {
                 self.hoverNode(node);
                 self.expandNode(node);
+
+                bkgLog('entityhover', [node.id, node.data.layerCounter].join(','));
             }
             self._lastHoverNode = node;
         });
@@ -1360,6 +1386,8 @@ define(function (require) {
                 self._syncOutTipEntities();
                 self.highlightNodeAndAdjeceny(node);
 
+                bkgLog('entityclick', node.id + ',' + node.data.layerCounter);
+                
                 self._activeNode = node;
             }
         });
@@ -1414,6 +1442,19 @@ define(function (require) {
 
             edgeEntity.bind('click', function () {
                 this.showRelationDetail(e);
+
+                bkgLog(
+                    'edgeclick', 
+                    [
+                        // from entity
+                        e.node1.id,
+                        e.node1.data.layerCounter,
+                        // to entity
+                        e.node2.id,
+                        e.node2.data.layerCounter
+                    ].join(',')
+                );
+
             }, this);
             edgeEntity.bind('mouseover', function () {
                 if (config.enableAnimation) {

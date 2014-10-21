@@ -5,6 +5,7 @@ define(function (require) {
     var etpl = require('etpl');
     var Sizzle = require('Sizzle');
     var util = require('../util/util');
+    var bkgLog = require('../util/log');
 
     var ScrollBar = require('../util/ScrollBar');
 
@@ -95,6 +96,8 @@ define(function (require) {
 
             this._$toggleBtn.innerHTML = '隐<br />藏<br /><';
 
+            bkgLog('sideshow');
+
             // 搜索栏自动隐藏
             var searchBar = this._kgraph.getComponentByType('SEARCHBAR');
             if (searchBar) {
@@ -114,6 +117,8 @@ define(function (require) {
             if (graphMain) {
                 graphMain.el.style.right = '0px';
             }
+
+            bkgLog('sidehide');
 
             this._$toggleBtn.innerHTML = '显<br />示<br />>';
         }
@@ -135,6 +140,15 @@ define(function (require) {
         var target = e.target || e.srcElement;
         if (Sizzle.matchesSelector(target, '.bkg-toggle')) {
             this.toggle();
+        }
+
+        var current = target;
+        while (current && current.nodeName.toLowerCase() !== 'a') {
+            current = current.parentNode;
+        }
+
+        if (current) {
+            bkgLog('link', current.getAttribute('title'), current.getAttribute('href'));
         }
     };
 

@@ -4,6 +4,7 @@ define(function (require) {
     var zrUtil = require('zrender/tool/util');
     var etpl = require('etpl');
     var util = require('../util/util');
+    var bkgLog = require('../util/log');
     var Sizzle = require('Sizzle');
 
     var renderPersonList = etpl.compile(require('text!../html/personList.html'));
@@ -47,8 +48,6 @@ define(function (require) {
 
         this._viewportWidth = this._$viewport.clientWidth;
 
-        this._itemWidth = Sizzle
-
         var self = this;
         util.addEventListener(this._$input, 'keydown', util.debounce(function () {
             self.filter(self._$input.value);
@@ -68,10 +67,7 @@ define(function (require) {
         util.addClass(this.el, 'hidden');
         this._$toggleBtn.innerHTML = '显 示';
 
-        // var graphMain = this._kgraph.getComponentByType('GRAPH');
-        // if (graphMain) {
-        //     graphMain.refresh();
-        // }
+        bkgLog('searchhide');
     }
 
     /**
@@ -81,10 +77,7 @@ define(function (require) {
         util.removeClass(this.el, 'hidden');
         this._$toggleBtn.innerHTML = '隐 藏';
         
-        // var graphMain = this._kgraph.getComponentByType('GRAPH');
-        // if (graphMain) {
-        //     graphMain.refresh();
-        // }
+        bkgLog('searchshow');
     }
 
     /**
@@ -165,6 +158,8 @@ define(function (require) {
         });
 
         this._updateSlider();
+
+        log('searchinput', name);
     }
 
     /**
@@ -176,6 +171,8 @@ define(function (require) {
             graphMain.highlightNodeToMain(id);
             graphMain.showEntityDetail(id);
             graphMain.moveToEntity(id);
+
+            log('searchclick', id);
         }
     }
 

@@ -5,7 +5,7 @@
     <div class="bkg-relation-description bkg-sidebar-module">
         <div class="bkg-module-title">
             <div class="bkg-circle"></div>
-            <h4><a href="http://www.baidu.com/s?wd=${fromEntity.name}%20${toEntity.name}%20关系" target="_blank">关系描述 来源${relationSite}</a></h4>
+            <h4><a href="http://www.baidu.com/s?wd=${fromEntity.name}%20${toEntity.name}%20${relationName}" title="${fromEntity.name} ${toEntity.name} ${relationName}" target="_blank">${fromEntity.name} ${toEntity.name} ${relationName}</a></h4>
         </div>
         <div class="bkg-relation-entity-from">
             <img src="${fromEntity.imageIcon}" alt="">
@@ -20,8 +20,16 @@
         </div>
         <div style="clear:both"></div>
     </div>
-    <!-- if: ${news} -->
-    <!-- import: sidebarRelationNews -->
+    <!-- if: ${eventMaiLuo} -->
+        <!-- import: sidebarMailuo -->
+        <!-- if: ${news} -->
+            <!-- import: sidebarRelationNews -->
+        <!-- /if -->
+    <!-- else -->
+        <!-- 没有关系摘要的暂时替代方案 -->
+        <!-- if: ${news} -->
+            <!-- import: sidebarRelationNews2 -->
+        <!-- /if -->
     <!-- /if -->
     <div class="bkg-detail-bottom-line"></div>
     <div class="bkg-detail-bottom"></div>
