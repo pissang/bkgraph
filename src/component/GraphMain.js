@@ -136,6 +136,8 @@ define(function (require) {
         this._min = [Infinity, Infinity];
         this._max = [zr.getWidth() / 2, zr.getHeight() / 2];
         var x0 = 0, y0 = 0, sx0 = 0, sy0 = 0;
+
+        var currentTime = Date.now();
         zr.painter.refresh = function () {
             // 默认只对第一层开启拖拽和缩放，所以需要手动同步所有层的位移和缩放
             var layers = zr.painter.getLayers();
@@ -149,10 +151,9 @@ define(function (require) {
                 position[0] = Math.min(-self._min[0] * scale[0] + 300, position[0]);
                 position[1] = Math.min(-self._min[1] * scale[1] + 300, position[1]);
 
-                if (
-                    isNotAroundZero(position[0] - x0) || isNotAroundZero(position[1] - y0)
-                    || isNotAroundZero(scale[0] - sx0) || isNotAroundZero(scale[1] - sy0)
-                ) {
+                var isPanned = isNotAroundZero(position[0] - x0) || isNotAroundZero(position[1] - y0);
+                var isZoomed = isNotAroundZero(scale[0] - sx0) || isNotAroundZero(scale[1] - sy0);
+                if (isPanned || isZoomed) {
                     for (var z in layers) {
                         if (z !== 'hover') {
                             vec2.copy(layers[z].position, layers[0].position);
@@ -162,6 +163,14 @@ define(function (require) {
                     }
 
                     self._syncOutTipEntities();
+
+                    if (isPanned) {
+                        // var time = Date.now();
+                        // 至少隔两秒发送拖拽日志
+                        // if ((time - currentTime) >= 2000) {
+
+                        // }
+                    }
                 }
                 x0 = position[0];
                 y0 = position[1];
@@ -336,6 +345,15 @@ define(function (require) {
         if (config.enableAnimation) {
             this._entryAnimation();
         }
+
+        // 发送首屏展现日志
+        var title = [];
+        this._graph.eachNode(function (node) {
+            if (node.entity) {
+                title.push(node.id, node.data.layerCounter);
+            }
+        });
+        bkgLog('se', title.join(','));
     };
 
     GraphMain.prototype.render = function () {

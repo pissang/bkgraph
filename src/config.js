@@ -38,7 +38,7 @@ define({
         }
     ],
 
-    enableAnimation: true,
+    enableAnimation: !!document.createElement('canvas').getContext,
     
     circleKeywords: '男友,女友,妻子,老婆,丈夫,老公,绯闻,暧昧,对象,干爹,真爱,夫妻,情侣,不和,私生子,艳照门,前夫,前妻,密友'
 });
