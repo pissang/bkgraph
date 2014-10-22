@@ -61,7 +61,10 @@ define(function (require) {
         //Then delete the generated function from the window [delete window[generatedFunction]]
         window[generatedFunction] = function(json){
           callback(json);
-          delete window[generatedFunction];
+          window[generatedFunction] = undefined;
+          try { // IE8
+            delete window[generatedFunction];
+          } catch(e) {}
         };  
 
         //Check if the user set their own params, and if not add a ? to start a list of params

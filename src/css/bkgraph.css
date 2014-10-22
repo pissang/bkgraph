@@ -4,6 +4,9 @@
   position: relative;
   font-family: arial, 'Hiragino Sans GB', 'Microsoft Yahei', '微软雅黑', '宋体', Tahoma, Arial, Helvetica, STHeiti;
   overflow: hidden;
+  background-image: url(../img/bg.png);
+  background-size: 1px 100%;
+  background-repeat: repeat;
 }
 .bkg-viewport a {
   color: white;
@@ -49,9 +52,6 @@
   right: 0px;
   top: 0px;
   bottom: 0px;
-  background-image: url(../img/bg.png);
-  background-size: 1px 100%;
-  background-repeat: repeat-x;
 }
 .bkg-graph .bkg-graph-bg .bkg-bg-layer {
   background-image: url(../img/star.png);
@@ -64,6 +64,7 @@
   right: 0px;
   bottom: 0px;
   height: 100px;
+  z-index: 1;
   background-image: url(../img/searchbar/search-bg.png);
   -webkit-transition: bottom 0.5s cubic-bezier(0.23, 1, 0.32, 1);
   -moz-transition: bottom 0.5s cubic-bezier(0.23, 1, 0.32, 1);
@@ -225,6 +226,7 @@
   left: 0px;
   top: 0px;
   bottom: 0px;
+  z-index: 0;
   width: 338px;
   background-color: #043362;
   color: white;
@@ -242,6 +244,8 @@
   /******* 新闻和脉络模块 ***********/
 
   /******* 新闻模块 ***********/
+
+  /******* 关系脉络 ***********/
 
   /** 作品模块 */
 
@@ -351,6 +355,9 @@
   margin: 4px 0px;
 }
 .bkg-sidebar .bkg-relation-detail .bkg-relation-description {
+  /*没有关系摘要的暂时替代方案*/
+
+  margin-bottom: 15px;
   position: relative;
 }
 .bkg-sidebar .bkg-relation-detail .bkg-relation-description img {
@@ -359,19 +366,29 @@
 }
 .bkg-sidebar .bkg-relation-detail .bkg-relation-description h5 {
   text-align: center;
-  margin: 2px 0px;
+  margin: 0px;
   font-weight: normal;
   font-size: 14px;
+  height: 22px;
+  line-height: 22px;
+  background-color: #000;
+  opacity: 0.8;
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
 }
 .bkg-sidebar .bkg-relation-detail .bkg-relation-entity-from {
   float: left;
+  position: relative;
 }
 .bkg-sidebar .bkg-relation-detail .bkg-relation-entity-to {
   float: right;
+  position: relative;
 }
 .bkg-sidebar .bkg-relation-detail .bkg-relation-name {
   position: absolute;
-  top: 50%;
+  top: 60%;
   left: 50%;
   width: 80px;
   height: 5px;
@@ -385,6 +402,7 @@
   top: -30px;
   font-size: 13px;
   display: inline-block;
+  line-height: 14px;
 }
 .bkg-sidebar .bkg-weibo .bkg-weibo-info .bkg-left {
   float: left;
@@ -463,6 +481,15 @@
 .bkg-sidebar .bkg-news li.bkg-item .bkg-publish-time {
   float: left;
 }
+.bkg-sidebar .bkg-mailuo li.bkg-item {
+  margin-bottom: 8px;
+}
+.bkg-sidebar .bkg-mailuo li.bkg-item .bkg-publish-time {
+  display: inline-block;
+}
+.bkg-sidebar .bkg-mailuo li.bkg-item .bkg-title {
+  margin-left: 20px;
+}
 .bkg-sidebar .bkg-works li {
   text-align: center;
   margin: 0px 5px 10px 0px;
@@ -510,6 +537,7 @@
   top: 0px;
   left: 0px;
   right: 0px;
+  z-index: 1;
   height: 55px;
   color: white;
 }
@@ -676,4 +704,32 @@
   background-color: #d5ebff;
   border-radius: 4px;
   opacity: 0.6;
+}
+/* 加载动画 */
+.bkg-loading {
+  position: absolute;
+  z-index: 10;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+}
+.bkg-loading .bkg-loading-animation {
+  width: 180px;
+  height: 240px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -90px;
+  margin-top: -120px;
+  background-repeat: no-repeat;
+  background-image: url(../img/loading.png);
+}
+.bkg-loading .bkg-loading-tip {
+  position: absolute;
+  bottom: -40px;
+  color: white;
+  font-size: 20px;
+  width: 100%;
+  text-align: center;
 }

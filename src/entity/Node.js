@@ -91,16 +91,6 @@ define(function (require) {
             outlineShape['on' + events[i]] = createEventHandler(events[i]);
         }
 
-        var image = new Image();
-        image.onload = function () {
-            imageShape.style.image = image;
-            imageShape.modSelf();
-            zr.refreshNextFrame();
-        }
-        // TODO
-        // image.crossOrigin = 'anonymous';
-        image.src = this.image;
-
         var imageShape = new ImageShape({
             style: {
                 image: defaultImage,
@@ -149,7 +139,23 @@ define(function (require) {
         this._outlineShape = outlineShape;
 
         this.el.scale[0] = this.el.scale[1] = this.radius / baseRadius;
+
+        // 加载头像图片
+        this.loadImage(zr);
     }
+
+    NodeEntity.prototype.loadImage = function (zr) {
+        var self = this;
+        var image = new Image();
+        image.onload = function () {
+            self._imageShape.style.image = image;
+            self._imageShape.modSelf();
+            self._zr.refreshNextFrame();
+        }
+        // TODO
+        // image.crossOrigin = 'anonymous';
+        image.src = this.image;
+    };
 
     NodeEntity.prototype.setDraggable = function (draggable) {
         this.draggable = draggable;
