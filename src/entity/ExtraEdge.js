@@ -90,6 +90,11 @@ define(function (require) {
         this.update();
     };
 
+    ExtraEdgeEntity.prototype.setZLevel = function (zlevel) {
+        this.el.zlevel = zlevel;
+        this.el.modSelf();
+    };
+
     ExtraEdgeEntity.prototype.update = function () {
         if (this.sourceEntity && this.targetEntity) {
             this._setCurvePoints(

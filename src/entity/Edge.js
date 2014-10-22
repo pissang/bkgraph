@@ -69,11 +69,15 @@ define(function (require) {
                 self.dispatch('mouseout');
             }
         });
-
     };
 
     EdgeEntity.prototype.initialize = function (zr) {
         this.update(zr);
+    };
+
+    EdgeEntity.prototype.setZLevel = function (zlevel) {
+        this.el.zlevel = zlevel;
+        this.el.modSelf();
     };
 
     EdgeEntity.prototype.update = function () {

@@ -5,6 +5,8 @@ define (function (require) {
     var Cycle = function () {
 
         this.nodes = [];
+
+        this.edges = [];
     }
 
     // TODO
@@ -27,6 +29,13 @@ define (function (require) {
                         var cycle = new Cycle();
                         cycle.nodes = stack.slice();
                         cycles.push(cycle);
+                        var len = cycle.nodes.length;
+                        for (var k = 0; k < len; k++) {
+                            var n1 = cycle.nodes[k];
+                            var n2 = cycle.nodes[(k + 1) % len];
+                            var e = graph.getEdge(n1, n2) || graph.getEdge(n2, n1);
+                            cycle.edges.push(e);
+                        }
                     }
                 } else {
                     // other.__visited = true;

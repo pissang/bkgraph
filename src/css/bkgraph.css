@@ -733,3 +733,28 @@
   width: 100%;
   text-align: center;
 }
+/* 新手引导 */
+.bkg-intro {
+  position: absolute;
+  z-index: 10;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+}
+.bkg-intro .bkg-mask {
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+  background-color: black;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
+}
+.bkg-intro .bkg-highlight {
+  opacity: 0.0;
+  filter: alpha(opacity=0);
+  width: 100px;
+  height: 100px;
+}

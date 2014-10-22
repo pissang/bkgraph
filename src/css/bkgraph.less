@@ -874,3 +874,73 @@
         text-align: center;
     }
 }
+
+.bkg-mask {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    background-color: black;
+    opacity: 0.5;
+    filter:alpha(opacity=50);
+}
+
+/* 新手引导 */
+.bkg-intro {
+
+    .bkg-tip {
+        position: absolute;
+        z-index: 12;
+    }
+
+    .bkg-next-tip {
+        position: absolute;
+        bottom: 2px;
+        left: 50%;
+        width: 98px;
+        height: 40px;
+        line-height: 40px;
+        margin-left: -49px;
+        color: white;
+        border: none;
+        outline: none;
+        padding: 0px;
+        background-image: url(../img/intro/next-bg.png);
+        background-color: transparent;
+    }
+
+    .bkg-mask {
+        background:transparent;
+        z-index: 11;
+    }
+
+    .bkg-tip-entity {
+        width: 262px;
+        height: 124px;
+        background-image: url(../img/intro/entity.png);
+    }
+
+    .bkg-tip-circle {
+        width: 284px;
+        height: 131px;
+        background-image: url(../img/intro/circle.png);
+    }
+
+    .bkg-tip-expand {
+        width: 344px;
+        height: 125px;
+        background-image: url(../img/intro/expand.png);
+    }
+
+    .bkg-tip-relation {
+        width: 343px;
+        height: 125px;
+        background-image: url(../img/intro/relation.png);
+    }
+    .bkg-tip-sidebar {
+        width: 316px;
+        height: 152px;
+        background-image: url(../img/intro/sidebar.png);
+    }
+}

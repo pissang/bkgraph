@@ -182,7 +182,14 @@ define(function (require) {
         }
 
         this.el.modSelf();
-    }
+    };
+
+    NodeEntity.prototype.setZLevel = function (zlevel) {
+        this._outlineShape.zlevel = zlevel;
+        this._imageShape.zlevel = zlevel;
+        this._labelShape.zlevel = zlevel;
+        this.el.modSelf();
+    };
 
     NodeEntity.prototype.highlight = function () {
         this._outlineShape.style.strokeColor = this.highlightStyle.color;
@@ -190,12 +197,10 @@ define(function (require) {
         this._labelShape.style.color = zrColor.alpha(this.highlightStyle.color, 0.8);
         this._labelShape.style.textColor = this.highlightStyle.labelColor;
 
-        this._outlineShape.zlevel = 3;
-        this._labelShape.zlevel = 3;
-        this._imageShape.zlevel = 3;
+        this.setZLevel(3);
 
         this.el.modSelf();
-    }
+    };
 
     NodeEntity.prototype.lowlight = function () {
         this._outlineShape.style.strokeColor = this.style.color;
@@ -203,12 +208,10 @@ define(function (require) {
         this._labelShape.style.color = zrColor.alpha(this.style.color, 0.8);
         this._labelShape.style.textColor = this.style.labelColor;
 
-        this._outlineShape.zlevel = 1;
-        this._labelShape.zlevel = 1;
-        this._imageShape.zlevel = 1;;
+        this.setZLevel(1);
 
         this.el.modSelf();
-    }
+    };
 
     NodeEntity.prototype.animateRadius = function (zr, r, time, cb) {
         this.stopAnimation('radius');

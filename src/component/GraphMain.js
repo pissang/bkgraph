@@ -123,11 +123,27 @@ define(function (require) {
                 n.entity.setDraggable(false);
             }
         });
-    }
+    };
 
     GraphMain.prototype.refresh = function () {
         this._zr.refreshNextFrame();
-    }
+    };
+
+    GraphMain.prototype.getGraph = function () {
+        return this._graph;
+    };
+
+    GraphMain.prototype.getZR = function () {
+        return this._zr;
+    };
+
+    GraphMain.prototype.getMainNode = function () {
+        return this._graph.getNodeById(this._mainNode.id);
+    };
+
+    GraphMain.prototype.getCircles = function () {
+        return this._circles;
+    };
 
     GraphMain.prototype._initZR = function () {
         $zrContainer = document.createElement('div');
@@ -330,11 +346,6 @@ define(function (require) {
             e.isExtra = true;
         }
 
-        var layer0 = this._zr.painter.getLayer(0);
-        var layer1 = this._zr.painter.getLayer(1, layer0);
-        var layer2 = this._zr.painter.getLayer(2, layer1);
-        var layer3 = this._zr.painter.getLayer(3, layer2);
-
         if (noPosition) {
             this.radialTreeLayout();
         } else {
@@ -403,8 +414,8 @@ define(function (require) {
                         this._createNodeEntity(e.node1);
                     }
                     if (!e.node2.entity) {
-                        // 第二层控制显示 20% 的数量
-                        if (e.node2.data.layerCounter == 2 && Math.random() < 1) {
+                        // 第二层控制显示 2/3 的数量
+                        if (e.node2.data.layerCounter == 2 && (this._baseEntityCount % 3 !== 0)) {
                             this._baseEntityCount++;
                             this._createNodeEntity(e.node2);
                         } else if (e.node2.data.layerCounter < 2) {
@@ -585,7 +596,7 @@ define(function (require) {
         }
 
         this._layouting = false;
-    }
+    };
 
     /**
      * 除了当前激活(点击或者在搜索栏里选择)外的节点，所有节点移除hover特效
@@ -602,7 +613,7 @@ define(function (require) {
                 }
             }
         }
-    }
+    };
 
     /**
      * 低亮所有节点
@@ -883,7 +894,7 @@ define(function (require) {
     /**
      * 移动视图到指定的实体位置
      */
-    GraphMain.prototype.moveToEntity = function (n) {
+    GraphMain.prototype.moveToEntity = function (n, cb) {
         var graph = this._graph;
         if (typeof(n) === 'string') {
             n = graph.getNodeById(n);
@@ -898,7 +909,7 @@ define(function (require) {
         vec2.mul(pos, pos, layer.scale);
         vec2.sub(pos, [zr.getWidth() / 2, zr.getHeight() / 2], pos);
 
-        this.moveTo(pos[0], pos[1]);
+        this.moveTo(pos[0], pos[1], cb);
     };
 
     /**

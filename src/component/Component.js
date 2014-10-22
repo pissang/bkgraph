@@ -19,6 +19,8 @@ define(function (require) {
 
     Component.prototype.setData = function (data) {};
 
+    Component.prototype.dispose = function () {};
+
     zrUtil.merge(Component.prototype, Eventful.prototype, true);
 
     return Component;

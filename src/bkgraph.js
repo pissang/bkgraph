@@ -27,6 +27,7 @@ define(function (require) {
     var HeaderBar = require('./component/HeaderBar');
     var KeyboardControl = require('./component/KeyboardControl');
     var Loading = require('./component/Loading');
+    var Intro = require('./component/Intro');
     var etpl = require('etpl');
     var jsonp = require('./util/jsonp');
     var util = require('./util/util');
@@ -224,6 +225,7 @@ define(function (require) {
         PanControl: PanControl,
         KeyboardControl: KeyboardControl,
         HeaderBar: HeaderBar,
+        Intro: Intro,
 
         init: init
     };
