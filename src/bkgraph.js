@@ -38,8 +38,6 @@ define(function (require) {
     // etpl trim
     etpl.addFilter('trim', util.trim);
 
-    var TUPU_URL = 'http://cq01-ps-dev377.cq01.baidu.com:8087/tupu/api/graph/v1';
-
     /**
      * @alias bkgraph~BKGraph
      * @param {HTMLElement} dom
@@ -204,16 +202,16 @@ define(function (require) {
     /**
      * 初始化图
      * @param {string|HTMLElement} dom
-     * @param {Object} [data]
+     * @param {string|Object} url
      * @param {Function} onsuccess
      * @memberOf bkgraph
      * @return {bkgraph~BKGraph}
      */
-    function init(dom, data, onsuccess) {
+    function init(dom, url, onsuccess) {
         if (typeof(dom) === 'string') {
             dom = document.getElementById(dom);
         }
-        var graph = new BKGraph(dom, data, onsuccess);
+        var graph = new BKGraph(dom, url, onsuccess);
 
         return graph;
     }
