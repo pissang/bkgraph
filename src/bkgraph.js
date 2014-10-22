@@ -80,8 +80,6 @@ define(function (require) {
                 data = self._fixData(data);
                 self._rawData = data;
 
-                self.removeComponent(loading);
-
                 self.initialize(data);
                 onsuccess && onsuccess(self);
             });
@@ -117,6 +115,10 @@ define(function (require) {
     }
 
     BKGraph.prototype.initialize = function (data) {
+        var loading = this.getComponentByType('loading');
+        if (loading) {
+            this.removeComponent(loading);
+        }
         // Graph Component is defaultly included
         var graphMain = new GraphMain();
         this.addComponent(graphMain);

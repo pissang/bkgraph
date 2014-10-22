@@ -150,7 +150,7 @@ define(function (require) {
         image.onload = function () {
             self._imageShape.style.image = image;
             self._imageShape.modSelf();
-            self._zr.refreshNextFrame();
+            zr.refreshNextFrame();
         }
         // TODO
         // image.crossOrigin = 'anonymous';

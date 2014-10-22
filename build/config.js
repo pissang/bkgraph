@@ -8,7 +8,7 @@
         // 使用requirejs的text插件
         'text': '../build/text',
         // 使用flashcanvas
-        // 'zrender/dep/excanvas': '../../zrender/extension/flashcanvas/src/flashcanvas'
+        'zrender/dep/excanvas': '../../zrender/extension/flashcanvas/src/flashcanvas'
     },
     packages: [
         {

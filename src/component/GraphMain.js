@@ -99,10 +99,10 @@ define(function (require) {
         this._initZR();
 
         var self = this;
-        this.el.addEventListener('mousedown', function () {
+        util.addEventListener(el, 'mousedown', function () {
             self._mouseDown = true;
         });
-        this.el.addEventListener('mouseup', function () {
+        util.addEventListener(el, 'mouseup', function () {
             self._mouseDown = false;
         });
     };
