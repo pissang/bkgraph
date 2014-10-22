@@ -177,11 +177,24 @@ define(function (require) {
 
                 var isPanned = isNotAroundZero(position[0] - x0) || isNotAroundZero(position[1] - y0);
                 var isZoomed = isNotAroundZero(scale[0] - sx0) || isNotAroundZero(scale[1] - sy0);
+
+                for (var z in layers) {
+                    if (z !== 'hover') {
+                        // 层的位置没同步
+                        if (
+                            isNotAroundZero(position[0] - layers[z].position[0]) || isNotAroundZero(position[1] - layers[z].position[1])
+                            || isNotAroundZero(scale[0] - layers[z].scale[0]) || isNotAroundZero(scale[1] - layers[z].scale[1])
+                        ) {
+                            layers[z].dirty = true;
+                        }
+                        vec2.copy(layers[z].position, position);
+                        vec2.copy(layers[z].scale, scale);
+                    }
+                }
+
                 if (isPanned || isZoomed) {
                     for (var z in layers) {
                         if (z !== 'hover') {
-                            vec2.copy(layers[z].position, layers[0].position);
-                            vec2.copy(layers[z].scale, layers[0].scale);
                             layers[z].dirty = true;   
                         }
                     }

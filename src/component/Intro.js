@@ -23,7 +23,7 @@ define(function (require) {
 
         this.el.className = 'bkg-intro';
 
-        this._current = parseInt(cookies.get('BKGraph_intro_current')) || 0;
+        this._current = parseInt(cookies.get('BKGraph_intro_current_0')) || 0;
 
         if (this._current >= ops.length) {
             setTimeout(function () {
@@ -81,7 +81,8 @@ define(function (require) {
         var mainNode = graphMain.getMainNode();
 
         if (this._$mask) {
-            this._$mask.parentNode.removeChild(this._$mask);
+            zr.painter.delLayer(9);
+            zr.painter.delLayer(10);
         }
 
         if (layer.position[0] !== 0 && layer.position[1] !== 0) {
@@ -102,7 +103,7 @@ define(function (require) {
         var opName = ops[current];
         var self = this;
 
-        cookies.set('BKGraph_intro_current', current);
+        cookies.set('BKGraph_intro_current_0', current);
         if (opName) {
             this._$nextBtn.innerHTML = '知道了(' + this._current + '/' + ops.length + ')';
 
@@ -221,7 +222,7 @@ define(function (require) {
         } else {
             showTip();
         }
-        
+
         zr.refreshNextFrame();
 
         function showTip() {
