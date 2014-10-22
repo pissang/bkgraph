@@ -3,6 +3,7 @@ define(function (require) {
     var Component = require('./Component');
     var zrUtil = require('zrender/tool/util');
     var util = require('../util/util');
+    var bkgLog = require('../util/log');
 
     var KeyboardControl = function () {
 
@@ -28,28 +29,30 @@ define(function (require) {
             switch(e.keyCode) {
                 case 87: //w
                 case 38: //up arrow
-                    // log('zhishitupumovetop', 'keyboard');
+                    bkgLog('keyboardup');
                     graphMain.moveTop();
                     break;
                 case 83: //s
                 case 40: //down arrow
-                    // log('zhishitupumovedown', 'keyboard');
+                    bkgLog('keyboarddown');
                     graphMain.moveDown();
                     break;
                 case 65: //a
                 case 37: //left arrow
-                    // log('zhishitupumoveleft', 'keyboard');
+                    bkgLog('keyboardleft');
                     graphMain.moveLeft();
                     break;
                 case 68: //d
                 case 39: //right arrow
-                    // log('zhishitupumoveright', 'keyboard');
+                    bkgLog('keyboardright');
                     graphMain.moveRight();
                     break;
                 case 81: //Q
+                    bkgLog('keyboardzoomout');
                     graphMain.zoomOut();
                     break;
                 case 69: //E
+                    bkgLog('keyboardzoomin');
                     graphMain.zoomIn();
                     break;
             }

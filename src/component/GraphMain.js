@@ -97,6 +97,14 @@ define(function (require) {
 
         this._initBG();
         this._initZR();
+
+        var self = this;
+        this.el.addEventListener('mousedown', function () {
+            self._mouseDown = true;
+        });
+        this.el.addEventListener('mouseup', function () {
+            self._mouseDown = false;
+        });
     };
 
     GraphMain.prototype.enableDrag = function () {
@@ -165,11 +173,20 @@ define(function (require) {
                     self._syncOutTipEntities();
 
                     if (isPanned) {
-                        // var time = Date.now();
+                        var time = Date.now();
                         // 至少隔两秒发送拖拽日志
-                        // if ((time - currentTime) >= 2000) {
-
-                        // }
+                        if ((time - currentTime) >= 2000 && self._mouseDown) {
+                            bkgLog('pan', position[0] + ',' + position[1]);
+                            currentTime = time;
+                        }
+                    }
+                    if (isZoomed) {
+                        var time = Date.now();
+                        // 至少隔两秒发送拖拽日志
+                        if ((time - currentTime) >= 2000) {
+                            bkgLog('zoom', scale[0]);
+                            currentTime = time;
+                        }
                     }
                 }
                 x0 = position[0];
@@ -1070,7 +1087,9 @@ define(function (require) {
             }
         }
 
-        bkgLog('expand', logTitle.join(','));
+        if (logTitle.length) {
+            bkgLog('expand', logTitle.join(','));
+        }
 
         this._syncHeaderBarExplorePercent();
         zr.refreshNextFrame();
