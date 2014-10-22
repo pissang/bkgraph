@@ -4,6 +4,16 @@
 // TODO Entity zlevel的管理
 define(function (require) {
 
+    // FlashCanvas配置
+    // 默认使用crossdomain.xml
+    // 
+    // 放在require zrender之前
+    window.FlashCanvasOptions = window.FlashCanvasOptions || {};
+    FlashCanvasOptions.swfPath = FlashCanvasOptions.swfPath || './';
+    if (FlashCanvasOptions.usePolicyFile == null) {
+        FlashCanvasOptions.usePolicyFile = true;
+    }
+
     if (typeof(console) !== 'undefined' && console.log) {
         console.log(require('text!./util/asciiEcharts'));
         console.log('\n\n\n%chttp://echarts.baidu.com', 'font-size:14px;');
