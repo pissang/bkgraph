@@ -733,16 +733,7 @@
   width: 100%;
   text-align: center;
 }
-/* 新手引导 */
-.bkg-intro {
-  position: absolute;
-  z-index: 10;
-  left: 0px;
-  right: 0px;
-  top: 0px;
-  bottom: 0px;
-}
-.bkg-intro .bkg-mask {
+.bkg-mask {
   position: absolute;
   left: 0px;
   right: 0px;
@@ -752,9 +743,52 @@
   opacity: 0.5;
   filter: alpha(opacity=50);
 }
-.bkg-intro .bkg-highlight {
-  opacity: 0.0;
-  filter: alpha(opacity=0);
-  width: 100px;
-  height: 100px;
+/* 新手引导 */
+.bkg-intro .bkg-tip {
+  position: absolute;
+  z-index: 12;
+}
+.bkg-intro .bkg-next-tip {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  width: 98px;
+  height: 40px;
+  line-height: 40px;
+  margin-left: -49px;
+  color: white;
+  border: none;
+  outline: none;
+  padding: 0px;
+  background-image: url(../img/intro/next-bg.png);
+  background-color: transparent;
+}
+.bkg-intro .bkg-mask {
+  background: transparent;
+  z-index: 11;
+}
+.bkg-intro .bkg-tip-entity {
+  width: 262px;
+  height: 124px;
+  background-image: url(../img/intro/entity.png);
+}
+.bkg-intro .bkg-tip-circle {
+  width: 284px;
+  height: 131px;
+  background-image: url(../img/intro/circle.png);
+}
+.bkg-intro .bkg-tip-expand {
+  width: 344px;
+  height: 125px;
+  background-image: url(../img/intro/expand.png);
+}
+.bkg-intro .bkg-tip-relation {
+  width: 343px;
+  height: 125px;
+  background-image: url(../img/intro/relation.png);
+}
+.bkg-intro .bkg-tip-sidebar {
+  width: 316px;
+  height: 152px;
+  background-image: url(../img/intro/sidebar.png);
 }

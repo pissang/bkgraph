@@ -161,7 +161,7 @@ define(function (require) {
         this._max = [zr.getWidth() / 2, zr.getHeight() / 2];
         var x0 = 0, y0 = 0, sx0 = 0, sy0 = 0;
 
-        var currentTime = Date.now();
+        var currentTime = new Date().getTime();
         zr.painter.refresh = function () {
             // 默认只对第一层开启拖拽和缩放，所以需要手动同步所有层的位移和缩放
             var layers = zr.painter.getLayers();
@@ -202,7 +202,7 @@ define(function (require) {
                     self._syncOutTipEntities();
 
                     if (isPanned) {
-                        var time = Date.now();
+                        var time = new Date().getTime();
                         // 至少隔两秒发送拖拽日志
                         if ((time - currentTime) >= 2000 && self._mouseDown) {
                             bkgLog('pan', position[0] + ',' + position[1]);
@@ -210,7 +210,7 @@ define(function (require) {
                         }
                     }
                     if (isZoomed) {
-                        var time = Date.now();
+                        var time = new Date().getTime();
                         // 至少隔两秒发送拖拽日志
                         if ((time - currentTime) >= 2000) {
                             bkgLog('zoom', scale[0]);
