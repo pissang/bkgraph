@@ -44,7 +44,7 @@ define(function (require) {
      * @alias bkgraph~BKGraph
      * @param {HTMLElement} dom
      */
-    var BKGraph = function (dom, data, onsuccess) {
+    var BKGraph = function (dom, url, onsuccess) {
 
         this._container = dom;
 
@@ -67,13 +67,11 @@ define(function (require) {
         var loading = new Loading();
         this.addComponent(loading);
 
-        if (typeof(data) === 'string' || typeof(data) === 'number') {
+        if (typeof(url) === 'string' || typeof(url) === 'number') {
                 
             var self = this;
 
-            // jsonp(TUPU_URL, {
-            //     id: data
-            // }, 'callback', function (data) {   
+            // jsonp(url, 'callback', function (data) {   
             //     data = self._fixData(data);
             //     self._rawData = data;
 
@@ -81,7 +79,7 @@ define(function (require) {
 
             //     onsuccess && onsuccess(self);
             // });
-            http.get('../mock/person/' + data, function (data) {
+            http.get(url, function (data) {
                 if (typeof(JSON) !== 'undefined' && JSON.parse) {
                     data = JSON.parse(data);
                 } else {
@@ -94,7 +92,7 @@ define(function (require) {
                 onsuccess && onsuccess(self);
             });
         } else {
-            data = self._fixData(data);
+            var data = self._fixData(url);
 
             this._rawData = data;
 

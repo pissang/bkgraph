@@ -46,6 +46,8 @@
                 name = name || '谢霆锋';
                 document.title = name + '人物关系图谱';
 
+                name = '../mock/person/' + name;
+
                 var g = bkg.init('viewport', name + '_f', function (g) {
                     var graphMain = g.getComponentByType('GRAPH');
                     g.addComponent(new bkg.SideBar());
