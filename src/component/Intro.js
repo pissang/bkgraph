@@ -6,7 +6,7 @@ define(function (require) {
     var util = require('../util/util');
     var cookies = require('../util/cookies');
 
-    var ops = ['entity', 'expand', 'relation', 'circle', 'sidebar'];
+    var ops = ['entity', 'expand', 'relation', 'sidebar', 'circle'];
 
     var Intro = function () {
 
@@ -86,15 +86,20 @@ define(function (require) {
         }
 
         if (layer.position[0] !== 0 && layer.position[1] !== 0) {
-            graphMain.moveToEntity(mainNode.id, function () {
-                // 恢复拖动和缩放
-                zr.modLayer(0, {
-                    panable: true,
-                    zoomable: true
-                });
+            graphMain.moveToEntity(mainNode.id, finish);
+        } else {
+            finish();
+        }
 
-                self._kgraph.removeComponent(self);
+        function finish () {
+            // 恢复拖动和缩放
+            zr.modLayer(0, {
+                panable: true,
+                zoomable: true
             });
+
+            // 移除自身
+            self._kgraph.removeComponent(self);
         }
     };
 
@@ -104,6 +109,7 @@ define(function (require) {
         var self = this;
 
         cookies.set('BKGraph_intro_current_0', current);
+
         if (opName) {
             this._$nextBtn.innerHTML = '知道了(' + this._current + '/' + ops.length + ')';
 

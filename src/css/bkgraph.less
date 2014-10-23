@@ -888,10 +888,23 @@
 
 /* 新手引导 */
 .bkg-intro {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    z-index: 11;
 
     .bkg-tip {
         position: absolute;
         z-index: 12;
+    }
+
+    .bkg-mask {
+        /* http://stackoverflow.com/questions/6480774/z-index-problem-in-ie-with-transparent-div */
+        filter:alpha(opacity=1);
+        opacity: 0.01;
+        z-index: 11;
     }
 
     .bkg-next-tip {
@@ -908,11 +921,6 @@
         padding: 0px;
         background-image: url(../img/intro/next-bg.png);
         background-color: transparent;
-    }
-
-    .bkg-mask {
-        background:transparent;
-        z-index: 11;
     }
 
     .bkg-tip-entity {
