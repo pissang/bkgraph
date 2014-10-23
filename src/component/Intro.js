@@ -253,9 +253,9 @@ define(function (require) {
         var graphMain = this._kgraph.getComponentByType('GRAPH');
         var zr = graphMain.getZR();
         this._$tip.style.display = 'block';
-        this._$tip.className = 'bkg-tip bkg-tip-relation';
+        this._$tip.className = 'bkg-tip bkg-tip-sidebar';
         this._$tip.style.left = 20 + 'px';
-        this._$tip.style.top = zr.getHeight() / 2 + 40 + 'px';
+        this._$tip.style.top = zr.getHeight() / 2 - 100 + 'px';
 
         return function () {
             self._$tip.style.display = 'none';

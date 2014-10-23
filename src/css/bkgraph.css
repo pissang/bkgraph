@@ -803,3 +803,7 @@
   height: 152px;
   background-image: url(../img/intro/sidebar.png);
 }
+.bkg-intro .bkg-tip-sidebar .bkg-next-tip {
+  margin-left: -10px;
+  margin-bottom: 15px;
+}
