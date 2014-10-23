@@ -261,6 +261,12 @@ define(function (require) {
     };
 
     Intro.prototype._sidebar = function (cb) {
+        var sideBar = this._kgraph.getComponentByType('SIDEBAR');
+        if (!sideBar) {
+            cb();
+            return;
+        }
+
         var self = this;
         var graphMain = this._kgraph.getComponentByType('GRAPH');
         var zr = graphMain.getZR();
