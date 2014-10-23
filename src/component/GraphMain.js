@@ -428,13 +428,13 @@ define(function (require) {
                     }
                     if (!e.node2.entity) {
                         // 第二层控制显示 2/3 的数量
-                        if (e.node2.data.layerCounter == 2 && (this._baseEntityCount % 3 !== 0)) {
-                            this._baseEntityCount++;
-                            this._createNodeEntity(e.node2);
-                        } else if (e.node2.data.layerCounter < 2) {
+                        // if (e.node2.data.layerCounter == 2 && (this._baseEntityCount % 3 !== 0)) {
+                        //     this._baseEntityCount++;
+                        //     this._createNodeEntity(e.node2);
+                        // } else if (e.node2.data.layerCounter < 2) {
                             this._baseEntityCount++;
                             this._createNodeEntity(e.node2)
-                        }
+                        // }
                     }
                 }
                 this._createEdgeEntity(e);
