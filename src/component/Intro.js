@@ -6,7 +6,7 @@ define(function (require) {
     var util = require('../util/util');
     var cookies = require('../util/cookies');
 
-    var ops = ['entity', 'expand', 'relation', 'sidebar', 'circle'];
+    var tipNames = ['entity', 'expand', 'relation', 'sidebar', 'circle'];
 
     var Intro = function () {
 
@@ -25,7 +25,7 @@ define(function (require) {
 
         this._current = parseInt(cookies.get('BKGraph_intro_current_0')) || 0;
 
-        if (this._current >= ops.length) {
+        if (this._current >= tipNames.length) {
             setTimeout(function () {
                 kg.removeComponent(self);
             })
@@ -46,6 +46,9 @@ define(function (require) {
         this._$nextBtn = document.createElement('button');
         this._$nextBtn.className = 'bkg-next-tip';
 
+        this._$closeBtn = document.createElement('div');
+        this._$closeBtn.className = 'bkg-close';
+
         var graphMain = this._kgraph.getComponentByType('GRAPH');
         var zr = graphMain.getZR();
         var maskLayer = zr.painter.getLayer(9);
@@ -62,6 +65,7 @@ define(function (require) {
         this.el.appendChild(this._$tip);
 
         this._$tip.appendChild(this._$nextBtn);
+        this._$tip.appendChild(this._$closeBtn);
 
         this._step();
 
@@ -71,9 +75,17 @@ define(function (require) {
             }
             self._step();
         });
+
+        util.addEventListener(this._$closeBtn, 'click', function () {
+            cookies.set('BKGraph_intro_current_0', tipNames.length);
+            if (self._finishPrevious) {
+                self._finishPrevious();
+            }
+            self.close();
+        })
     };
 
-    Intro.prototype.stop = function () {
+    Intro.prototype.close = function () {
         var self = this;
         var graphMain = this._kgraph.getComponentByType('GRAPH');
         var zr = graphMain.getZR();
@@ -105,20 +117,20 @@ define(function (require) {
 
     Intro.prototype._step = function () {
         var current = this._current++;
-        var opName = ops[current];
+        var opName = tipNames[current];
         var self = this;
 
         cookies.set('BKGraph_intro_current_0', current);
 
         if (opName) {
-            this._$nextBtn.innerHTML = '知道了(' + this._current + '/' + ops.length + ')';
+            this._$nextBtn.innerHTML = '知道了(' + this._current + '/' + tipNames.length + ')';
 
             this._finishPrevious = this['_' + opName](function () {
                 self._step();
             });
         } else {
             // Finish
-            this.stop();
+            this.close();
         }
     };
 

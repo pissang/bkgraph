@@ -756,6 +756,15 @@
   position: absolute;
   z-index: 12;
 }
+.bkg-intro .bkg-tip .bkg-close {
+  position: absolute;
+  right: 20px;
+  top: 10px;
+  background-image: url(../img/intro/close.png);
+  width: 33px;
+  height: 37px;
+  cursor: pointer;
+}
 .bkg-intro .bkg-mask {
   /* http://stackoverflow.com/questions/6480774/z-index-problem-in-ie-with-transparent-div */
 
