@@ -141,10 +141,15 @@ define(function (require) {
         this.el.scale[0] = this.el.scale[1] = this.radius / baseRadius;
 
         // 加载头像图片
-        this.loadImage(zr);
+        // this.loadImage(zr);
     }
 
     NodeEntity.prototype.loadImage = function (zr) {
+        if (this._imageLoaded) {
+            return;
+        }
+        this._imageLoaded = true;
+
         var self = this;
         var image = new Image();
         image.onload = function () {
@@ -152,8 +157,6 @@ define(function (require) {
             self._imageShape.modSelf();
             zr.refreshNextFrame();
         }
-        // TODO
-        // image.crossOrigin = 'anonymous';
         image.src = this.image;
     };
 

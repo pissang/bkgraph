@@ -374,7 +374,7 @@ define(function (require) {
 
         this.render();
         
-        // this._loadStorage();
+        this._loadStorage();
 
         var circles = this._findCircles(config.circleKeywords.split(','));
         this._circles = circles;
@@ -1570,7 +1570,7 @@ define(function (require) {
             headerBarComponent.setExplorePercent(this.getExplorePercent());
         }
 
-        // this._saveStorage();
+        this._saveStorage();
     }
 
     GraphMain.prototype._culling = function () {
@@ -1600,6 +1600,9 @@ define(function (require) {
             var n = graph.nodes[i];
             if (n.entity) {
                 n.entity.el.ignore = !n.entity.isInsideRect(rect);
+                if (!n.entity.el.ignore) {
+                    n.entity.loadImage(zr);
+                }
             }
         }
         for (var i = 0; i < graph.edges.length; i++) {
