@@ -1,3 +1,6 @@
+/**
+ * 组件基类
+ */
 define(function (require) {
 
     var Eventful = require('zrender/mixin/Eventful');
@@ -11,8 +14,17 @@ define(function (require) {
 
     Component.prototype.type = 'COMPONENT';
 
+    /**
+     * 初始化组件，在 addComponent 时调用
+     * @param  {bkgraph~BKGraph} kg
+     */
     Component.prototype.initialize = function (kg) {};
 
+    /**
+     * 组件缩放，在 BKGraph
+     * @param  {number} w
+     * @param  {number} h
+     */
     Component.prototype.resize = function (w, h) {
         // Not implemented
     };

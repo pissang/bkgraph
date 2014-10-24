@@ -61,7 +61,7 @@ define(function (require) {
     }
 
     /**
-     * 显示搜索栏
+     * 隐藏搜索栏
      */
     SearchBar.prototype.hide = function () {
         util.addClass(this.el, 'hidden');
@@ -71,11 +71,16 @@ define(function (require) {
     }
 
     /**
-     * 隐藏搜索栏
+     * 显示搜索栏
      */
     SearchBar.prototype.show = function () {
         util.removeClass(this.el, 'hidden');
         this._$toggleBtn.innerHTML = '隐 藏';
+
+        var sideBar = this._kgraph.getComponentByType('SIDEBAR');
+        if (sideBar) {
+            sideBar.hide();
+        }
         
         bkgLog('searchshow');
     }

@@ -153,7 +153,7 @@ define(function (require) {
                 halfAvailableNode = node;
 
                 // 在主要视觉区域内
-                if (x > 100 && x < width - 200 && y > 100 && y < height - 200) {
+                if (x > 300 && x < width - 300 && y > 300 && y < height - 300) {
                     availabelNode = node;
                 }
             }
