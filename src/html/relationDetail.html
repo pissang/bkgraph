@@ -5,7 +5,7 @@
     <div class="bkg-relation-description bkg-sidebar-module">
         <div class="bkg-module-title">
             <div class="bkg-circle"></div>
-            <h4><a href="http://www.baidu.com/s?wd=${fromEntity.name}%20${toEntity.name}%20${relationName}" title="${fromEntity.name} ${toEntity.name} ${relationName}" target="_blank">${fromEntity.name} ${toEntity.name} ${relationName}</a></h4>
+            <h4><a href="http://www.baidu.com/s?wd=${fromEntity.name}%20${toEntity.name}%20${relationName}" title="${fromEntity.name}${toEntity.name} ${relationName}_百度搜索" target="_blank">${fromEntity.name}${toEntity.name} ${relationName|truncate(6)}_百度搜索</a></h4>
         </div>
         <div class="bkg-relation-entity-from">
             <img src="${fromEntity.imageIcon}" alt="">
