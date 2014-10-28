@@ -226,14 +226,15 @@
             display: inline-block;
             overflow: hidden;
             position: relative;
-
+            
+            box-sizing: border-box;
+            border-radius: 5px;
             width: 85px;
             height: 85px;
 
             margin-left: 1px;
 
             img {
-                border-radius: 5px;
                 width: 85px;
                 cursor: pointer;
             }
@@ -251,6 +252,16 @@
                 background-color: black;
                 opacity: 0.8;
                 font-weight: normal;
+            }
+        }
+
+        li.bkg-person.active {
+            border: 2px solid #fadf00;
+
+            h5 {
+                color: #000;
+                background-color: #fadf00;
+                opacity: 0.65;
             }
         }
 

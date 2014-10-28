@@ -153,8 +153,11 @@ define(function (require) {
             entities = data.entities;
         } else {
             for (var i = 0; i < data.entities.length; i++) {
-                if (data.entities[i].name.indexOf(name) >= 0) {
-                    entities.push(data.entities[i]);
+                var entity = data.entities[i];
+                if (entity.name.indexOf(name) >= 0
+                    || entity.namePinYin.indexOf(name) >= 0
+                ) {
+                    entities.push(entity);
                 }
             }
         }
@@ -200,6 +203,13 @@ define(function (require) {
                 }
                 parent = target.parentNode;
             }
+            
+            var activeDom = Sizzle('.active', this.el)[0];
+            if(activeDom) {
+                util.removeClass(activeDom, 'active');
+            }
+            util.addClass(parent, 'active');
+
             this.clickPerson(parent.getAttribute('data-bkg-entity-id'));
         }
     }
