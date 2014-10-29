@@ -89,6 +89,12 @@
 
     &.hidden {
         bottom: -95px;
+
+        .bkg-toggle {
+            .arrow {
+                background-image: url(../img/searchbar/arrow-hidden.png);
+            }
+        }
     }
 
     h3 {
@@ -145,6 +151,15 @@
         line-height: 34px;
 
         cursor: pointer;
+
+        .arrow {
+            display: inline-block;
+            margin-left: 6px;
+            width: 18px;
+            height: 10px;
+
+            background-image: url(../img/searchbar/arrow-search.png);
+        }
     }
 
     .bkg-person-list {
@@ -509,11 +524,15 @@
 
         .bkg-latest-weibo-content {
             margin-top: 11px;
-            line-height: 22px;
+            line-height: 21px;
         }
 
         .bkg-latest-weibo-info {
-            margin-top: 5px;
+            margin-top: -2px;
+
+            a {
+                margin-top: 4px;
+            }
         }
 
         .bkg-latest-weibo-time {
@@ -609,7 +628,7 @@
     .bkg-works {
         li {
             text-align: center;
-            margin: 0px 6px 10px 0px;
+            margin: 0 6px 0 0;
             font-size: 13px;
             width: 67px;
             display: inline-block;
@@ -620,14 +639,19 @@
                 height: 87px;
             }
 
+            &:nth-child(4n) {
+                margin-right: 0;
+            }
+
+            &:nth-child(n + 5) {
+                margin-top: 10px;
+            }
+
             &:hover {
                 a {
                     text-decoration: underline;
                 }
             }
-        }
-        li:nth-child(4n) {
-            margin-right: 0;
         }
 
         a {

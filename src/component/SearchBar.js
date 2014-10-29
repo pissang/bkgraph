@@ -65,7 +65,7 @@ define(function (require) {
      */
     SearchBar.prototype.hide = function () {
         util.addClass(this.el, 'hidden');
-        this._$toggleBtn.innerHTML = '显 示';
+        this._$toggleBtn.innerHTML = '搜 索<span class="arrow"></span>';
 
         bkgLog('searchhide');
     }
@@ -75,7 +75,7 @@ define(function (require) {
      */
     SearchBar.prototype.show = function () {
         util.removeClass(this.el, 'hidden');
-        this._$toggleBtn.innerHTML = '隐 藏';
+        this._$toggleBtn.innerHTML = '隐 藏<span class="arrow"></span>';
 
         var sideBar = this._kgraph.getComponentByType('SIDEBAR');
         if (sideBar) {
@@ -192,7 +192,9 @@ define(function (require) {
         else if (Sizzle.matchesSelector(target, '.bkg-next-page')) {
             this.nextPage();
         }
-        else if (Sizzle.matchesSelector(target, '.bkg-toggle')) {
+        else if (Sizzle.matchesSelector(target, '.bkg-toggle')
+                || Sizzle.matchesSelector(target, '.bkg-toggle .arrow')
+        ) {
             this.toggle();
         }
         else if (Sizzle.matchesSelector(target, '.bkg-person *')) {
