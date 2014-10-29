@@ -12,7 +12,8 @@
         color: white;
     }
 
-    ul {
+    ul,
+    li {
         margin: 0px;
         padding: 0px;
     }
@@ -291,7 +292,7 @@
             transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
 
     font-size: 13px;
-    line-height: 20px;
+    line-height: 21px;
 
     .bkg-sidebar-viewport {
         box-sizing: border-box;
@@ -304,7 +305,7 @@
     a {
         color: #02c0fe;
         text-decoration: none;
-        padding: 1px 3px;
+        padding: 0 3px;
         line-height: 15px;
 
         &:hover {
@@ -349,7 +350,7 @@
     .bkg-sidebar-module {
         margin-bottom: 21px;
 
-        padding-left: 11px;
+        padding-left: 10px;
         box-sizing: border-box;
 
         .bkg-module-title {
@@ -369,7 +370,7 @@
                 font-size: 16px;
                 display: inline-block;
                 line-height: 30px;
-                margin: 0px 0px 0px 5px;
+                margin: 0;
                 font-weight: normal;
             }
             a {
@@ -385,7 +386,7 @@
     
     .bkg-entity-detail,
     .bkg-relation-detail {
-        margin: 30px 15px 30px 10px;
+        margin: 29px 17px 30px 10px;
 
         border-left: 1px solid #1c7bcc;
         border-top: 1px solid #1c7bcc;
@@ -398,7 +399,7 @@
     }
 
     .bkg-detail-bottom-line {
-        width: 10px;
+        width: 7px;
         height: 1px;
         background-color: #1c7bcc;
         position: absolute;
@@ -417,7 +418,7 @@
             margin-left: 102px;
 
             p {
-                margin: 4px 0px;
+                /* margin: 4px 0px; */
             }
         }
     }
@@ -481,12 +482,14 @@
 
     /******* 微博模块 ***********/
     .bkg-weibo {
+        margin-bottom: 17px;
+
         .bkg-weibo-info {
             .bkg-left {
                 float: left;
             }
             .bkg-right {
-                margin-left: 61px;
+                margin-left: 62px;
             }
             h5 {
                 margin: 0px;
@@ -500,12 +503,12 @@
                 display: inline-block;
             }
             p {
-                margin-top: 7px;
+                margin-top: 5px;
             }
         }
 
         .bkg-latest-weibo-content {
-            margin-top: 17px;
+            margin-top: 11px;
             line-height: 22px;
         }
 
@@ -561,14 +564,16 @@
 
     /******* 新闻模块 ***********/
     .bkg-news {
+        margin-bottom: 20px;
+
         li.bkg-item {
             
-            margin-bottom: 12px;
+            margin-bottom: 5px;
             position: relative;
 
             .bkg-news-tail {
                 color: #a9b2c1;
-                margin-top: 5px;
+                margin-top: -2px;
                 height: 18px;
             }
 
@@ -585,16 +590,17 @@
 
     /******* 关系脉络 ***********/
     .bkg-mailuo {
+        margin-bottom: 19px;
         li.bkg-item {
 
-            margin-bottom: 10px;
+            margin-bottom: 2px;
 
             .bkg-publish-time {
                 display: inline-block;
             }
 
             .bkg-title {
-                margin-left: 20px;
+                margin-left: 13px;
             }
         }
     }
@@ -603,7 +609,7 @@
     .bkg-works {
         li {
             text-align: center;
-            margin: 0px 5px 10px 0px;
+            margin: 0px 6px 10px 0px;
             font-size: 13px;
             width: 67px;
             display: inline-block;
@@ -620,10 +626,14 @@
                 }
             }
         }
+        li:nth-child(4n) {
+            margin-right: 0;
+        }
 
         a {
             color: white;
             display: inline-block;
+            padding: 0;
 
             &:hover {
                 background: transparent;

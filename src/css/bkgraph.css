@@ -11,7 +11,8 @@
 .bkg-viewport a {
   color: white;
 }
-.bkg-viewport ul {
+.bkg-viewport ul,
+.bkg-viewport li {
   margin: 0px;
   padding: 0px;
 }
@@ -180,7 +181,6 @@
   left: 0px;
   top: 0px;
   /** 图片不换行 */
-
   white-space: nowrap;
   -webkit-transition: left 0.5s ease-in-out;
   -moz-transition: left 0.5s ease-in-out;
@@ -192,12 +192,13 @@
   display: inline-block;
   overflow: hidden;
   position: relative;
+  box-sizing: border-box;
+  border-radius: 5px;
   width: 85px;
   height: 85px;
   margin-left: 1px;
 }
 .bkg-searchbar .bkg-person-list li.bkg-person img {
-  border-radius: 5px;
   width: 85px;
   cursor: pointer;
 }
@@ -215,6 +216,14 @@
   opacity: 0.8;
   font-weight: normal;
 }
+.bkg-searchbar .bkg-person-list li.bkg-person.active {
+  border: 2px solid #fadf00;
+}
+.bkg-searchbar .bkg-person-list li.bkg-person.active h5 {
+  color: #000;
+  background-color: #fadf00;
+  opacity: 0.65;
+}
 .bkg-searchbar .bkg-person-list li.bkg-empty {
   height: 85px;
   line-height: 85px;
@@ -228,7 +237,7 @@
   bottom: 0px;
   z-index: 0;
   width: 338px;
-  background-color: #043362;
+  background-color: #053669;
   color: white;
   -webkit-transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
   -moz-transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
@@ -236,19 +245,13 @@
   -o-transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
   transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
   font-size: 13px;
-  line-height: 20px;
+  line-height: 21px;
   /**人物基本信息模块**/
-
   /******* 微博模块 ***********/
-
   /******* 新闻和脉络模块 ***********/
-
   /******* 新闻模块 ***********/
-
   /******* 关系脉络 ***********/
-
   /** 作品模块 */
-
 }
 .bkg-sidebar .bkg-sidebar-viewport {
   box-sizing: border-box;
@@ -259,7 +262,7 @@
 .bkg-sidebar a {
   color: #02c0fe;
   text-decoration: none;
-  padding: 1px 3px;
+  padding: 0 3px;
   line-height: 15px;
 }
 .bkg-sidebar a:hover {
@@ -280,9 +283,9 @@
   top: -11px;
 }
 .bkg-sidebar .bkg-entity-detail-title h3 {
-  color: #9bd1fe;
-  background-color: #043362;
-  font-size: 22px;
+  color: #fff;
+  background-color: #053669;
+  font-size: 20px;
   display: inline-block;
   padding: 0px 20px;
   margin: 0px;
@@ -294,12 +297,12 @@
   height: 100%;
 }
 .bkg-sidebar .bkg-sidebar-module {
-  margin-bottom: 25px;
-  padding-left: 11px;
+  margin-bottom: 21px;
+  padding-left: 10px;
   box-sizing: border-box;
 }
 .bkg-sidebar .bkg-sidebar-module .bkg-module-title {
-  margin: 0px 0px 6px -11px;
+  margin: 0 0 4px -11px;
 }
 .bkg-sidebar .bkg-sidebar-module .bkg-module-title .bkg-circle {
   width: 10px;
@@ -311,10 +314,10 @@
 }
 .bkg-sidebar .bkg-sidebar-module .bkg-module-title h4 {
   color: #02c0fe;
-  font-size: 18px;
+  font-size: 16px;
   display: inline-block;
   line-height: 30px;
-  margin: 0px 0px 0px 5px;
+  margin: 0;
   font-weight: normal;
 }
 .bkg-sidebar .bkg-sidebar-module .bkg-module-title a {
@@ -327,7 +330,7 @@
 }
 .bkg-sidebar .bkg-entity-detail,
 .bkg-sidebar .bkg-relation-detail {
-  margin: 30px 10px 30px 10px;
+  margin: 29px 17px 30px 10px;
   border-left: 1px solid #1c7bcc;
   border-top: 1px solid #1c7bcc;
   position: relative;
@@ -337,7 +340,7 @@
   height: 0px;
 }
 .bkg-sidebar .bkg-detail-bottom-line {
-  width: 10px;
+  width: 7px;
   height: 1px;
   background-color: #1c7bcc;
   position: absolute;
@@ -352,11 +355,10 @@
   margin-left: 102px;
 }
 .bkg-sidebar .bkg-person-info .bkg-person-description p {
-  margin: 4px 0px;
+  /* margin: 4px 0px; */
 }
 .bkg-sidebar .bkg-relation-detail .bkg-relation-description {
   /*没有关系摘要的暂时替代方案*/
-
   margin-bottom: 15px;
   position: relative;
 }
@@ -368,11 +370,11 @@
   text-align: center;
   margin: 0px;
   font-weight: normal;
-  font-size: 14px;
-  height: 22px;
-  line-height: 22px;
+  font-size: 13px;
+  height: 21px;
+  line-height: 21px;
   background-color: #000;
-  opacity: 0.8;
+  opacity: 0.65;
   position: absolute;
   left: 0px;
   right: 0px;
@@ -381,20 +383,22 @@
 .bkg-sidebar .bkg-relation-detail .bkg-relation-entity-from {
   float: left;
   position: relative;
+  height: 124px;
 }
 .bkg-sidebar .bkg-relation-detail .bkg-relation-entity-to {
   float: right;
   position: relative;
+  height: 124px;
 }
 .bkg-sidebar .bkg-relation-detail .bkg-relation-name {
   position: absolute;
   top: 60%;
   left: 50%;
   width: 80px;
-  height: 5px;
+  height: 4px;
   margin-left: -40px;
   border-radius: 3px;
-  background-color: #2a98fa;
+  background-color: #0e90fe;
   text-align: center;
 }
 .bkg-sidebar .bkg-relation-detail .bkg-relation-name span {
@@ -404,15 +408,19 @@
   display: inline-block;
   line-height: 14px;
 }
+.bkg-sidebar .bkg-weibo {
+  margin-bottom: 17px;
+}
 .bkg-sidebar .bkg-weibo .bkg-weibo-info .bkg-left {
   float: left;
 }
 .bkg-sidebar .bkg-weibo .bkg-weibo-info .bkg-right {
-  margin-left: 65px;
+  margin-left: 62px;
 }
 .bkg-sidebar .bkg-weibo .bkg-weibo-info h5 {
   margin: 0px;
-  font-size: 14px;
+  font-size: 18px;
+  font-weight: normal;
 }
 .bkg-sidebar .bkg-weibo .bkg-weibo-info .bkg-weibo-v {
   background-image: url(../img/sidebar/v.png);
@@ -421,10 +429,11 @@
   display: inline-block;
 }
 .bkg-sidebar .bkg-weibo .bkg-weibo-info p {
-  margin: 5px 0px;
+  margin-top: 5px;
 }
 .bkg-sidebar .bkg-weibo .bkg-latest-weibo-content {
-  margin-top: 10px;
+  margin-top: 11px;
+  line-height: 22px;
 }
 .bkg-sidebar .bkg-weibo .bkg-latest-weibo-info {
   margin-top: 5px;
@@ -465,34 +474,40 @@
   color: white;
   text-decoration: underline;
 }
+.bkg-sidebar .bkg-news {
+  margin-bottom: 20px;
+}
 .bkg-sidebar .bkg-news li.bkg-item {
-  margin-bottom: 8px;
+  margin-bottom: 5px;
   position: relative;
 }
 .bkg-sidebar .bkg-news li.bkg-item .bkg-news-tail {
-  color: #9bd1fe;
-  margin-top: 1px;
+  color: #a9b2c1;
+  margin-top: -2px;
   height: 18px;
 }
 .bkg-sidebar .bkg-news li.bkg-item .bkg-news-source {
   float: right;
-  color: #9bd1fe;
+  color: #a9b2c1;
 }
 .bkg-sidebar .bkg-news li.bkg-item .bkg-publish-time {
   float: left;
 }
+.bkg-sidebar .bkg-mailuo {
+  margin-bottom: 19px;
+}
 .bkg-sidebar .bkg-mailuo li.bkg-item {
-  margin-bottom: 8px;
+  margin-bottom: 2px;
 }
 .bkg-sidebar .bkg-mailuo li.bkg-item .bkg-publish-time {
   display: inline-block;
 }
 .bkg-sidebar .bkg-mailuo li.bkg-item .bkg-title {
-  margin-left: 20px;
+  margin-left: 13px;
 }
 .bkg-sidebar .bkg-works li {
   text-align: center;
-  margin: 0px 5px 10px 0px;
+  margin: 0px 6px 10px 0px;
   font-size: 13px;
   width: 67px;
   display: inline-block;
@@ -505,15 +520,19 @@
 .bkg-sidebar .bkg-works li:hover a {
   text-decoration: underline;
 }
+.bkg-sidebar .bkg-works li:nth-child(4n) {
+  margin-right: 0;
+}
 .bkg-sidebar .bkg-works a {
   color: white;
   display: inline-block;
+  padding: 0;
 }
 .bkg-sidebar .bkg-works a:hover {
   background: transparent;
 }
 .bkg-sidebar .bkg-works .bkg-work-title {
-  margin-top: 3px;
+  margin-top: 5px;
   display: block;
 }
 .bkg-sidebar .bkg-toggle {
@@ -693,16 +712,17 @@
 .bkg-scrollbar-viewport .bkg-scrollbar-bar-y {
   top: 0px;
   bottom: 0px;
-  width: 5px;
+  width: 7px;
   right: 0px;
   position: absolute;
+  background-color: #3672aa;
 }
 .bkg-scrollbar-viewport .bkg-scrollbar-button {
   position: absolute;
   width: 5px;
-  left: 0px;
+  left: 1px;
   background-color: #d5ebff;
-  border-radius: 4px;
+  border-radius: 10px;
   opacity: 0.6;
 }
 /* 加载动画 */
@@ -767,7 +787,6 @@
 }
 .bkg-intro .bkg-mask {
   /* http://stackoverflow.com/questions/6480774/z-index-problem-in-ie-with-transparent-div */
-
   filter: alpha(opacity=1);
   opacity: 0.01;
   z-index: 11;
@@ -799,12 +818,12 @@
 }
 .bkg-intro .bkg-tip-expand {
   width: 344px;
-  height: 125px;
+  height: 121px;
   background-image: url(../img/intro/expand.png);
 }
 .bkg-intro .bkg-tip-relation {
   width: 343px;
-  height: 125px;
+  height: 121px;
   background-image: url(../img/intro/relation.png);
 }
 .bkg-intro .bkg-tip-sidebar {
