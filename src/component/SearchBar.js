@@ -155,7 +155,7 @@ define(function (require) {
             for (var i = 0; i < data.entities.length; i++) {
                 var entity = data.entities[i];
                 if (entity.name.indexOf(name) >= 0
-                    || entity.namePinYin.indexOf(name) >= 0
+                    || entity.namePinYin && entity.namePinYin.indexOf(name) >= 0
                 ) {
                     entities.push(entity);
                 }
