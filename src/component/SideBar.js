@@ -38,7 +38,7 @@ define(function (require) {
 
         this._$toggleBtn = document.createElement('div');
         this._$toggleBtn.className = 'bkg-toggle';
-        this._$toggleBtn.innerHTML = '显<br />示<br />';
+        this._$toggleBtn.innerHTML = '显<br />示<br /><';
         this.el.appendChild(this._$toggleBtn);
 
         this._scrollbar = new ScrollBar(this._$content);
@@ -94,7 +94,7 @@ define(function (require) {
                 graphMain.el.style.right = -this.el.clientWidth + 'px';
             }
 
-            this._$toggleBtn.innerHTML = '隐<br />藏<br /><';
+            this._$toggleBtn.innerHTML = '隐<br />藏<br />>';
 
             bkgLog('sideshow');
 
@@ -120,7 +120,7 @@ define(function (require) {
 
             bkgLog('sidehide');
 
-            this._$toggleBtn.innerHTML = '显<br />示<br />>';
+            this._$toggleBtn.innerHTML = '显<br />示<br /><';
         }
     };
 
