@@ -41,8 +41,8 @@ define(function (require) {
         this.minRadius = 30;
         this.maxRadius = 40;
 
-        this.minRelationWeight = 30;
-        this.maxRelationWeight = 40;
+        this.minRelationWeight = 20;
+        this.maxRelationWeight = 20;
 
         this.draggable = false;
 
@@ -328,6 +328,8 @@ define(function (require) {
             max = Math.max(max, relation.relationWeight);
         }
         diff = max - min;
+
+        var wFactors = [10, 2, 0.5, 0.5, 0.5, 0.5];
         for (var i = 0; i < data.relations.length; i++) {
             var relation = data.relations[i];
             if (relation.isExtra) {
@@ -339,7 +341,7 @@ define(function (require) {
             var e = graph.addEdge(relation.fromID, relation.toID, relation);
             e.layout = {
                 // 边权重
-                weight: w * 12 / Math.pow(e.node1.data.layerCounter + 1, 1)
+                weight: w * wFactors[e.node1.data.layerCounter]
                 // weight: e.node1.data.layerCounter === 0 ? 200 : w
             };
         }
@@ -492,7 +494,7 @@ define(function (require) {
             };
         }, this);
         var layout = new TreeLayout();
-        var layerPadding = [100, 400, 200, 200, 200, 200, 200];
+        var layerPadding = [100, 200, 200, 200, 200, 200, 200];
         layout.layerPadding = function (level) {
             return layerPadding[level] || 200;
         };
@@ -537,29 +539,17 @@ define(function (require) {
         // forceLayout.enableAcceleration = false;
         forceLayout.maxSpeedIncrease = 100;
         // 这个真是不好使
-        forceLayout.preventOverlap = true;
+        forceLayout.preventNodeOverlap = true;
+        forceLayout.preventNodeEdgeOverlap = true;
 
         graph.eachNode(function (n) {
-            n.layout.mass = n.degree() * 3;
+            if (n.data.layerCounter === 1) {
+                n.layout.mass = 10;
+            } else {
+                n.layout.mass = n.degree() * 3;
+            }
         });
 
-        // 在边上加入顶点防止重叠实体与边发生重叠
-        // TODO 效果不好
-        var edgeNodes = [];
-        graph.eachEdge(function (e) {
-            var n = graph.addNode(e.id, e);
-            var p = vec2.create();
-            vec2.add(p, e.node1.layout.position, e.node2.layout.position);
-            vec2.scale(p, p, 0.5);
-            n.layout = {
-                position: p,
-                mass: 2,
-                size: 30
-            };
-            edgeNodes.push(n);
-            n.isEdgeNode = true;
-        });
-        
         forceLayout.init(graph, true);
         forceLayout.temperature = 0.04;
         this._layouting = true;
@@ -567,16 +557,10 @@ define(function (require) {
 
         forceLayout.onupdate = function () {
             for (var i = 0; i < graph.nodes.length; i++) {
-                if (graph.nodes[i].layout.fixed) {
-                    vec2.copy(graph.nodes[i].layout.position, graph.nodes[i].position);
+                var n = graph.nodes[i];
+                if (n.layout.fixed && n.entity) {
+                    vec2.copy(n.layout.position, n.entity.el.position);
                 }
-            }
-            for (var i = 0; i < edgeNodes.length; i++) {
-                var n = edgeNodes[i];
-                var e = n.data;
-                var p = n.layout.position;
-                vec2.add(p, e.node1.layout.position, e.node2.layout.position);
-                vec2.scale(p, p, 0.5);
             }
             self._updateNodePositions();   
 
