@@ -32,7 +32,7 @@ define(function (require) {
      * @alias bkgraph~BKGraph
      * @param {HTMLElement} dom
      */
-    var BKGraph = function (dom, url, onsuccess) {
+    var BKGraph = function (dom, url, data, onsuccess) {
 
         this._container = dom;
 
@@ -55,19 +55,32 @@ define(function (require) {
         var loading = new Loading();
         this.addComponent(loading);
 
-        if (typeof(url) === 'string' || typeof(url) === 'number') {
-                
+        if (typeof(url) === 'string' && url.indexOf('http') == 0) {
+
             var self = this;
 
-            // jsonp(url, 'callback', function (data) {   
-            //     data = self._fixData(data);
-            //     self._rawData = data;
+            if(url.indexOf('?') > 0) {
+                url += '&';
+            } else {
+                url += '?';
+            }
+            url += 'id=' + data;
 
-            //     self.initialize(data);
+            jsonp(url, 'callback', function (data) {   
+                data = self._fixData(data);
+                self._rawData = data;
 
-            //     onsuccess && onsuccess(self);
-            // });
-            http.get(url, function (data) {
+                self.initialize(data);
+
+                onsuccess && onsuccess(self);
+            });
+        }
+        else if (typeof(url) === 'string' && url !== '') {
+                
+            var self = this;
+            data = data || '';
+            
+            http.get(url + data, function (data) {
                 if (typeof(JSON) !== 'undefined' && JSON.parse) {
                     data = JSON.parse(data);
                 } else {
@@ -80,7 +93,7 @@ define(function (require) {
                 onsuccess && onsuccess(self);
             });
         } else {
-            var data = self._fixData(url);
+            var data = self._fixData(data);
 
             this._rawData = data;
 
@@ -192,16 +205,17 @@ define(function (require) {
     /**
      * 初始化图
      * @param {string|HTMLElement} dom
-     * @param {string|Object} url
+     * @param {string} url
+     * @param {string|Object} data
      * @param {Function} onsuccess
      * @memberOf bkgraph
      * @return {bkgraph~BKGraph}
      */
-    function init(dom, url, onsuccess) {
+    function init(dom, url, data, onsuccess) {
         if (typeof(dom) === 'string') {
             dom = document.getElementById(dom);
         }
-        var graph = new BKGraph(dom, url, onsuccess);
+        var graph = new BKGraph(dom, url, data, onsuccess);
 
         return graph;
     }
