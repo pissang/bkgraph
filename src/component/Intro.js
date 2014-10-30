@@ -77,7 +77,10 @@ define(function (require) {
         });
 
         util.addEventListener(this._$closeBtn, 'click', function () {
-            cookies.set('BKGraph_intro_current_0', tipNames.length);
+            cookies.set('BKGraph_intro_current_0', tipNames.length, {
+                // 10 years
+                expires: 360 * 24 * 3600 * 10
+            });
             if (self._finishPrevious) {
                 self._finishPrevious();
             }
@@ -120,7 +123,10 @@ define(function (require) {
         var opName = tipNames[current];
         var self = this;
 
-        cookies.set('BKGraph_intro_current_0', current);
+        cookies.set('BKGraph_intro_current_0', current, {
+            // 10 years
+            expires: 360 * 24 * 3600 * 10
+        });
 
         if (opName) {
             this._$nextBtn.innerHTML = '知道了(' + this._current + '/' + tipNames.length + ')';
