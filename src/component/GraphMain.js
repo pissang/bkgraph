@@ -1497,7 +1497,8 @@ define(function (require) {
                         e.node1.data.layerCounter,
                         // to entity
                         e.node2.id,
-                        e.node2.data.layerCounter
+                        e.node2.data.layerCounter,
+                        e.data.ID
                     ].join(',')
                 );
 
