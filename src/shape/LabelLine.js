@@ -62,10 +62,10 @@ define(function (require) {
 
         var width = area.getTextWidth(text, style.textFont);
         var height = area.getTextWidth('国', style.textFont);
+        ctx.textBaseline = 'top';
         if (angle < 0.2 || angle > 2.94) {
-            y -= r + textPadding;
+            y -= r + textPadding + height;
             x -= width / 2;
-            ctx.textBaseline = 'bottom';
             // 顺便保存rect
             this.__rect = {
                 x: Math.min(x, cx - r * 2),
@@ -75,7 +75,7 @@ define(function (require) {
             };
         } else {
             x += r + textPadding;
-            ctx.textBaseline = 'middle';
+            y -= height / 2;
             // 顺便保存rect
             this.__rect = {
                 x: cx - r * 2,

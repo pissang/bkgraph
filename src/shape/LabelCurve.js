@@ -56,13 +56,12 @@ define(function (require) {
         if (textPadding == null) { textPadding = 5; }
 
         ctx.font = style.textFont;
-        var x = cx + r + textPadding;
-        var y = cy;
-        ctx.textBaseline = 'middle';
-        ctx.fillText(text, x, y);
-
         var width = area.getTextWidth(text, style.textFont);
         var height = area.getTextWidth('国', style.textFont);
+        ctx.textBaseline = 'top';
+        var x = cx + r + textPadding;
+        var y = cy - height / 2;
+        ctx.fillText(text, x, y);
         // 顺便保存rect
         this.__rect = {
             x: cx - r * 2,
