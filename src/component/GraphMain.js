@@ -409,12 +409,10 @@ define(function (require) {
         this._root = new Group();
         zr.addGroup(this._root);
 
-        // 补边使用bundle优化性能, IE8不使用
-        if (config.enableAnimation) {
-            this._extraEdgeBundle = new ExtraEdgeBundleEntity();
-            this._extraEdgeBundle.initialize(zr);
-            this._root.addChild(this._extraEdgeBundle.el);
-        }
+        // 补边使用bundle优化性能
+        this._extraEdgeBundle = new ExtraEdgeBundleEntity();
+        this._extraEdgeBundle.initialize(zr);
+        this._root.addChild(this._extraEdgeBundle.el);
 
         // 所有实体都在 zlevel-1 层
         // 所有边都在 zlevel-0 层
@@ -638,7 +636,7 @@ define(function (require) {
         }
 
         zr.refreshNextFrame();
-    }
+    };
 
     /**
      * 节点移除hover特效
@@ -658,7 +656,7 @@ define(function (require) {
 
             node._isHover = false;
         }
-    }
+    };
 
     /**
      * 鼠标 hover 到节点上的特效
@@ -682,7 +680,7 @@ define(function (require) {
         // }
 
         node.entity.highlight();
-    }
+    };
 
     /**
      * 低亮指定节点
@@ -692,7 +690,7 @@ define(function (require) {
             node.entity.lowlight();
             node._isHighlight = false;
         }
-    }
+    };
 
     /**
      * 高亮指定节点
@@ -702,7 +700,7 @@ define(function (require) {
             node.entity.highlight();
             node._isHighlight = true;
         }
-    }
+    };
 
     /**
      * 高亮节点与邻接节点, 点击触发
@@ -818,7 +816,7 @@ define(function (require) {
         this._syncHeaderBarExplorePercent();
 
         zr.refreshNextFrame();
-    }
+    };
 
     /**
      * 默认显示所有圈子
@@ -849,7 +847,7 @@ define(function (require) {
         }
         this._zr.refreshNextFrame();
         this._syncHeaderBarExplorePercent();
-    }
+    };
 
     /**
      * 在边栏中显示实体详细信息
@@ -868,7 +866,7 @@ define(function (require) {
                 sideBar.show();
             }
         }
-    }
+    };
 
     /**
      * 在边栏中显示关系的详细信息
@@ -886,7 +884,7 @@ define(function (require) {
             sideBar.setData(data, true);
             sideBar.show();
         }
-    }
+    };
 
     /**
      * 移动视图到指定的实体位置
@@ -1053,9 +1051,7 @@ define(function (require) {
                 e.canCollapse = false;
                 e.entity = null;
 
-                if (config.enableAnimation) {
-                    this._extraEdgeBundle.removeEdge(e);
-                }
+                this._extraEdgeBundle.removeEdge(e);
             }
         }, this);
 
@@ -1474,9 +1470,7 @@ define(function (require) {
                     label: e.data.relationName,
                     style: style
                 });
-                if (config.enableAnimation) {
-                    this._extraEdgeBundle.addEdge(e);
-                }
+                this._extraEdgeBundle.addEdge(e);
             } else {
                 edgeEntity = new EdgeEntity({
                     sourceEntity: e.node1.entity,
