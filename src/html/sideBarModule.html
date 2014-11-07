@@ -102,3 +102,57 @@
         <!-- /for -->
     </ul>
 </div>
+
+<!-- target: sidebarTieba -->
+<div class="bkg-tieba bkg-sidebar-module">
+    <div class="bkg-module-title">
+        <div class="bkg-circle"></div>
+        <h4><a href="${tieba.tiebaUrl}" title="百度贴吧" target="_blank">${tieba.tiebaName}</a></h4>
+    </div>
+    <div class="bkg-tieba-info">
+        ${tiebaInfo}
+    </div>
+    <ul>
+        <!-- for: ${tieba.tiezi} as ${item}, ${index} -->
+        <li class="bkg-item">
+            <div class="bkg-circle"></div>
+            <a href="${item.tieziUrl}" target="_blank" class="bkg-title" title="${item.tieziTitle}">
+                ${item.tieziTitle|truncate(20)}
+            </a>
+            <div class="bkg-tieba-tail">
+                ${item.tieziInfo}
+            </div>
+        </li>
+        <!-- /for -->
+    </ul>
+</div>
+
+<!-- target: sidebarFightResult -->
+<div class="bkg-text bkg-sidebar-module">
+    <!-- use: sidebarModuleTitle(sidebarModuleName="战斗记录") -->
+    <ul>
+        <!-- for: ${fightResult} as ${item}, ${index} -->
+        <li class="bkg-item">
+            <div class="bkg-circle"></div>
+            <a href="https://www.baidu.com/s?wd=${name}vs${item|substr(2)}" target="_blank" class="bkg-title" title="${name}vs${item|substr(2)}">${item}</a>
+        </li>
+        <!-- /for -->
+    </ul>
+</div>
+
+<!-- target: sidebarCoappear -->
+<div class="bkg-video bkg-sidebar-module">
+    <div class="bkg-module-title">
+        <div class="bkg-circle"></div>
+        <h4>${fromEntity.name}${toEntity.name}_出现的剧集</h4>
+    </div>
+    <ul>
+        <!-- for: ${coappear} as ${item}, ${index} -->
+        <li>
+            <a href="${item.comicLink}" target="_blank" title="${item.comicNum}">
+                ${item.comicNum}
+            </a>
+        </li>
+        <!-- /for -->
+    </ul>
+</div>

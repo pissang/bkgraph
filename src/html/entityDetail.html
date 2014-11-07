@@ -9,19 +9,39 @@
         </div>
         <img class="bkg-person-pic" src="${imageIcon}" />
         <div class="bkg-person-description">
-            <!-- if: ${birthDate} -->
+            <!-- if: ${birthDate} && !${tieba}-->
             <p><b>出生:</b> ${birthDate}</p>
+            <!-- /if -->
+
+            <!-- if: ${skill} -->
+            <p><b>代表技能:</b> ${skill|truncate(20)}</p>
             <!-- /if -->
             <p>
                 <b>简介:</b> ${introduction.content|truncate(68)}
                 <a href="${sourceUrl}" class="bkg-more" title="更多" target="_blank">更多>></a>
             </p>
         </div>
+
+        <!-- if: ${tieba} -->
+        <div class="bkg-person-vote">
+        </div>
+        <!-- /if -->
+
         <div style="clear:both;"></div>
     </div>
+    
     <!-- if: ${news} -->
     <!-- import: sidebarNews -->
     <!-- /if -->
+
+    <!-- if: ${tieba} -->
+    <!-- import: sidebarTieba -->
+    <!-- /if -->
+    
+    <!-- if: ${fightResult} -->
+    <!-- import: sidebarFightResult -->
+    <!-- /if -->
+    
     <!-- if: ${weibo} -->
     <!-- import: sidebarWeibo -->
     <!-- /if -->

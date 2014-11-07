@@ -111,6 +111,10 @@ define(function (require) {
             return str;
         },
 
+        substr: function (str, start, end) {
+            return str.substr(start, end);
+        },
+
         trim: function (str) {
             return str.replace(/^\s+|\s+$/g, '');
         },

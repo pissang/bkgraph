@@ -9,6 +9,8 @@ define(function (require) {
 
     var ScrollBar = require('../util/ScrollBar');
 
+    var vote = require('./vote');
+
     etpl.compile(require('text!../html/sideBarModule.html'));
     var renderEntityDetail = etpl.compile(require('text!../html/entityDetail.html'));
     var renderRelationDetail = etpl.compile(require('text!../html/relationDetail.html'));
@@ -67,8 +69,27 @@ define(function (require) {
     SideBar.prototype.render = function (data, isRelation) {
         if (isRelation) {
             this._$content.innerHTML = renderRelationDetail(data);
+
+            var entities = this._kgraph._rawData.entities;
+            for(var i = 0, len = entities.length;i < len; i++) {
+                if(entities[i].name == data.fromName 
+                    && entities[i].tieba
+                ) {
+                    var $relationVote = Sizzle('.bkg-relation-vote', this._$content)[0];
+                    if ($relationVote) {
+                        new vote('pk', $relationVote, data);
+                    }
+                    break;
+                }
+            }
         } else {
             this._$content.innerHTML = renderEntityDetail(data);
+
+            if (data.tieba) {
+                var $personVote = Sizzle('.bkg-person-vote', this._$content)[0];
+                data._scrollbar = this._scrollbar;
+                new vote('list', $personVote, data);
+            }
         }
 
         this._scrollbar.scrollTo(0);

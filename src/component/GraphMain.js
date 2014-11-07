@@ -8,6 +8,7 @@ define(function (require) {
     var zrUtil = require('zrender/tool/util');
     var Group = require('zrender/Group');
     var CircleShape = require('zrender/shape/Circle');
+    var RectangleShape = require('zrender/shape/Rectangle');
     var Component = require('./Component');
     var vec2 = require('zrender/tool/vector');
 
@@ -241,6 +242,25 @@ define(function (require) {
                 layers[z].dom.parentNode.removeChild(layers[z].dom);
             }
         }
+
+        this.__tip = new RectangleShape({
+            style : {
+                x : 0,
+                y : 0,
+                width : 62,
+                height: 22,
+                
+                brushType : 'stroke',
+                strokeColor : "#fff",
+                lineWidth : 1,
+                lineJoin : 'round',
+                text : '百度一下',
+                textPosition : 'inside'
+            },
+            ignore: true,
+            zlevel: 3
+        });
+        zr.addShape(this.__tip);
     }
 
     GraphMain.prototype._initBG = function () {
@@ -1462,6 +1482,7 @@ define(function (require) {
     GraphMain.prototype._createEdgeEntity = function (e, style) {
         var edgeEntity;
         var zr = this._zr;
+        var tip = this.__tip;
         if (e.node1.entity && e.node2.entity) {
             if (e.isExtra) {
                 edgeEntity = new ExtraEdgeEntity({
@@ -1481,7 +1502,13 @@ define(function (require) {
             edgeEntity.initialize(this._zr);
 
             edgeEntity.bind('click', function () {
-                this.showRelationDetail(e);
+                if(e.node1.data.tieba) {
+                    var wd = e.node1.data.name + '%20' + e.node2.data.name + '%20' + e.data.relationName;
+                    window.open('http://www.baidu.com/s?wd=' + wd, 'newwindow' + wd);
+                }
+                else {
+                    this.showRelationDetail(e);
+                }
 
                 bkgLog(
                     'edgeclick', 
@@ -1502,12 +1529,26 @@ define(function (require) {
                     edgeEntity.animateTextPadding(zr, 300, 12);
                 }
                 edgeEntity.highlightLabel();
+
+                // 添加搜索tip
+                if(e.node1.data.tieba) {
+                    tip.style.x = this.el.getRect().x;
+                    tip.style.y = this.el.getRect().y - tip.style.height;
+                    tip.ignore = false;
+                    tip.modSelf();
+                }
             });
             edgeEntity.bind('mouseout', function () {
                 if (config.enableAnimation) {
                     edgeEntity.animateTextPadding(zr, 300, 5);
                 }
                 edgeEntity.lowlightLabel();
+
+                // 隐藏搜索tip
+                if(e.node1.data.tieba) {
+                    tip.ignore = true;
+                    tip.modSelf();
+                }
             });
 
             e.entity = edgeEntity;

@@ -156,7 +156,7 @@
             display: inline-block;
             margin-left: 6px;
             width: 18px;
-            height: 10px;
+            height: 11px;
 
             background-image: url(../img/searchbar/arrow-search.png);
         }
@@ -493,6 +493,149 @@
                 line-height: 14px;
             }
         }
+        /** 投票 */
+        .bkg-relation-vote {
+
+            padding-left: 10px;
+            margin-bottom: 10px;
+
+            .bkg-relation-ranking {
+                margin: 10px;
+
+                .bkg-left {
+                    float: left;
+                }
+
+                .bkg-right {
+                    float: right;
+                }
+            }
+
+            .bkg-relation-voting {
+
+                .bkg-vote-icon {
+                    cursor: pointer;
+                    margin: 0 5px;
+                    width: 30px;
+                    height: 30px;
+                    background: url(../img/sidebar/vote.gif) no-repeat 0 -37px;
+                }
+
+                .bkg-left {
+                    float: left;
+                    background-color: #ee4f4f;
+
+                    .bkg-vote-icon {
+                        float: left;
+
+                        &.disable {
+                            background-position: 0 -74px;
+                        }
+                    }
+                }
+
+                .bkg-right {
+                    float: right;
+
+                    .bkg-vote-icon {
+                        float: right;
+                        background-position: 0 -111px;
+
+                        &.disable {
+                            background-position: 0 -148px;
+                        }
+                    }
+                }
+            }
+            .bkg-relation-pk-wrapper {
+                
+                .bkg-relation-pk-voting {
+
+                    height: 33px;
+                    position: relative;
+                    background: #489bdc;
+                    
+                    .bkg-relation-pk-bg {
+                        background: #ee4f4f;
+                        height: 33px;
+                        width: 50%;
+                    }
+
+                    .bkg-vote-icon {
+                        cursor: pointer;
+                        background: url(../img/sidebar/vote.gif) no-repeat 0 -37px;
+                        height: 33px;
+                        width: 31px;
+                        line-height: 33px;
+                        float: left;
+                    }
+
+                    .bkg-relation-pk-num {
+                        float: left;
+                        height: 33px;
+                        line-height: 33px;
+                        color: #fff;
+                        text-decoration: none;
+                        width: 60px;
+                        position: relative;
+                        z-index: 20;
+                    }
+
+                    .bkg-relation-pk-vl {
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+
+                        .bkg-vote-icon {
+                            background-position: 0 -37px;
+
+                            &.disable {
+                                cursor: auto;
+                                background-position: 0 -74px;
+                            }
+                        }
+
+                        .bkg-relation-pk-leftnum {
+                            overflow: hidden;
+                            padding-left: 10px;
+                        }
+                    }
+
+                    .bkg-relation-pk-vr {
+                        position: absolute;
+                        right: 0;
+                        top: 0;
+
+                        .bkg-vote-icon {
+                            background-position: 0 -111px;
+
+                            &.disable {
+                                cursor: auto;
+                                background-position: 0 -148px;
+                            }
+                        }
+
+                        .bkg-relation-pk-rightnum {
+                            padding-right: 10px;
+                            text-align: right;
+                        }
+                    }
+
+                    .bkg-relation-pk-active {
+                        width: 10px;
+                        height: 33px;
+                        position: absolute;
+                        left: 50%;
+                        top: 0;
+                        margin-left: -5px;
+                        background-position: 0 0;
+                    }
+                }
+
+            }
+            
+
+        }
     }
 
     /******* 微博模块 ***********/
@@ -548,9 +691,11 @@
         }
     }
     
-    /******* 新闻和脉络模块 ***********/
+    /******* 新闻和脉络、贴吧、文字模块 ***********/
     .bkg-news,
-    .bkg-mailuo {
+    .bkg-mailuo,
+    .bkg-tieba,
+    .bkg-text {
         li.bkg-item {
             
             position: relative;
@@ -667,6 +812,169 @@
         .bkg-work-title {
             margin-top: 5px;
             display: block;
+        }
+    }
+
+    /** 贴吧模块 */
+    .bkg-tieba {
+
+        .bkg-tieba-info {
+            margin-bottom: 5px;
+            color: #a9b2c1;
+        }
+
+        li.bkg-item {
+            
+            margin-bottom: 5px;
+            position: relative;
+
+            .bkg-tieba-tail {
+                margin-left: 5px;
+                margin-top: -2px;
+                color: #a9b2c1;
+                height: 18px;
+            }
+        }
+    }
+
+    /** 视频模块 */
+    .bkg-video {
+        li {
+            display: inline-block;
+            margin: 0 6px 0 0;
+
+            &:nth-child(4n) {
+                margin-right: 0;
+            }
+
+            &:nth-child(n + 5) {
+                margin-top: 10px;
+            }
+
+            a {
+                display: inline-block;
+                
+                border-radius: 4px;
+                padding: 11px 0;
+                width: 60px;
+                
+                font-size: 13px;
+                background-color: #f5f5f5;
+                color: #000;
+                text-align: center;
+                
+                &:hover {
+                    background-color: #02c0fe;
+                    color: #fff;
+                }
+            }
+        }
+    }
+
+    /** ranking */
+    .bkg-person-vote {
+
+        clear: both;
+        margin-top: 10px;
+
+        .bkg-person-vote-title {
+
+            margin-bottom: 10px;
+            font-size: 16px;
+
+            .bkg-vote-icon {
+                cursor: pointer;
+                display: inline-block;
+
+                margin-left: 20px;
+                padding: 7px 0;
+                width: 131px;
+                font-size: 13px;
+                background: #ee504f url(../img/sidebar/vote.gif) no-repeat 10px -36px;
+                color: #fff;
+                text-align: center;
+
+                &.disable {
+                    cursor: default;
+                    background-position: 10px -73px;
+                }
+            }
+        }
+
+        .bkg-person-vote-default,
+        .bkg-person-vote-list {
+
+            padding: 5px 0;
+            border: 1px solid #797979;
+            background-color: #154373;
+            text-align: center;
+
+            -webkit-user-select: none;  
+               -moz-user-select: none;  
+                -ms-user-select: none;
+                    user-select: none;
+
+            span {
+                display: inline-block;
+                margin-right: 10px;
+                width: 73px;
+                white-space: nowrap;
+            }
+
+        }
+
+        .bkg-person-vote-default {
+            
+            cursor: pointer;
+
+            .arrow {
+                display: inline-block;
+                width: 18px;
+                height: 10px;
+                background-image: url(../img/searchbar/arrow-search.png);
+
+                &.hide {
+                    background-image: url(../img/searchbar/arrow-hidden.png);
+                }
+            }
+
+        }
+
+        .bkg-person-vote-list {
+
+            position: absolute;
+            opacity: 0.9;
+            z-index: 10;
+
+            &.hide {
+                display: none;
+            }
+
+            .pre,
+            .next {
+                cursor: pointer;
+                display: inline-block;
+                width: 18px;
+                height: 10px;
+            }
+
+            .pre {
+                background-image: url(../img/searchbar/arrow-search.png);
+            }
+
+            .next {
+                background-image: url(../img/searchbar/arrow-hidden.png);
+            }
+
+            ul {
+                overflow: hidden;
+                padding-right: 41px;
+                height: 125px;
+
+                .bkg-vote-num {
+                    text-align: right;
+                }
+            }
         }
     }
 

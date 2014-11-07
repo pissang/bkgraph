@@ -27,6 +27,8 @@ define(function (require) {
     etpl.addFilter('truncate', util.truncate);
     // etpl trim
     etpl.addFilter('trim', util.trim);
+    // etpl substr
+    etpl.addFilter('substr', util.substr);
 
     /**
      * @alias bkgraph~BKGraph
