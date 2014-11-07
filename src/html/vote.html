@@ -1,0 +1,49 @@
+<!-- target: personVote -->
+<div class="bkg-person-vote-title">
+    <span>火影人物人气大比拼</span>
+    <span class="bkg-vote-icon ${isPersonVoted}" data-name="${name}">${result}</span>
+</div>
+<div class="bkg-person-vote-default">
+    <span><b>排名：</b>${index}</span>
+    <span>${name}</span>
+    <span><b>人气：</b>${result}</span>
+    <span class="arrow hide"></span>
+</div>
+<div class="bkg-person-vote-list hide">
+    <span id="bkg-person-list-pre" class="pre"></span>
+    <ul id="bkg-person-list">
+        <!-- for: ${votelist} as ${item}, ${index} -->
+        <li>
+            <span>${item.index}</span>
+            <span>${item.name}</span>
+            <span class="bkg-vote-num">${item.num}</span>
+        </li>
+        <!-- /for -->
+    </ul>
+    <span id="bkg-person-list-next" class="next"></span>
+</div>
+
+<!-- target: relationPKBar-->
+<div class="bkg-relation-pk-wrapper">
+    <div class="bkg-relation-ranking">
+        <div class="bkg-left">
+            当前排名：${fromIndex}
+        </div>
+        <div class="bkg-right">
+            当前排名：${toIndex}
+        </div>
+        <div style="clear:both"></div>
+    </div>
+    <div class="bkg-relation-pk-voting">
+        <div class="bkg-relation-pk-bg"></div>
+        <div class="bkg-relation-pk-vl">
+            <span class="bkg-vote-icon ${isPersonFromVoted}" data-name="${fromName}"></span>
+            <span class="bkg-relation-pk-num bkg-relation-pk-leftnum">${fromResult}</span>
+        </div>
+        <div class="bkg-vote-icon bkg-relation-pk-active"></div>
+        <div class="bkg-relation-pk-vr">
+            <span class="bkg-relation-pk-num bkg-relation-pk-rightnum">${toResult}</span>
+            <span class="bkg-vote-icon ${isPersonToVoted}" data-name="${toName}"></span>
+        </div>
+    </div>
+</div>
