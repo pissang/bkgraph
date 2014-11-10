@@ -1,12 +1,14 @@
 define(function (require) {
 
     var Sizzle = require('Sizzle');
+    var zrUtil = require('zrender/tool/util');
     var util = require('../util/util');
     var jsonp = require('../util/jsonp');
     var etpl = require('etpl');
     var bkgLog = require('../util/log');
 
     var ScrollList = require('../util/ScrollList');
+    var ScrollBar = require('../util/ScrollBar');
 
     var config = require('../config');
     var api = config.voteAPI;
@@ -14,11 +16,15 @@ define(function (require) {
 
     etpl.compile(require('text!../html/vote.html'));
 
-    var vote = function (flag, dom, data) {
+    var Vote = function (flag, dom, data, scrollBar) {
 
         this._dom = dom;
 
-        this._data = data;
+        this._data = zrUtil.clone(data);
+
+        if(scrollBar) {
+            this._scrollbar = scrollBar;
+        }
 
         if (flag == 'pk') {
             this.addPKBar();
@@ -33,7 +39,7 @@ define(function (require) {
         });
     };
 
-    vote.prototype._dispatchClick = function (e) {
+    Vote.prototype._dispatchClick = function (e) {
         var target = e.target || e.srcElement;
 
         var current = target;
@@ -73,7 +79,7 @@ define(function (require) {
 
     };
 
-    vote.prototype.addPKBar = function () {
+    Vote.prototype.addPKBar = function () {
 
         var self = this;
 
@@ -157,7 +163,7 @@ define(function (require) {
         });
     };
 
-    vote.prototype.addRankingList = function () {
+    Vote.prototype.addRankingList = function () {
 
         var self = this;
 
@@ -205,13 +211,15 @@ define(function (require) {
 
             self._scrollList = scrollList;
 
-            self._data._scrollbar.resize();
+            if(self._scrollbar && self._scrollbar instanceof ScrollBar) {
+                self._scrollbar.resize();
+            }
             
         });
         
     };
 
-    vote.prototype.vote = function (dom) {
+    Vote.prototype.vote = function (dom) {
 
         var self = this;
         var name = dom.getAttribute('data-name');
@@ -250,7 +258,7 @@ define(function (require) {
         
     };
 
-    vote.prototype._getSortedList = function (data) {
+    Vote.prototype._getSortedList = function (data) {
 
         var self = this;
 
@@ -278,5 +286,5 @@ define(function (require) {
         return votelist;
     };
 
-    return vote;
+    return Vote;
 });

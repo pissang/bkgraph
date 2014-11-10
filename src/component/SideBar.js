@@ -9,7 +9,7 @@ define(function (require) {
 
     var ScrollBar = require('../util/ScrollBar');
 
-    var vote = require('./vote');
+    var Vote = require('./Vote');
 
     etpl.compile(require('text!../html/sideBarModule.html'));
     var renderEntityDetail = etpl.compile(require('text!../html/entityDetail.html'));
@@ -77,7 +77,7 @@ define(function (require) {
                 ) {
                     var $relationVote = Sizzle('.bkg-relation-vote', this._$content)[0];
                     if ($relationVote) {
-                        new vote('pk', $relationVote, data);
+                        new Vote('pk', $relationVote, data);
                     }
                     break;
                 }
@@ -87,8 +87,7 @@ define(function (require) {
 
             if (data.tieba) {
                 var $personVote = Sizzle('.bkg-person-vote', this._$content)[0];
-                data._scrollbar = this._scrollbar;
-                new vote('list', $personVote, data);
+                new Vote('list', $personVote, data, this._scrollbar);
             }
         }
 
