@@ -70,7 +70,7 @@ define(function (require) {
         if (isRelation) {
             this._$content.innerHTML = renderRelationDetail(data);
 
-            var entities = this._kgraph._rawData.entities;
+            var entities = this._kgraph.getRawData().entities;
             for(var i = 0, len = entities.length;i < len; i++) {
                 if(entities[i].name == data.fromName 
                     && entities[i].tieba
