@@ -410,9 +410,11 @@ define(function (require) {
         zr.addGroup(this._root);
 
         // 补边使用bundle优化性能
-        this._extraEdgeBundle = new ExtraEdgeBundleEntity();
-        this._extraEdgeBundle.initialize(zr);
-        this._root.addChild(this._extraEdgeBundle.el);
+        if (config.enableAnimation) {
+            this._extraEdgeBundle = new ExtraEdgeBundleEntity();
+            this._extraEdgeBundle.initialize(zr);
+            this._root.addChild(this._extraEdgeBundle.el);   
+        }
 
         // 所有实体都在 zlevel-1 层
         // 所有边都在 zlevel-0 层
@@ -913,20 +915,29 @@ define(function (require) {
     GraphMain.prototype.moveTo = function (x, y, cb) {
         var zr = this._zr;
         var layers = zr.painter.getLayers();
-        var self = this;
-        self._animating = true;
-        zr.animation.animate(layers[0])
-            .when(800, {
-                position: [x, y]
-            })
-            .during(function () {
-                zr.refreshNextFrame();
-            })
-            .done(function () {
-                self._animating = false;
-                cb && cb();
-            })
-            .start('CubicInOut');
+
+        if (config.enableAnimation) {
+            var self = this;
+            self._animating = true;
+            zr.animation.animate(layers[0])
+                .when(800, {
+                    position: [x, y]
+                })
+                .during(function () {
+                    zr.refreshNextFrame();
+                })
+                .done(function () {
+                    self._animating = false;
+                    cb && cb();
+                })
+                .start('CubicInOut');   
+        } else {
+            var pos = layers[0].position;
+            pos[0] = x;
+            pos[1] = y;
+            zr.refreshNextFrame();
+            cb && cb();
+        }
     };
 
     GraphMain.prototype.moveLeft = function (cb) {
@@ -1050,8 +1061,9 @@ define(function (require) {
                 this._root.removeChild(e.entity.el);
                 e.canCollapse = false;
                 e.entity = null;
-
-                this._extraEdgeBundle.removeEdge(e);
+                if (config.enableAnimation) {
+                    this._extraEdgeBundle.removeEdge(e);
+                }
             }
         }, this);
 
@@ -1226,6 +1238,10 @@ define(function (require) {
             // 环中所有边都符合关键词
             if (i == cycle.nodes.length) {
                 matchCircles.push(cycle);
+
+                for (var k = 0; k < cycle.edges.length; k++) {
+                    cycle.edges[k].isSpecial = true;
+                }
             }
 
             // matchCircles.push(cycle);
@@ -1470,7 +1486,9 @@ define(function (require) {
                     label: e.data.relationName,
                     style: style
                 });
-                this._extraEdgeBundle.addEdge(e);
+                if (config.enableAnimation) {
+                    this._extraEdgeBundle.addEdge(e);
+                }
             } else {
                 edgeEntity = new EdgeEntity({
                     sourceEntity: e.node1.entity,
@@ -1492,7 +1510,8 @@ define(function (require) {
                         // to entity
                         e.node2.id,
                         e.node2.data.layerCounter,
-                        e.data.ID
+                        e.data.ID,
+                        e.isSpecial ? 1 : 0
                     ].join(',')
                 );
 
