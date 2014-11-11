@@ -46,6 +46,8 @@ define(function (require) {
 
         this.draggable = false;
 
+        this.entryAnimation = true;
+
         this._kgraph = null;
         
         this._zr = null;
@@ -385,7 +387,7 @@ define(function (require) {
         }
 
         // 刚打开时的展开动画
-        if (config.enableAnimation) {
+        if (config.enableAnimation && this.enableEntryAnimation) {
             this._entryAnimation();
         }
 
@@ -792,7 +794,7 @@ define(function (require) {
                 n._isHighlight = true;
             } else {
                 n.entity.highlight();
-                n._isHighlight = true;   
+                n._isHighlight = true;
             }
 
             var inEdge = current.inEdges[0];
@@ -818,6 +820,35 @@ define(function (require) {
         this._syncHeaderBarExplorePercent();
 
         zr.refreshNextFrame();
+    };
+
+    GraphMain.prototype.highlightEdge = function (e) {
+        if (typeof(e) === 'string') {
+            e = this._getEdgeByID(e);
+        }
+        if (!e) {
+            return;
+        }
+        this._lastClickNode = null;
+        this._activeNode = null;
+
+        this.lowlightAll();
+
+        if (!e.node1.entity) {
+            e.node1.entity = this._createNodeEntity(e.node1);
+        }
+        if (!e.node2.entity) {
+            e.node2.entity = this._createNodeEntity(e.node2);
+        }
+        e.node1.entity.highlight();
+        e.node1._isHighlight = true;
+        e.node2.entity.highlight();
+        e.node2._isHighlight = true;
+
+        if (!e.entity) {
+            this._createEdgeEntity(e);
+        }
+        e.entity.highlight();
     };
 
     /**
@@ -874,6 +905,12 @@ define(function (require) {
      * 在边栏中显示关系的详细信息
      */
      GraphMain.prototype.showRelationDetail = function (e) {
+        if (typeof(e) === 'string') {
+            e = this._getEdgeByID(e);
+        }
+        if (!e) {
+            return;
+        }
         var sideBar = this._kgraph.getComponentByType('SIDEBAR');
         if (sideBar) {
             var data = {};
@@ -908,6 +945,29 @@ define(function (require) {
 
         this.moveTo(pos[0], pos[1], cb);
     };
+
+    GraphMain.prototype.moveToRelation = function (e, cb) {
+        if (typeof(e) === 'string') {
+            e = this._getEdgeByID(e);
+        }
+
+        if (!e) {
+            return;
+        }
+        var zr = this._zr;
+        var pos1 = e.node1.entity.el.position;
+        var pos2 = e.node2.entity.el.position;
+
+        var pos = vec2.add([], pos1, pos2);
+        pos[0] /= 2;
+        pos[1] /= 2;
+
+        var layer = zr.painter.getLayer(0);
+        vec2.mul(pos, pos, layer.scale);
+        vec2.sub(pos, [zr.getWidth() / 2, zr.getHeight() / 2], pos);
+
+        this.moveTo(pos[0], pos[1], cb);
+    }
 
     /**
      * 移动视图到指定的位置
@@ -1139,6 +1199,16 @@ define(function (require) {
     GraphMain.prototype.getExplorePercent = function () {
         var nodes = this._graph.nodes;
         return (this._nodeEntityCount - this._baseEntityCount) / (nodes.length - this._baseEntityCount);
+    };
+
+    GraphMain.prototype._getEdgeByID = function (e) {
+        var graph = this._graph;
+        for (var i = 0; i < graph.edges.length; i++) {
+            if (graph.edges[i].data.ID === e) {
+                e = graph.edges[i];
+                return e;
+            }
+        }
     };
 
     // 保存已展开的节点到localStorage
@@ -1500,7 +1570,7 @@ define(function (require) {
 
             edgeEntity.bind('click', function () {
                 this.showRelationDetail(e);
-
+                this.highlightEdge(e);
                 bkgLog(
                     'edgeclick', 
                     [
