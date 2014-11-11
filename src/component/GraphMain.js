@@ -47,6 +47,8 @@ define(function (require) {
 
         this.draggable = false;
 
+        this.entryAnimation = true;
+
         this._kgraph = null;
         
         this._zr = null;
@@ -405,7 +407,7 @@ define(function (require) {
         }
 
         // 刚打开时的展开动画
-        if (config.enableAnimation) {
+        if (config.enableAnimation && this.enableEntryAnimation) {
             this._entryAnimation();
         }
 
@@ -430,9 +432,11 @@ define(function (require) {
         zr.addGroup(this._root);
 
         // 补边使用bundle优化性能
-        this._extraEdgeBundle = new ExtraEdgeBundleEntity();
-        this._extraEdgeBundle.initialize(zr);
-        this._root.addChild(this._extraEdgeBundle.el);
+        if (config.enableAnimation) {
+            this._extraEdgeBundle = new ExtraEdgeBundleEntity();
+            this._extraEdgeBundle.initialize(zr);
+            this._root.addChild(this._extraEdgeBundle.el);   
+        }
 
         // 所有实体都在 zlevel-1 层
         // 所有边都在 zlevel-0 层
@@ -810,7 +814,7 @@ define(function (require) {
                 n._isHighlight = true;
             } else {
                 n.entity.highlight();
-                n._isHighlight = true;   
+                n._isHighlight = true;
             }
 
             var inEdge = current.inEdges[0];
@@ -836,6 +840,35 @@ define(function (require) {
         this._syncHeaderBarExplorePercent();
 
         zr.refreshNextFrame();
+    };
+
+    GraphMain.prototype.highlightEdge = function (e) {
+        if (typeof(e) === 'string') {
+            e = this._getEdgeByID(e);
+        }
+        if (!e) {
+            return;
+        }
+        this._lastClickNode = null;
+        this._activeNode = null;
+
+        this.lowlightAll();
+
+        if (!e.node1.entity) {
+            e.node1.entity = this._createNodeEntity(e.node1);
+        }
+        if (!e.node2.entity) {
+            e.node2.entity = this._createNodeEntity(e.node2);
+        }
+        e.node1.entity.highlight();
+        e.node1._isHighlight = true;
+        e.node2.entity.highlight();
+        e.node2._isHighlight = true;
+
+        if (!e.entity) {
+            this._createEdgeEntity(e);
+        }
+        e.entity.highlight();
     };
 
     /**
@@ -892,6 +925,12 @@ define(function (require) {
      * 在边栏中显示关系的详细信息
      */
      GraphMain.prototype.showRelationDetail = function (e) {
+        if (typeof(e) === 'string') {
+            e = this._getEdgeByID(e);
+        }
+        if (!e) {
+            return;
+        }
         var sideBar = this._kgraph.getComponentByType('SIDEBAR');
         if (sideBar) {
             var data = {};
@@ -927,26 +966,58 @@ define(function (require) {
         this.moveTo(pos[0], pos[1], cb);
     };
 
+    GraphMain.prototype.moveToRelation = function (e, cb) {
+        if (typeof(e) === 'string') {
+            e = this._getEdgeByID(e);
+        }
+
+        if (!e) {
+            return;
+        }
+        var zr = this._zr;
+        var pos1 = e.node1.entity.el.position;
+        var pos2 = e.node2.entity.el.position;
+
+        var pos = vec2.add([], pos1, pos2);
+        pos[0] /= 2;
+        pos[1] /= 2;
+
+        var layer = zr.painter.getLayer(0);
+        vec2.mul(pos, pos, layer.scale);
+        vec2.sub(pos, [zr.getWidth() / 2, zr.getHeight() / 2], pos);
+
+        this.moveTo(pos[0], pos[1], cb);
+    }
+
     /**
      * 移动视图到指定的位置
      */
     GraphMain.prototype.moveTo = function (x, y, cb) {
         var zr = this._zr;
         var layers = zr.painter.getLayers();
-        var self = this;
-        self._animating = true;
-        zr.animation.animate(layers[0])
-            .when(800, {
-                position: [x, y]
-            })
-            .during(function () {
-                zr.refreshNextFrame();
-            })
-            .done(function () {
-                self._animating = false;
-                cb && cb();
-            })
-            .start('CubicInOut');
+
+        if (config.enableAnimation) {
+            var self = this;
+            self._animating = true;
+            zr.animation.animate(layers[0])
+                .when(800, {
+                    position: [x, y]
+                })
+                .during(function () {
+                    zr.refreshNextFrame();
+                })
+                .done(function () {
+                    self._animating = false;
+                    cb && cb();
+                })
+                .start('CubicInOut');   
+        } else {
+            var pos = layers[0].position;
+            pos[0] = x;
+            pos[1] = y;
+            zr.refreshNextFrame();
+            cb && cb();
+        }
     };
 
     GraphMain.prototype.moveLeft = function (cb) {
@@ -1070,8 +1141,9 @@ define(function (require) {
                 this._root.removeChild(e.entity.el);
                 e.canCollapse = false;
                 e.entity = null;
-
-                this._extraEdgeBundle.removeEdge(e);
+                if (config.enableAnimation) {
+                    this._extraEdgeBundle.removeEdge(e);
+                }
             }
         }, this);
 
@@ -1147,6 +1219,16 @@ define(function (require) {
     GraphMain.prototype.getExplorePercent = function () {
         var nodes = this._graph.nodes;
         return (this._nodeEntityCount - this._baseEntityCount) / (nodes.length - this._baseEntityCount);
+    };
+
+    GraphMain.prototype._getEdgeByID = function (e) {
+        var graph = this._graph;
+        for (var i = 0; i < graph.edges.length; i++) {
+            if (graph.edges[i].data.ID === e) {
+                e = graph.edges[i];
+                return e;
+            }
+        }
     };
 
     // 保存已展开的节点到localStorage
@@ -1246,6 +1328,10 @@ define(function (require) {
             // 环中所有边都符合关键词
             if (i == cycle.nodes.length) {
                 matchCircles.push(cycle);
+
+                for (var k = 0; k < cycle.edges.length; k++) {
+                    cycle.edges[k].isSpecial = true;
+                }
             }
 
             // matchCircles.push(cycle);
@@ -1491,7 +1577,9 @@ define(function (require) {
                     label: e.data.relationName,
                     style: style
                 });
-                this._extraEdgeBundle.addEdge(e);
+                if (config.enableAnimation) {
+                    this._extraEdgeBundle.addEdge(e);
+                }
             } else {
                 edgeEntity = new EdgeEntity({
                     sourceEntity: e.node1.entity,
@@ -1502,6 +1590,7 @@ define(function (require) {
             edgeEntity.initialize(this._zr);
 
             edgeEntity.bind('click', function () {
+
                 if(e.node1.data.tieba) {
                     var wd = e.node1.data.name + '%20' + e.node2.data.name + '%20' + e.data.relationName;
                     window.open('http://www.baidu.com/s?wd=' + wd, 'newwindow' + wd);
@@ -1509,6 +1598,8 @@ define(function (require) {
                 else {
                     this.showRelationDetail(e);
                 }
+
+                this.highlightEdge(e);
 
                 bkgLog(
                     'edgeclick', 
@@ -1519,7 +1610,8 @@ define(function (require) {
                         // to entity
                         e.node2.id,
                         e.node2.data.layerCounter,
-                        e.data.ID
+                        e.data.ID,
+                        e.isSpecial ? 1 : 0
                     ].join(',')
                 );
 

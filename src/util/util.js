@@ -121,6 +121,23 @@ define(function (require) {
 
         supportCanvas: function () {
             return supportCanvas;
+        },
+
+        getURLSearch: function() {
+            var search = window.location.search;
+            var obj = {};
+            if (search) {
+                search = search.slice(util.indexOf(search, '?') + 1);
+                var params = search.split('&');
+                for (var i = 0; i < params.length; i++) {
+                    var keyValue = params[i].split('=');
+                    var key = decodeURIComponent(keyValue[0]);
+                    var value = decodeURIComponent(keyValue[1]);
+                    obj[key] = value;
+                }
+            }
+
+            return obj;
         }
     }
 

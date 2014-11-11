@@ -134,8 +134,21 @@ define(function (require) {
         var graphMain = new GraphMain();
         this.addComponent(graphMain);
 
+        var params = util.getURLSearch();
+
         if (data) {
+            if (params['relation']) {
+                graphMain.enableEntryAnimation = false;
+            }
             graphMain.setData(data);
+        }
+
+        if (params['relation']) {
+            setTimeout(function () {
+                graphMain.highlightEdge(params['relation']);
+                graphMain.moveToRelation(params['relation']);
+                graphMain.showRelationDetail(params['relation']);
+            });
         }
     }
 
