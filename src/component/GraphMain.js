@@ -21,6 +21,7 @@ define(function (require) {
     var bkgLog = require('../util/log');
     var util = require('../util/util');
     var intersect = require('../util/intersect');
+    var jsonp = require('../util/jsonp');
 
     var Cycle = require('./Cycle');
 
@@ -893,11 +894,16 @@ define(function (require) {
 
         var sideBar = this._kgraph.getComponentByType('SIDEBAR');
         if (sideBar) {
-            sideBar.setData(n.data);
 
-            if (showSidebar) {
-                sideBar.show();
-            }
+            jsonp(this._kgraph._detailAPI, { id: this._kgraph._tupuID, detail_id: n.id }, 'callback', function (data) {
+
+                sideBar.setData(data);
+
+                if (showSidebar) {
+                    sideBar.show();
+                }
+
+            });
         }
     };
 
@@ -913,15 +919,20 @@ define(function (require) {
         }
         var sideBar = this._kgraph.getComponentByType('SIDEBAR');
         if (sideBar) {
-            var data = {};
-            for (var name in e.data) {
-                data[name] = e.data[name];
-            }
-            data.fromEntity = this._graph.getNodeById(data.fromID).data;
-            data.toEntity = this._graph.getNodeById(data.toID).data;
+            // var data = {};
+            // for (var name in e.data) {
+            //     data[name] = e.data[name];
+            // }
+            var self = this;
+            jsonp(this._kgraph._detailAPI, { id: this._kgraph._tupuID, detail_id: e.data.ID }, 'callback', function (data) {
 
-            sideBar.setData(data, true);
-            sideBar.show();
+                data.fromEntity = self._graph.getNodeById(data.fromID).data;
+                data.toEntity = self._graph.getNodeById(data.toID).data;
+
+                sideBar.setData(data, true);
+                sideBar.show();
+
+            });
         }
     };
 

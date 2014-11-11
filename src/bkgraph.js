@@ -38,6 +38,10 @@ define(function (require) {
 
         this._components = [];
 
+        this._detailAPI = url;
+
+        this._tupuID = data;
+
         this._width = 0;
 
         this._height = 0;
@@ -59,14 +63,7 @@ define(function (require) {
 
             var self = this;
 
-            if(url.indexOf('?') > 0) {
-                url += '&';
-            } else {
-                url += '?';
-            }
-            url += 'id=' + data;
-
-            jsonp(url, 'callback', function (data) {   
+            jsonp(url, { id: data }, 'callback', function (data) {
                 data = self._fixData(data);
                 self._rawData = data;
 
