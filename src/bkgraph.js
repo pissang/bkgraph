@@ -143,6 +143,12 @@ define(function (require) {
                 graphMain.showRelationDetail(params['relation']);
             });
         }
+
+        // Intro Component is defaultly included (except location has releation param)
+        if (!params['relation']) {
+            var intro = new Intro();
+            this.addComponent(intro);
+        }
     }
 
     BKGraph.prototype.addComponent = function (component) {
