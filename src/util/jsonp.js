@@ -32,7 +32,9 @@ define(function (require) {
               queryString += '&';
             }
           }
-          url += '?' + queryString;
+          if(url.indexOf('?') === -1){ url += '?'; }
+          else{ url += '&'; }
+          url += queryString;
         } else if(typeof data == 'function'){
           method = data;
           callback = method;
