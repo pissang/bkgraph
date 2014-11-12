@@ -31,14 +31,14 @@
 }
 .bkg-graph {
   position: absolute;
-  right: 0px;
+  left: 0px;
   top: 0px;
   bottom: 0px;
-  -webkit-transition: right 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-  -moz-transition: right 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-  -ms-transition: right 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-  -o-transition: right 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-  transition: right 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  -webkit-transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  -moz-transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  -ms-transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  -o-transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
 }
 .bkg-graph .bkg-graph-zr {
   position: absolute;
@@ -76,6 +76,9 @@
 .bkg-searchbar.hidden {
   bottom: -95px;
 }
+.bkg-searchbar.hidden .bkg-toggle .arrow {
+  background-image: url(../img/searchbar/arrow-hidden.png);
+}
 .bkg-searchbar h3 {
   color: white;
   font-weight: normal;
@@ -112,7 +115,7 @@
   width: 106px;
   height: 32px;
   position: absolute;
-  right: 50px;
+  left: 50px;
   top: -32px;
   color: white;
   background-image: url(../img/searchbar/toggle-btn.png);
@@ -120,6 +123,13 @@
   font-size: 16px;
   line-height: 34px;
   cursor: pointer;
+}
+.bkg-searchbar .bkg-toggle .arrow {
+  display: inline-block;
+  margin-left: 6px;
+  width: 18px;
+  height: 10px;
+  background-image: url(../img/searchbar/arrow-search.png);
 }
 .bkg-searchbar .bkg-person-list {
   position: absolute;
@@ -232,7 +242,7 @@
 /** 边栏 */
 .bkg-sidebar {
   position: absolute;
-  left: 0px;
+  right: 0px;
   top: 0px;
   bottom: 0px;
   z-index: 0;
@@ -275,7 +285,7 @@
   margin: 0px;
 }
 .bkg-sidebar.hidden {
-  left: -338px;
+  right: -338px;
 }
 .bkg-sidebar .bkg-entity-detail-title {
   text-align: center;
@@ -433,13 +443,16 @@
 }
 .bkg-sidebar .bkg-weibo .bkg-latest-weibo-content {
   margin-top: 11px;
-  line-height: 22px;
+  line-height: 21px;
 }
 .bkg-sidebar .bkg-weibo .bkg-latest-weibo-info {
-  margin-top: 5px;
+  margin-top: -2px;
+}
+.bkg-sidebar .bkg-weibo .bkg-latest-weibo-info a {
+  margin-top: 4px;
 }
 .bkg-sidebar .bkg-weibo .bkg-latest-weibo-time {
-  color: #9bd1fe;
+  color: #a9b2c1;
 }
 .bkg-sidebar .bkg-weibo .bkg-latest-weibo-comment {
   float: right;
@@ -507,7 +520,7 @@
 }
 .bkg-sidebar .bkg-works li {
   text-align: center;
-  margin: 0px 6px 10px 0px;
+  margin: 0 6px 0 0;
   font-size: 13px;
   width: 67px;
   display: inline-block;
@@ -517,11 +530,14 @@
   width: 67px;
   height: 87px;
 }
-.bkg-sidebar .bkg-works li:hover a {
-  text-decoration: underline;
-}
 .bkg-sidebar .bkg-works li:nth-child(4n) {
   margin-right: 0;
+}
+.bkg-sidebar .bkg-works li:nth-child(n + 5) {
+  margin-top: 10px;
+}
+.bkg-sidebar .bkg-works li:hover a {
+  text-decoration: underline;
 }
 .bkg-sidebar .bkg-works a {
   color: white;
@@ -539,14 +555,14 @@
   width: 20px;
   height: 84px;
   position: absolute;
-  right: -20px;
+  left: -20px;
   top: 50%;
   margin-top: -42px;
   background-image: url(../img/sidebar/toggle-btn.png);
   cursor: pointer;
   color: white;
   font-size: 12px;
-  padding-top: 20px;
+  padding-top: 15px;
   text-align: center;
   box-sizing: border-box;
 }
