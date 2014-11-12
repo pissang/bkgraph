@@ -31,14 +31,14 @@
 }
 .bkg-graph {
   position: absolute;
-  right: 0px;
+  left: 0px;
   top: 0px;
   bottom: 0px;
-  -webkit-transition: right 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-  -moz-transition: right 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-  -ms-transition: right 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-  -o-transition: right 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-  transition: right 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  -webkit-transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  -moz-transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  -ms-transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  -o-transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
 }
 .bkg-graph .bkg-graph-zr {
   position: absolute;
@@ -115,7 +115,7 @@
   width: 106px;
   height: 32px;
   position: absolute;
-  right: 50px;
+  left: 50px;
   top: -32px;
   color: white;
   background-image: url(../img/searchbar/toggle-btn.png);
@@ -128,7 +128,7 @@
   display: inline-block;
   margin-left: 6px;
   width: 18px;
-  height: 11px;
+  height: 10px;
   background-image: url(../img/searchbar/arrow-search.png);
 }
 .bkg-searchbar .bkg-person-list {
@@ -242,7 +242,7 @@
 /** 边栏 */
 .bkg-sidebar {
   position: absolute;
-  left: 0px;
+  right: 0px;
   top: 0px;
   bottom: 0px;
   z-index: 0;
@@ -288,7 +288,7 @@
   margin: 0px;
 }
 .bkg-sidebar.hidden {
-  left: -338px;
+  right: -338px;
 }
 .bkg-sidebar .bkg-entity-detail-title {
   text-align: center;
@@ -798,7 +798,7 @@
   width: 20px;
   height: 84px;
   position: absolute;
-  right: -20px;
+  left: -20px;
   top: 50%;
   margin-top: -42px;
   background-image: url(../img/sidebar/toggle-btn.png);
