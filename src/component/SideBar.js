@@ -14,7 +14,7 @@ define(function (require) {
     var renderRelationDetail = etpl.compile(require('text!../html/relationDetail.html'));
 
     var SideBar = function () {
-        
+
         Component.call(this);
 
         var self = this;
@@ -91,7 +91,7 @@ define(function (require) {
             // 图谱部分右移
             var graphMain = this._kgraph.getComponentByType('GRAPH');
             if (graphMain) {
-                graphMain.el.style.right = -this.el.clientWidth + 'px';
+                graphMain.el.style.left = -this.el.clientWidth + 'px';
             }
 
             this._$toggleBtn.innerHTML = '隐<br />藏<br />>';
