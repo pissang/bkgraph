@@ -47,7 +47,10 @@
                 name = name || '谢霆锋';
                 document.title = name + '人物关系图谱';
 
-                var g = bkg.init('viewport', '../mock/person/' + name + '_f', function (g) {
+                var url = 'http://nj02-wd-knowledge45-ssd1l.nj02.baidu.com:8066/tupu/api/graph/v1?id=277';
+                // url = '../mock/person/' + name + '_f';
+
+                var g = bkg.init('viewport', url, function (g) {
                     var graphMain = g.getComponentByType('GRAPH');
                     g.addComponent(new bkg.SideBar());
                     g.addComponent(new bkg.HeaderBar());

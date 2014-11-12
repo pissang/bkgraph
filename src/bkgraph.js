@@ -32,15 +32,13 @@ define(function (require) {
      * @alias bkgraph~BKGraph
      * @param {HTMLElement} dom
      */
-    var BKGraph = function (dom, url, data, onsuccess) {
+    var BKGraph = function (dom, url, onsuccess) {
 
         this._container = dom;
 
         this._components = [];
 
         this._detailAPI = url;
-
-        this._tupuID = data;
 
         this._width = 0;
 
@@ -59,11 +57,11 @@ define(function (require) {
         var loading = new Loading();
         this.addComponent(loading);
 
+        var self = this;
+
         if (typeof(url) === 'string' && url.indexOf('http') == 0) {
 
-            var self = this;
-
-            jsonp(url, { id: data }, 'callback', function (data) {
+            jsonp(url, 'callback', function (data) {
                 data = self._fixData(data);
                 self._rawData = data;
 
@@ -74,10 +72,7 @@ define(function (require) {
         }
         else if (typeof(url) === 'string' && url !== '') {
                 
-            var self = this;
-            data = data || '';
-            
-            http.get(url + data, function (data) {
+            http.get(url, function (data) {
                 if (typeof(JSON) !== 'undefined' && JSON.parse) {
                     data = JSON.parse(data);
                 } else {
@@ -90,7 +85,8 @@ define(function (require) {
                 onsuccess && onsuccess(self);
             });
         } else {
-            var data = self._fixData(data);
+            var data = url;
+            data = this._fixData(data);
 
             this._rawData = data;
 
@@ -221,11 +217,11 @@ define(function (require) {
      * @memberOf bkgraph
      * @return {bkgraph~BKGraph}
      */
-    function init(dom, url, data, onsuccess) {
+    function init(dom, url, onsuccess) {
         if (typeof(dom) === 'string') {
             dom = document.getElementById(dom);
         }
-        var graph = new BKGraph(dom, url, data, onsuccess);
+        var graph = new BKGraph(dom, url, onsuccess);
 
         return graph;
     }
