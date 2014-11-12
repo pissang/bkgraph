@@ -1384,7 +1384,7 @@ define(function (require) {
         var rect = {
             x: (-layer0.position[0] + left) / layer0.scale[0],
             y: (-layer0.position[1] + top)/ layer0.scale[1],
-            width: zr.getWidth() / layer0.scale[0],
+            width: (zr.getWidth() - left) / layer0.scale[0],
             height: (zr.getHeight() - top - bottom) / layer0.scale[1]
         }
 
