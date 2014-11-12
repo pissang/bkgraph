@@ -893,7 +893,7 @@ define(function (require) {
         var sideBar = this._kgraph.getComponentByType('SIDEBAR');
         if (sideBar) {
 
-            jsonp(this._kgraph._detailAPI, { id: this._kgraph._tupuID, detail_id: n.id }, 'callback', function (data) {
+            jsonp(this._kgraph._detailAPI, { detail_id: n.id }, 'callback', function (data) {
 
                 sideBar.setData(data);
                 sideBar.show();
@@ -918,7 +918,7 @@ define(function (require) {
             //     data[name] = e.data[name];
             // }
             var self = this;
-            jsonp(this._kgraph._detailAPI, { id: this._kgraph._tupuID, detail_id: e.data.ID }, 'callback', function (data) {
+            jsonp(this._kgraph._detailAPI, { detail_id: e.data.ID }, 'callback', function (data) {
 
                 data.fromEntity = self._graph.getNodeById(data.fromID).data;
                 data.toEntity = self._graph.getNodeById(data.toID).data;
