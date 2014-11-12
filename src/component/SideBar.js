@@ -115,7 +115,7 @@ define(function (require) {
 
             var graphMain = this._kgraph.getComponentByType('GRAPH');
             if (graphMain) {
-                graphMain.el.style.right = '0px';
+                graphMain.el.style.left = '0px';
             }
 
             bkgLog('sidehide');

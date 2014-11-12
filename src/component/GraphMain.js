@@ -894,10 +894,9 @@ define(function (require) {
         if (sideBar) {
 
             jsonp(this._kgraph._detailAPI, { detail_id: n.id }, 'callback', function (data) {
-
                 sideBar.setData(data);
-                sideBar.show();
             });
+            sideBar.show();
         }
     };
 
