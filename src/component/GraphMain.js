@@ -82,6 +82,8 @@ define(function (require) {
         // 第一次展现的节点数，用于计算用户探索的百分比
         this._baseEntityCount = 0;
 
+        this._firstShowEntityDetail = true;
+
         this._parallax = null;
     };
 
@@ -295,7 +297,7 @@ define(function (require) {
         var noPosition = false;
         for (var i = 0; i < data.entities.length; i++) {
             var entity = data.entities[i];
-            var n = graph.addNode(entity.ID, entity);
+            var n = graph.addNode(entity.id, entity);
             var r = diff > 0 ?
                 (entity.hotValue - min) * (this.maxRadius - this.minRadius) / diff + this.minRadius
                 : (this.maxRadius + this.minRadius) / 2;
@@ -884,7 +886,7 @@ define(function (require) {
     /**
      * 在边栏中显示实体详细信息
      */
-    GraphMain.prototype.showEntityDetail = function (n) {
+    GraphMain.prototype.showEntityDetail = function (n, showSidebar) {
         var graph = this._graphLayout;
         if (typeof(n) === 'string') {
             n = graph.getNodeById(n);
@@ -896,7 +898,9 @@ define(function (require) {
             jsonp(this._kgraph._detailAPI, { detail_id: n.id }, 'callback', function (data) {
                 sideBar.setData(data);
             });
-            sideBar.show();
+            if (showSidebar) {
+                sideBar.show();
+            }
         }
     };
 
@@ -917,7 +921,7 @@ define(function (require) {
             //     data[name] = e.data[name];
             // }
             var self = this;
-            jsonp(this._kgraph._detailAPI, { detail_id: e.data.ID }, 'callback', function (data) {
+            jsonp(this._kgraph._detailAPI, { detail_id: e.data.id }, 'callback', function (data) {
 
                 data.fromEntity = self._graph.getNodeById(data.fromID).data;
                 data.toEntity = self._graph.getNodeById(data.toID).data;
@@ -1208,7 +1212,7 @@ define(function (require) {
     GraphMain.prototype._getEdgeByID = function (e) {
         var graph = this._graph;
         for (var i = 0; i < graph.edges.length; i++) {
-            if (graph.edges[i].data.ID === e) {
+            if (graph.edges[i].data.id === e) {
                 e = graph.edges[i];
                 return e;
             }
@@ -1508,7 +1512,10 @@ define(function (require) {
             self._lastHoverNode = null;
         });
         nodeEntity.bind('click', function () {
-            self.showEntityDetail(node);
+            self.showEntityDetail(node, self._firstShowEntityDetail);
+            if(self._firstShowEntityDetail) {
+                self._firstShowEntityDetail = false;
+            }
 
             if (self._lastClickNode !== node) {
                 self._lastClickNode = node;
@@ -1581,7 +1588,7 @@ define(function (require) {
                         // to entity
                         e.node2.id,
                         e.node2.data.layerCounter,
-                        e.data.ID,
+                        e.data.id,
                         e.isSpecial ? 1 : 0
                     ].join(',')
                 );
