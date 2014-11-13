@@ -241,7 +241,7 @@ define(function (require) {
             var $li = $img.parentNode;
             this._itemWidth = $li.clientWidth;
             var style = util.getStyle($li);
-            this._itemWidth += parseInt(style['margin-left']) + parseInt(style['margin-right']);
+            this._itemWidth += parseInt(style['marginLeft']) + parseInt(style['marginRight']);
         }
 
         this._loadImage();
