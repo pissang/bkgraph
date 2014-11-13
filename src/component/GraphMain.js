@@ -82,8 +82,6 @@ define(function (require) {
         // 第一次展现的节点数，用于计算用户探索的百分比
         this._baseEntityCount = 0;
 
-        this._firstShowEntityDetail = true;
-
         this._parallax = null;
     };
 
@@ -1512,10 +1510,7 @@ define(function (require) {
             self._lastHoverNode = null;
         });
         nodeEntity.bind('click', function () {
-            self.showEntityDetail(node, self._firstShowEntityDetail);
-            if(self._firstShowEntityDetail) {
-                self._firstShowEntityDetail = false;
-            }
+            self.showEntityDetail(node, true);
 
             if (self._lastClickNode !== node) {
                 self._lastClickNode = node;
