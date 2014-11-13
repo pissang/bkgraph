@@ -177,7 +177,7 @@ define(function (require) {
         var graphMain = this._kgraph.getComponentByType('GRAPH');
         if (graphMain) {
             graphMain.highlightNodeToMain(id);
-            graphMain.showEntityDetail(id);
+            graphMain.showEntityDetail(id, true);
             graphMain.moveToEntity(id);
 
             bkgLog('searchclick', id);
