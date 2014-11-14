@@ -278,7 +278,8 @@ define(function (require) {
         var zr = graphMain.getZR();
         this._$tip.style.display = 'block';
         this._$tip.className = 'bkg-tip bkg-tip-sidebar';
-        this._$tip.style.left = 20 + 'px';
+        this._$tip.style.left = 'auto';
+        this._$tip.style.right = 20 + 'px';
         this._$tip.style.top = zr.getHeight() / 2 - 100 + 'px';
 
         return function () {
