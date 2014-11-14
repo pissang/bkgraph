@@ -44,6 +44,10 @@ define({
     circleKeywords: '男友,女友,妻子,老婆,丈夫,老公,绯闻,暧昧,对象,干爹,真爱,夫妻,情侣,不和,私生子,艳照门,前夫,前妻,密友,中戏校友,情人',
 
     voteAPI: 'http://api.open.baidu.com/pae/component/api/vote',
-    voteProjectHuoying: 'ks_huoying'
+    voteProjectHuoying: 'ks_huoying',
+
+    layout: {
+        edgeFactorLayers: [10, 2, 0.5, 0.5, 0.5, 0.5]
+    }
     
 });
