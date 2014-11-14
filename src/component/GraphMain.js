@@ -173,7 +173,7 @@ define(function (require) {
                 // 限制拖拽的范围
                 position[0] = Math.max(-self._max[0] * scale[0] + zr.getWidth() - 500, position[0]);
                 position[1] = Math.max(-self._max[1] * scale[1] + zr.getHeight() - 300, position[1]);
-                position[0] = Math.min(-self._min[0] * scale[0] + 300, position[0]);
+                position[0] = Math.min(-self._min[0] * scale[0] + 500, position[0]);
                 position[1] = Math.min(-self._min[1] * scale[1] + 300, position[1]);
 
                 var isPanned = isNotAroundZero(position[0] - x0) || isNotAroundZero(position[1] - y0);
