@@ -394,11 +394,13 @@
   float: left;
   position: relative;
   height: 124px;
+  width: 91px;
 }
 .bkg-sidebar .bkg-relation-detail .bkg-relation-entity-to {
   float: right;
   position: relative;
   height: 124px;
+  width: 91px;
 }
 .bkg-sidebar .bkg-relation-detail .bkg-relation-name {
   position: absolute;
