@@ -406,8 +406,8 @@ define(function (require) {
         // 所有边都在 zlevel-0 层
         graph.eachEdge(function (e) {
             if (
-                e.node1.data.layerCounter <= 2 &&
-                e.node2.data.layerCounter <= 2
+                e.node1.data.layerCounter <= 1 &&
+                e.node2.data.layerCounter <= 1
             ) {
                 if (!e.isExtra) {
                     if (!e.node1.entity) {
@@ -415,14 +415,8 @@ define(function (require) {
                         this._createNodeEntity(e.node1);
                     }
                     if (!e.node2.entity) {
-                        // 第二层控制显示 2/3 的数量
-                        // if (e.node2.data.layerCounter == 2 && (this._baseEntityCount % 3 !== 0)) {
-                        //     this._baseEntityCount++;
-                        //     this._createNodeEntity(e.node2);
-                        // } else if (e.node2.data.layerCounter < 2) {
-                            this._baseEntityCount++;
-                            this._createNodeEntity(e.node2)
-                        // }
+                        this._baseEntityCount++;
+                        this._createNodeEntity(e.node2)
                     }
                 }
                 this._createEdgeEntity(e);
