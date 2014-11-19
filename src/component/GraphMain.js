@@ -328,10 +328,13 @@ define(function (require) {
                 mass: 1,
                 size: r
             };
+            // Fix the center node
+            if (entity.layerCounter === 0) {
+                n.layout.fixed = true;
+            }
             if (!entity.position) {
                 noPosition = true;
                 if (entity.layerCounter === 0) {
-                    n.layout.fixed = true;
                     n.layout.position = [
                         width / 2,
                         height / 2
@@ -341,30 +344,11 @@ define(function (require) {
             }
         }
 
-        max = -Infinity;
-        min = Infinity;
         for (var i = 0; i < data.relations.length; i++) {
             var relation = data.relations[i];
-            min = Math.min(min, relation.relationWeight);
-            max = Math.max(max, relation.relationWeight);
-        }
-        diff = max - min;
-
-        var wFactors = [10, 2, 0.5, 0.5, 0.5, 0.5];
-        for (var i = 0; i < data.relations.length; i++) {
-            var relation = data.relations[i];
-            if (relation.isExtra) {
-                continue;
+            if (!relation.isExtra) {
+                graph.addEdge(relation.fromID, relation.toID, relation);
             }
-            var w = diff > 0 ? 
-                (relation.relationWeight - min) / diff * (this.maxRelationWeight - this.minRelationWeight) + this.minRelationWeight
-                : (this.maxRelationWeight + this.minRelationWeight) / 2;
-            var e = graph.addEdge(relation.fromID, relation.toID, relation);
-            e.layout = {
-                // 边权重
-                weight: w * wFactors[e.node1.data.layerCounter]
-                // weight: e.node1.data.layerCounter === 0 ? 200 : w
-            };
         }
 
         // 加入补边
@@ -375,11 +359,12 @@ define(function (require) {
         }, this);
         for (var i = 0; i < data.relations.length; i++) {
             var relation = data.relations[i];
-            if (!relation.isExtra) {
-                continue;
+            if (relation.isExtra) {
+                var e = this._graph.addEdge(relation.fromID, relation.toID, relation);
+                if (e) {
+                    e.isExtra = true;
+                }
             }
-            var e = this._graph.addEdge(relation.fromID, relation.toID, relation);
-            e.isExtra = true;
         }
 
         if (noPosition) {
@@ -441,8 +426,8 @@ define(function (require) {
         // 所有边都在 zlevel-0 层
         graph.eachEdge(function (e) {
             if (
-                e.node1.data.layerCounter <= 2 &&
-                e.node2.data.layerCounter <= 2
+                e.node1.data.layerCounter <= 1 &&
+                e.node2.data.layerCounter <= 1
             ) {
                 if (!e.isExtra) {
                     if (!e.node1.entity) {
@@ -450,14 +435,8 @@ define(function (require) {
                         this._createNodeEntity(e.node1);
                     }
                     if (!e.node2.entity) {
-                        // 第二层控制显示 2/3 的数量
-                        // if (e.node2.data.layerCounter == 2 && (this._baseEntityCount % 3 !== 0)) {
-                        //     this._baseEntityCount++;
-                        //     this._createNodeEntity(e.node2);
-                        // } else if (e.node2.data.layerCounter < 2) {
-                            this._baseEntityCount++;
-                            this._createNodeEntity(e.node2)
-                        // }
+                        this._baseEntityCount++;
+                        this._createNodeEntity(e.node2)
                     }
                 }
                 this._createEdgeEntity(e);
@@ -570,6 +549,22 @@ define(function (require) {
                 n.layout.mass = n.degree() * 3;
             }
         });
+        var wFactors = [10, 2, 0.5, 0.5, 0.5, 0.5];
+        max = -Infinity;
+        min = Infinity;
+        graph.eachEdge(function (e) {
+            min = Math.min(min, e.data.relationWeight);
+            max = Math.max(max, e.data.relationWeight);
+        });
+        diff = max - min;
+        graph.eachEdge(function (e) {
+            var w = diff > 0 ? 
+                (e.data.relationWeight - min) / diff * (this.maxRelationWeight - this.minRelationWeight) + this.minRelationWeight
+                : (this.maxRelationWeight + this.minRelationWeight) / 2;
+            e.layout = {
+                weight: w * config.layout.edgeFactorLayers[e.node1.data.layerCounter]
+            };
+        }, this);
 
         forceLayout.init(graph, true);
         forceLayout.temperature = 0.04;
@@ -595,7 +590,7 @@ define(function (require) {
                 }
             }
         }
-       forceLayout.step(10);
+        forceLayout.step(10);
     };
 
     /**

@@ -108,7 +108,6 @@ define(function (require) {
             if (entity.layerCounter === 0) {
                 data.mainEntity = entity;
             }
-            entity.isSpecial = parseInt(entity.isSpecial);
         }
 
         return data;

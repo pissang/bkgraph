@@ -153,7 +153,7 @@ define(function (require) {
         var halfAvailableNode;
         // 查找合适的能够放引导的点
         graph.eachNode(function (node) {
-            if (node.entity && node.data.layerCounter == 2) {
+            if (node.entity && node.data.layerCounter == 1) {
                 var pos = node.entity.el.position;
                 var x = pos[0], y = pos[1];
                 halfAvailableNode = node;
