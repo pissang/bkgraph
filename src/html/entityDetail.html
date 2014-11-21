@@ -7,7 +7,7 @@
             <div class="bkg-circle"></div>
             <h4><a href="${sourceUrl}" title="基本信息 百度百科" target="_blank">基本信息 百度百科</a></h4>
         </div>
-        <img class="bkg-person-pic" src="${imageIcon}" />
+        <a class="bkg-person-pic" href="${sourceUrl}" target="_blank" title="${name}_百度百科"><img src="${imageIcon}" /></a>
         <div class="bkg-person-description">
             <!-- if: ${birthDate} -->
             <p><b>出生:</b> ${birthDate}</p>
@@ -19,14 +19,31 @@
         </div>
         <div style="clear:both;"></div>
     </div>
+
+    <div class="bkg-taglist">
+        <!-- if: ${singleTag} -->
+        <div class="bkg-tags">
+            <span>TA的那些事儿:</span>
+            <!-- for: ${singleTag} as ${tag}, ${index} -->
+            <a href="http://www.baidu.com/s?wd=${name}%20${tag.text}" title="${name} ${tag.text}_百度搜索" target="_blank">${tag.text}</a>
+            <!-- /for -->
+        </div>
+        <!-- /if -->
+        <!-- if: ${recommendation} -->
+        <div class="bkg-tags bkg-tags-highlight">
+            <p class="bkg-tag-title">星途相似的那些人儿</p>
+            <a href="http://www.baidu.com/s?wd=房祖名%20星二代" title="" target="_blank">房祖名(星二代)</a>
+        </div>
+        <!-- /if -->
+    </div>
+    <!-- if: ${representativeWork} -->
+    <!-- import: sidebarWorks -->
+    <!-- /if -->
     <!-- if: ${news} -->
     <!-- import: sidebarNews -->
     <!-- /if -->
     <!-- if: ${weibo} -->
     <!-- import: sidebarWeibo -->
-    <!-- /if -->
-    <!-- if: ${representativeWork} -->
-    <!-- import: sidebarWorks -->
     <!-- /if -->
     <div class="bkg-detail-bottom-line"></div>
     <div class="bkg-detail-bottom"></div>

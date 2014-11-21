@@ -340,10 +340,13 @@
     }
 
     .bkg-entity-detail-title {
+        margin-right: 17px;
+        border-top: 1px solid #1c7bcc;
         text-align: center;
-        position: relative;
-        top: -11px;
+
         h3 {
+            position: relative;
+            top: -11px;
             color: #fff;
             background-color: #053669;
             font-size: 20px;
@@ -364,6 +367,7 @@
 
     .bkg-sidebar-module {
         margin-bottom: 21px;
+        margin-right: 17px;
 
         padding-left: 10px;
         box-sizing: border-box;
@@ -397,15 +401,52 @@
                 }
             }
         }
+
     }
     
     .bkg-entity-detail,
     .bkg-relation-detail {
-        margin: 29px 17px 30px 10px;
+        margin: 29px 0 30px 10px;
 
         border-left: 1px solid #1c7bcc;
-        border-top: 1px solid #1c7bcc;
         position: relative;
+
+        .bkg-taglist {
+
+            margin-top: 18px;
+
+            .bkg-tags {
+
+                margin-bottom: 10px;
+                padding-left: 10px;
+                padding-right: 17px;
+
+                .bkg-tag-title {
+                    font-size: 16px;
+                    line-height: 34px;
+                }
+
+                a {
+                    border-radius: 4px;
+                    padding: 3px 5px;
+
+                    line-height: 30px;
+                    background-color: #0b71ca;
+                    color: #fff;
+
+                    &:hover {
+                        background-color: #06437f;
+                    }
+                }
+            }
+
+            .bkg-tags-highlight {
+                padding-top: 10px;
+                padding-bottom: 10px;
+
+                background-color: #085196;
+            }
+        }
     }
 
     .bkg-detail-bottom {
@@ -424,9 +465,15 @@
     /**人物基本信息模块**/
     .bkg-person-info {
         .bkg-person-pic {
+            padding: 0;
             width: 91px;
             height: 124px;
             float: left;
+
+            img {
+                width: 91px;
+                height: 124px;
+            }
         }
 
         .bkg-person-description {
@@ -439,7 +486,8 @@
     }
     
     .bkg-relation-detail {
-        .bkg-relation-description {
+        .bkg-relation-info {
+            position: relative;
             /*没有关系摘要的暂时替代方案*/
             margin-bottom: 15px;
 
@@ -461,38 +509,75 @@
                 right: 0px;
                 bottom: 0px;
             }
-            position: relative;
-        }
-        .bkg-relation-entity-from {
-            float: left;
-            position: relative;
-            height: 124px;
-            width: 91px;
-        }
-        .bkg-relation-entity-to {
-            float: right;
-            position: relative;
-            height: 124px;
-            width: 91px;
-        }
-        .bkg-relation-name {
-            position: absolute;
-            top: 60%;
-            left: 50%;
-            width: 80px;
-            height: 4px;
-            margin-left: -40px;
 
-            border-radius: 3px;
-            background-color: #0e90fe;
-            text-align: center;
+            .bkg-relation-entity {
 
-            span {
                 position: relative;
-                top: -30px;
-                font-size: 13px;
-                display: inline-block;
-                line-height: 14px;
+
+                .bkg-relation-entity-from,
+                .bkg-relation-entity-to {
+
+                    position: relative;
+                    height: 124px;
+                    width: 91px;
+
+                    a {
+                        display: inline-block;
+
+                        padding: 0;
+                        width: 91px;
+                        height: 124px;
+
+                        color: #fff;
+
+                        img {
+                            border: none;
+                            width: 91px;
+                            height: 124px;
+                        }
+                    }
+                }
+                .bkg-relation-entity-from {
+                    float: left;
+                }
+                .bkg-relation-entity-to {
+                    float: right;
+                }
+                .bkg-relation-name {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    width: 80px;
+                    height: 4px;
+                    margin-left: -40px;
+
+                    border-radius: 3px;
+                    background-color: #0e90fe;
+                    text-align: center;
+
+                    a {
+                        position: relative;
+                        top: -24px;
+                        color: #fff;
+                        font-size: 13px;
+                        display: inline-block;
+                        line-height: 14px;
+
+                        &:hover {
+                            background: transparent;
+                            color: #fff;
+                            text-decoration: underline;
+                        }
+                    }
+                }
+            }
+
+            .bkg-relation-description {
+                margin-top: 12px;
+
+                p {
+                    color: #97cdfa;
+                }
             }
         }
     }
@@ -623,6 +708,11 @@
             .bkg-title {
                 margin-left: 13px;
             }
+        }
+
+        .bkg-mailuo-title {
+            font-size: 16px;
+            line-height: 34px;
         }
     }
     

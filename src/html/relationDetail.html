@@ -2,34 +2,64 @@
     <div class="bkg-entity-detail-title">
         <h3>${fromEntity.name}&${toEntity.name}</h3>
     </div>
-    <div class="bkg-relation-description bkg-sidebar-module">
+    <div class="bkg-relation-info bkg-sidebar-module">
         <div class="bkg-module-title">
             <div class="bkg-circle"></div>
             <h4><a href="http://www.baidu.com/s?wd=${fromEntity.name}%20${toEntity.name}%20${relationName}" title="${fromEntity.name}${toEntity.name} ${relationName}_百度搜索" target="_blank">${fromEntity.name}${toEntity.name} ${relationName|truncate(6)}_百度搜索</a></h4>
         </div>
-        <div class="bkg-relation-entity-from">
-            <img src="${fromEntity.imageIcon}" alt="">
-            <h5>${fromEntity.name}</h5>
+        <div class="bkg-relation-entity">
+            <div class="bkg-relation-entity-from">
+                <a href="http://www.baidu.com/s?wd=${fromEntity.name}" target="_blank" title="${fromEntity.name}_百度搜索">
+                    <img src="${fromEntity.imageIcon}" alt="">
+                    <h5>${fromEntity.name}</h5>
+                </a>
+            </div>
+            <div class="bkg-relation-name">
+                <a href="http://www.baidu.com/s?wd=${fromEntity.name}%20${toEntity.name}%20${relationName}" title="${fromEntity.name}${toEntity.name} ${relationName}_百度搜索" target="_blank"><span>${relationName}</span></a>
+            </div>
+            <div class="bkg-relation-entity-to">
+                <a href="http://www.baidu.com/s?wd=${toEntity.name}" target="_blank" title="${toEntity.name}_百度搜索">
+                    <img src="${toEntity.imageIcon}" alt="">
+                    <h5>${toEntity.name}</h5>
+                </a>
+            </div>
+            <div style="clear:both"></div>
         </div>
-        <div class="bkg-relation-name">
-            <span>${relationName}</span>
+        <!-- if: ${relationExplaination} -->
+        <div class="bkg-relation-description">
+            <p>
+                <b>关系简介:</b> ${relationExplaination.text|truncate(60)}
+                <a href="${relationExplaination.url}" class="bkg-more" title="查看详情" target="_blank">查看详情>></a>
+            </p>
         </div>
-        <div class="bkg-relation-entity-to">
-            <img src="${toEntity.imageIcon}" alt="">
-            <h5>${toEntity.name}</h5>
-        </div>
-        <div style="clear:both"></div>
+        <!-- /if -->
     </div>
+
+    <div class="bkg-taglist">
+        <!-- if: ${pairTag} -->
+        <div class="bkg-tags">
+            <span>TA俩那些事儿:</span>
+            <!-- for: ${pairTag} as ${tag}, ${index} -->
+            <a href="http://www.baidu.com/s?wd=${fromEntity.name}%20${toEntity.name}%20${tag.text}" title="${fromEntity.name} ${toEntity.name} ${tag.text}_百度搜索" target="_blank">${tag.text}</a>
+            <!-- /for -->
+        </div>
+        <!-- /if -->
+        <!-- if: ${recommendation} -->
+        <div class="bkg-tags bkg-tags-highlight">
+            <p class="bkg-tag-title">${recommendation.title}</p>
+            <!-- for: ${recommendation.content} as ${rec}, ${index} -->
+            <a href="http://www.baidu.com/s?wd=${rec.fromName}%20${rec.toName}%20${rec.relationName}" title="${rec.fromName} ${rec.toName} ${rec.relationName}_百度搜索" target="_blank">${rec.fromName}-${rec.toName}</a>
+            <!-- /for -->
+        </div>
+        <!-- /if -->
+    </div>
+
     <!-- if: ${eventMaiLuo} -->
         <!-- import: sidebarMailuo -->
-        <!-- if: ${news} -->
-            <!-- import: sidebarRelationNews -->
-        <!-- /if -->
-    <!-- else -->
-        <!-- 没有关系摘要的暂时替代方案 -->
-        <!-- if: ${news} -->
-            <!-- import: sidebarRelationNews2 -->
-        <!-- /if -->
+    <!-- /if -->
+
+    <!-- if: ${news} -->
+        <!-- import: sidebarRelationNews -->
     <!-- /if -->
     <div class="bkg-detail-bottom-line"></div>
     <div class="bkg-detail-bottom"></div>
