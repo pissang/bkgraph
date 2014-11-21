@@ -523,11 +523,11 @@ define(function (require) {
         forceLayout.preventNodeEdgeOverlap = true;
 
         graph.eachNode(function (n) {
-            if (n.data.layerCounter === 1) {
+            // if (n.data.layerCounter === 1) {
                 n.layout.mass = 10;
-            } else {
-                n.layout.mass = n.degree() * 3;
-            }
+            // } else {
+            //     n.layout.mass = n.degree() * 3;
+            // }
         });
         var wFactors = [10, 2, 0.5, 0.5, 0.5, 0.5];
         max = -Infinity;
