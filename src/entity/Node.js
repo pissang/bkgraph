@@ -10,11 +10,12 @@ define(function (require) {
     var vec2 = require('zrender/tool/vector');
 
     var util = require('../util/util');
+    var config = require('../config');
 
     var baseRadius = 50;
 
     var defaultImage = new Image;
-    defaultImage.src = 'img/default-avatar.png';
+    defaultImage.src = config.defaultNodeImage;
 
     var NodeEntity = function (opts) {
 

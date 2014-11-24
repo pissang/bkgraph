@@ -1,6 +1,12 @@
 define(function() {
 
+    var config = require('../config');
+
     return function(fm, title, href){
+        if (config.isPlat) {
+            return;
+        }
+
         var url = 'http://nsclick.baidu.com/v.gif?pid=201&pj=www';
         var data = {
             fm: 'zhishitupu' + fm,

@@ -48,6 +48,10 @@ define({
 
     layout: {
         edgeFactorLayers: [20, 4, 0.5, 0.5, 0.5, 0.5]
-    }
+    },
+
+    defaultNodeImage: 'img/default-avatar.png',
+
+    isPlat: false
     
 });

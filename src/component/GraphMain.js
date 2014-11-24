@@ -1636,7 +1636,9 @@ define(function (require) {
             headerBarComponent.setExplorePercent(this.getExplorePercent());
         }
 
-        this._saveStorage();
+        if (!config.isPlat) {
+            this._saveStorage();
+        }
     }
 
     GraphMain.prototype._culling = function () {
