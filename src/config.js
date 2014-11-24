@@ -47,7 +47,7 @@ define({
     voteProjectHuoying: 'ks_huoying',
 
     layout: {
-        edgeFactorLayers: [10, 2, 0.5, 0.5, 0.5, 0.5]
+        edgeFactorLayers: [20, 4, 0.5, 0.5, 0.5, 0.5]
     }
     
 });
