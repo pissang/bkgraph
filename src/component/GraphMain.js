@@ -206,7 +206,10 @@ define(function (require) {
                         var time = new Date().getTime();
                         // 至少隔两秒发送拖拽日志
                         if ((time - currentTime) >= 2000 && self._mouseDown) {
-                            bkgLog('pan', position[0] + ',' + position[1]);
+                            bkgLog({
+                                type: 'zhishitupupan',
+                                target: position[0] + ',' + position[1]
+                            });
                             currentTime = time;
                         }
                     }
@@ -214,7 +217,10 @@ define(function (require) {
                         var time = new Date().getTime();
                         // 至少隔两秒发送拖拽日志
                         if ((time - currentTime) >= 2000) {
-                            bkgLog('zoom', scale[0]);
+                            bkgLog({
+                                type: 'zhishitupuzoom',
+                                target: scale[0]
+                            });
                             currentTime = time;
                         }
                     }
@@ -382,7 +388,23 @@ define(function (require) {
                 title.push(node.id, node.data.layerCounter);
             }
         });
-        bkgLog('se', title.join(','));
+
+        var nodeNum = 200; // 每条日志中传的最大节点个数
+        var sendLogTimes = Math.ceil(title.length / nodeNum); // 发送次数
+        var logParam = [];
+        for (var times = 0; times < sendLogTimes; times++) {
+            logParam = [];
+            var len = (times + 1) * nodeNum > title.length ? title.length : (times + 1) * nodeNum;
+            for (var j = times * nodeNum; j < len; j++) {
+                logParam.push(title[j]);
+            }
+
+            bkgLog({
+                type: 'zhishitupuse',
+                target: logParam.join(','),
+                page: sendLogTimes + '-' + (times + 1)
+            });
+        }
     };
 
     GraphMain.prototype.render = function () {
@@ -892,7 +914,7 @@ define(function (require) {
                 sideBar.setData(data);
             });
             if (showSidebar) {
-                sideBar.show();
+                sideBar.show(n.id + ',' + n.data.layerCounter);
             }
         }
     };
@@ -920,7 +942,18 @@ define(function (require) {
                 data.toEntity = self._graph.getNodeById(data.toID).data;
 
                 sideBar.setData(data, true);
-                sideBar.show();
+                var logParam = [
+                                // from entity
+                                e.node1.id,
+                                e.node1.data.layerCounter,
+                                // to entity
+                                e.node2.id,
+                                e.node2.data.layerCounter,
+                                e.data.id,
+                                e.isExtra ? 1 : 0,
+                                e.isSpecial ? 1 : 0
+                            ].join(',');
+                sideBar.show(logParam);
 
             });
         }
@@ -1153,6 +1186,13 @@ define(function (require) {
                 this._createNodeEntity(other);
 
                 logTitle.push(other.id, other.data.layerCounter);
+
+                for (var j = 0, inEdgesLen = other.inEdges.length; j < inEdgesLen; j++) {
+                    var inEdge = other.inEdges[j];
+                    if (inEdge.node1 === node) {
+                        logTitle.push(inEdge.data.id);
+                    }
+                }
             }
             if (!e.entity) {
                 this._createEdgeEntity(e);
@@ -1165,7 +1205,11 @@ define(function (require) {
         }
 
         if (logTitle.length) {
-            bkgLog('expand', logTitle.join(','));
+            bkgLog({
+                type: 'zhishitupuexpand',
+                target: logTitle.join(','),
+                area: 'entity'
+            });
         }
 
         this._syncHeaderBarExplorePercent();
@@ -1490,7 +1534,11 @@ define(function (require) {
                 self.hoverNode(node);
                 self.expandNode(node);
 
-                bkgLog('entityhover', [node.id, node.data.layerCounter].join(','));
+                bkgLog({
+                    type: 'zhishitupuhover',
+                    target: [node.id, node.data.layerCounter].join(','),
+                    area: 'entity'
+                });
             }
             self._lastHoverNode = node;
         });
@@ -1512,7 +1560,11 @@ define(function (require) {
                 self._syncOutTipEntities();
                 self.highlightNodeAndAdjeceny(node);
 
-                bkgLog('entityclick', node.id + ',' + node.data.layerCounter);
+                bkgLog({
+                    type: 'zhishitupuclick',
+                    target: node.id + ',' + node.data.layerCounter,
+                    area: 'entity'
+                });
                 
                 self._activeNode = node;
             }
@@ -1569,19 +1621,21 @@ define(function (require) {
             edgeEntity.bind('click', function () {
                 this.showRelationDetail(e);
                 this.highlightEdge(e);
-                bkgLog(
-                    'edgeclick', 
-                    [
-                        // from entity
-                        e.node1.id,
-                        e.node1.data.layerCounter,
-                        // to entity
-                        e.node2.id,
-                        e.node2.data.layerCounter,
-                        e.data.id,
-                        e.isSpecial ? 1 : 0
-                    ].join(',')
-                );
+                bkgLog({
+                    type: 'zhishitupuclick',
+                    target: [
+                                // from entity
+                                e.node1.id,
+                                e.node1.data.layerCounter,
+                                // to entity
+                                e.node2.id,
+                                e.node2.data.layerCounter,
+                                e.data.id,
+                                e.isExtra ? 1 : 0,
+                                e.isSpecial ? 1 : 0
+                            ].join(','),
+                    area: 'relation'
+                });
 
             }, this);
             edgeEntity.bind('mouseover', function () {

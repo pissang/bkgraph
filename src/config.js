@@ -47,7 +47,7 @@ define({
     voteProjectHuoying: 'ks_huoying',
 
     layout: {
-        edgeFactorLayers: [20, 4, 0.5, 0.5, 0.5, 0.5]
+        edgeFactorLayers: [65, 20, 2.5, 2.5, 2.5, 2.5]
     },
 
     defaultNodeImage: 'img/default-avatar.png',

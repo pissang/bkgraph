@@ -109,7 +109,10 @@ define(function (require) {
         window.open(url, 'newwindow', 'height=' + height + ',width=' + width + ',left=' + left + ',top=' + top); 
 
         // Log weibo level
-        bkgLog('weibo', idx.toString());
+        bkgLog({
+            type: 'zhishitupuweibo',
+            target: idx.toString()
+        });
     }
 
     zrUtil.inherits(HeaderBar, Component);

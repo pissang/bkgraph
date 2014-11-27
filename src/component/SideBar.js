@@ -68,8 +68,20 @@ define(function (require) {
     SideBar.prototype.render = function (data, isRelation) {
         if (isRelation) {
             this._$content.innerHTML = renderRelationDetail(data);
+            this._logParam = [
+                                // from entity
+                                data.fromID,
+                                data.fromEntity.layerCounter,
+                                // to entity
+                                data.toID,
+                                data.toEntity.layerCounter,
+                                data.id,
+                                data.isExtra ? 1 : 0,
+                                data.isSpecial ? 1 : 0
+                            ].join(',');
         } else {
             this._$content.innerHTML = renderEntityDetail(data);
+            this._logParam = data.id + ',' + data.layerCounter;
         }
 
         this._scrollbar.scrollTo(0);
@@ -85,7 +97,7 @@ define(function (require) {
     /**
      * 显示边栏
      */
-    SideBar.prototype.show = function () {
+    SideBar.prototype.show = function (logParam) {
         if (util.hasClass(this.el, 'hidden')) {
             util.removeClass(this.el, 'hidden');
 
@@ -97,20 +109,24 @@ define(function (require) {
 
             this._$toggleBtn.innerHTML = '隐<br />藏<br />>';
 
-            bkgLog('sideshow');
-
             // 搜索栏自动隐藏
             var searchBar = this._kgraph.getComponentByType('SEARCHBAR');
             if (searchBar) {
-                searchBar.hide();
+                searchBar.hide(logParam);
             }
         }
+
+        bkgLog({
+            type: 'zhishitupushow',
+            target: logParam,
+            area: 'sidebar'
+        });
     };
 
     /**
      * 隐藏边栏
      */
-    SideBar.prototype.hide = function () {
+    SideBar.prototype.hide = function (logParam) {
         if (!util.hasClass(this.el, 'hidden')) {
             util.addClass(this.el, 'hidden');
 
@@ -119,7 +135,11 @@ define(function (require) {
                 graphMain.el.style.left = '0px';
             }
 
-            bkgLog('sidehide');
+            bkgLog({
+                type: 'zhishitupuhide',
+                target: logParam,
+                area: 'sidebar'
+            });
 
             this._$toggleBtn.innerHTML = '显<br />示<br /><';
         }
@@ -128,19 +148,19 @@ define(function (require) {
     /**
      * 切换边栏的显示隐藏
      */
-    SideBar.prototype.toggle = function () {
+    SideBar.prototype.toggle = function (logParam) {
         if (util.hasClass(this.el, 'hidden')) {
-            this.show();
+            this.show(logParam);
         }
         else {
-            this.hide();
+            this.hide(logParam);
         }
     };
 
     SideBar.prototype._dispatchClick= function (e) {
         var target = e.target || e.srcElement;
         if (Sizzle.matchesSelector(target, '.bkg-toggle')) {
-            this.toggle();
+            this.toggle(this._logParam);
         }
 
         var current = target;
@@ -149,7 +169,16 @@ define(function (require) {
         }
 
         if (current) {
-            bkgLog('link', current.getAttribute('title'), current.getAttribute('href'));
+            var linkArea = current.getAttribute('data-area');
+            bkgLog({
+                type: 'zhishitupulink',
+                target: [
+                            this._logParam,
+                            current.getAttribute('title'),
+                            current.getAttribute('href')
+                        ].join(','),
+                area: 'sidebar-' + linkArea
+            });
         }
     };
 

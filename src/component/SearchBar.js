@@ -67,7 +67,10 @@ define(function (require) {
         util.addClass(this.el, 'hidden');
         this._$toggleBtn.innerHTML = '搜 索<span class="arrow"></span>';
 
-        bkgLog('searchhide');
+        bkgLog({
+            type: 'hide',
+            area: 'searchbar'
+        });
     }
 
     /**
@@ -82,7 +85,10 @@ define(function (require) {
             sideBar.hide();
         }
         
-        bkgLog('searchshow');
+        bkgLog({
+            type: 'show',
+            area: 'searchbar'
+        });
     }
 
     /**
@@ -118,6 +124,12 @@ define(function (require) {
         util.removeClass(this._$prevPageBtn, 'disable');
 
         this._loadImage();
+
+        bkgLog({
+            type: 'click',
+            target: 'next',
+            area: 'searchbar'
+        });
     }
     /**
      * 人物列表翻到上一页
@@ -141,6 +153,12 @@ define(function (require) {
 
 
         this._loadImage();
+
+        bkgLog({
+            type: 'click',
+            target: 'pre',
+            area: 'searchbar'
+        });
     }
 
     /**
@@ -167,7 +185,10 @@ define(function (require) {
 
         this._updateSlider();
 
-        bkgLog('searchinput', name);
+        bkgLog({
+            type: 'search',
+            target: name
+        });
     }
 
     /**
@@ -180,7 +201,11 @@ define(function (require) {
             graphMain.showEntityDetail(id, true);
             graphMain.moveToEntity(id);
 
-            bkgLog('searchclick', id);
+            bkgLog({
+                type: 'click',
+                target: id,
+                area: 'searchbar'
+            });
         }
     }
 
