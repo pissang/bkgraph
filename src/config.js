@@ -47,7 +47,7 @@ define({
     voteProjectHuoying: 'ks_huoying',
 
     layout: {
-        layerDistance: [0, 100, 300, 300, 300, 300, 300],
+        layerDistance: [0, 150, 300, 300, 300, 300, 300],
         layerConstraint: 0.3
     },
 

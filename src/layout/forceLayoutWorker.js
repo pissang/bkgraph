@@ -295,7 +295,7 @@ define(function __echartsForceLayoutWorker(require) {
     };
 
     ForceLayout.prototype.edgeToNodeRepulsionFactor = function (mass, d, k) {
-        return k * mass / d;
+        return k * mass / Math.sqrt(d);
     };
 
     ForceLayout.prototype.attractionFactor = function (w, d, k) {

@@ -576,7 +576,7 @@ define(function (require) {
             };
         }, this);
 
-        forceLayout.init(graph, false);
+        forceLayout.init(graph, true);
         forceLayout.temperature = 0.04;
         this._layouting = true;
         var self = this;
