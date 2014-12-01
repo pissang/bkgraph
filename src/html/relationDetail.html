@@ -37,7 +37,7 @@
 
     <div class="bkg-taglist">
         <!-- if: ${pairTag} -->
-        <div class="bkg-tags">
+        <div class="bkg-tags bkg-tags-highlight">
             <span>TA俩那些事儿:</span>
             <!-- for: ${pairTag} as ${tag}, ${index} -->
             <a href="http://www.baidu.com/s?wd=${fromEntity.name}%20${toEntity.name}%20${tag.text}" title="${fromEntity.name} ${toEntity.name} ${tag.text}_百度搜索" data-area="relation-pairTag" target="_blank">${tag.text}</a>
@@ -45,11 +45,21 @@
         </div>
         <!-- /if -->
         <!-- if: ${recommendation} -->
-        <div class="bkg-tags bkg-tags-highlight">
+        <div class="bkg-rec-tags">
             <p class="bkg-tag-title">${recommendation.title}</p>
-            <!-- for: ${recommendation.content} as ${rec}, ${index} -->
-            <a href="http://www.baidu.com/s?wd=${rec.fromName}%20${rec.toName}%20${rec.relationName}" title="${rec.fromName} ${rec.toName} ${rec.relationName}_百度搜索" data-area="relation-recommendation" target="_blank">${rec.fromName}-${rec.toName}</a>
-            <!-- /for -->
+            <ul>
+                <!-- for: ${recommendation.content} as ${rec}, ${index} -->
+                <li>
+                    <a class="bkg-rec-tag-pic" href="http://www.baidu.com/s?wd=${rec.fromName}%20${rec.toName}%20${rec.relationName}" target="_blank" data-area="relation-recommendation" title="${rec.fromName} ${rec.toName} ${rec.relationName}_百度搜索">
+                        <img src="http://t10.baidu.com/it/u=1891128588,277331666&amp;fm=58" alt="">
+                        <h5>${rec.fromName}${rec.toName}</h5>
+                    </a>
+                    <a href="http://www.baidu.com/s?wd=${rec.fromName}%20${rec.toName}%20${rec.relationName}" target="_blank" data-area="relation-recommendation" title="${rec.fromName} ${rec.toName} ${rec.relationName}_百度搜索">
+                        <span>${rec.relationName|truncate(10)}</span>
+                    </a>
+                </li>
+                <!-- /for -->
+            </ul>
         </div>
         <!-- /if -->
     </div>

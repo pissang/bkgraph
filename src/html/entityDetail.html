@@ -5,7 +5,7 @@
     <div class="bkg-sidebar-module bkg-person-info">
         <div class="bkg-module-title">
             <div class="bkg-circle"></div>
-            <h4><a href="${sourceUrl}" title="基本信息 百度百科" data-area="entity-baike" target="_blank">基本信息 百度百科</a></h4>
+            <h4><a href="${sourceUrl}" title="基本信息 百度百科" data-area="entity-baike" target="_blank">基本信息</a></h4>
         </div>
         <a class="bkg-person-pic" href="${sourceUrl}" data-area="entity-baike" target="_blank" title="${name}_百度百科"><img src="${imageIcon}" /></a>
         <div class="bkg-person-description">
@@ -22,7 +22,7 @@
 
     <div class="bkg-taglist">
         <!-- if: ${singleTag} -->
-        <div class="bkg-tags">
+        <div class="bkg-tags bkg-tags-highlight">
             <span>TA的那些事儿:</span>
             <!-- for: ${singleTag} as ${tag}, ${index} -->
             <a href="http://www.baidu.com/s?wd=${name}%20${tag.text}" title="${name} ${tag.text}_百度搜索" data-area="entity-singleTag" target="_blank">${tag.text}</a>
@@ -30,9 +30,21 @@
         </div>
         <!-- /if -->
         <!-- if: ${recommendation} -->
-        <div class="bkg-tags bkg-tags-highlight">
-            <p class="bkg-tag-title">星途相似的那些人儿</p>
-            <a href="http://www.baidu.com/s?wd=房祖名%20星二代" title="" data-area="entity-recommendation" target="_blank">房祖名(星二代)</a>
+        <div class="bkg-rec-tags">
+            <p class="bkg-tag-title">您可能感兴趣那些人儿</p>
+            <ul>
+                <!-- for: ${recommendation.content} as ${recTag}, ${index} -->
+                <li>
+                    <a href="http://www.baidu.com/s?wd=${recTag.name}%20${recTag.reason}" target="_blank" data-area="entity-recommendation" title="${recTag.name} ${recTag.reason}_百度搜索">
+                        <img src="${recTag.image}" alt="">
+                        <h5>${recTag.name}</h5>
+                    </a>
+                    <a href="http://www.baidu.com/s?wd=${recTag.name}%20${recTag.reason}" target="_blank" data-area="entity-recommendation" title="${recTag.name} ${recTag.reason}_百度搜索">
+                        <span>${recTag.reason|truncate(10)}</span>
+                    </a>
+                </li>
+                <!-- /for -->
+            </ul>
         </div>
         <!-- /if -->
     </div>
