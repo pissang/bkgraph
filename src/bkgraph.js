@@ -59,7 +59,7 @@ define(function (require) {
 
         var self = this;
 
-        if (typeof(url) === 'string' && url.indexOf('http') == 0) {
+        // if (typeof(url) === 'string' && url.indexOf('http') == 0) {
 
             jsonp(url, 'callback', function (data) {
                 data = self._fixData(data);
@@ -69,31 +69,31 @@ define(function (require) {
 
                 onsuccess && onsuccess(self);
             });
-        }
-        else if (typeof(url) === 'string' && url !== '') {
+        // }
+        // else if (typeof(url) === 'string' && url !== '') {
                 
-            http.get(url, function (data) {
-                if (typeof(JSON) !== 'undefined' && JSON.parse) {
-                    data = JSON.parse(data);
-                } else {
-                    data = eval('(' + data + ')');
-                }
-                data = self._fixData(data);
-                self._rawData = data;
+        //     http.get(url, function (data) {
+        //         if (typeof(JSON) !== 'undefined' && JSON.parse) {
+        //             data = JSON.parse(data);
+        //         } else {
+        //             data = eval('(' + data + ')');
+        //         }
+        //         data = self._fixData(data);
+        //         self._rawData = data;
 
-                self.initialize(data);
-                onsuccess && onsuccess(self);
-            });
-        } else {
-            var data = url;
-            data = this._fixData(data);
+        //         self.initialize(data);
+        //         onsuccess && onsuccess(self);
+        //     });
+        // } else {
+        //     var data = url;
+        //     data = this._fixData(data);
 
-            this._rawData = data;
+        //     this._rawData = data;
 
-            this.initialize(data);
+        //     this.initialize(data);
 
-            onsuccess && onsuccess(this);
-        }
+        //     onsuccess && onsuccess(this);
+        // }
     }
 
     BKGraph.prototype._fixData = function (data) {

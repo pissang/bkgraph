@@ -281,10 +281,11 @@ define(function __echartsForceLayoutWorker(require) {
 
         this.bbox = new ArrayCtor(4);
 
+        this.layerDistance = [0];
+        this.layerConstraint = 0;
+
         this._rootRegion = new Region();
         this._rootRegion.centerOfMass = vec2.create();
-
-        this._massArr = null;
 
         this._k = 0;
     }
@@ -301,39 +302,30 @@ define(function __echartsForceLayoutWorker(require) {
         return w * d / k;
     };
 
-    ForceLayout.prototype.initNodes = function(positionArr, massArr, sizeArr) {
+    ForceLayout.prototype.initNodes = function(nodes) {
 
         this.temperature = 1.0;
 
-        var nNodes = positionArr.length / 2;
+        var nNodes = nodes.length;
         this.nodes.length = 0;
-        var haveSize = typeof(sizeArr) !== 'undefined';
 
         for (var i = 0; i < nNodes; i++) {
             var node = new GraphNode();
-            node.position[0] = positionArr[i * 2];
-            node.position[1] = positionArr[i * 2 + 1];
-            node.mass = massArr[i];
-            if (haveSize) {
-                node.size = sizeArr[i];
-            }
+            node.mass = nodes[i].mass;
+            node.size = nodes[i].size;
+            node.layer = nodes[i].layer;
             this.nodes.push(node);
-        }
-
-        this._massArr = massArr;
-        if (haveSize) {
-            this._sizeArr = sizeArr;
         }
     };
 
-    ForceLayout.prototype.initEdges = function(edgeArr, edgeWeightArr) {
-        var nEdges = edgeArr.length / 2;
+    ForceLayout.prototype.initEdges = function(edges) {
+        var nEdges = edges.length;
         this.edges.length = 0;
-        var edgeHaveWeight = typeof(edgeWeightArr) !== 'undefined';
 
         for (var i = 0; i < nEdges; i++) {
-            var sIdx = edgeArr[i * 2];
-            var tIdx = edgeArr[i * 2 + 1];
+            var e = edges[i];
+            var sIdx = e.node1Index;
+            var tIdx = e.node2Index;
             var sNode = this.nodes[sIdx];
             var tNode = this.nodes[tIdx];
 
@@ -343,10 +335,7 @@ define(function __echartsForceLayoutWorker(require) {
             sNode.outDegree++;
             tNode.inDegree++;
             var edge = new GraphEdge(sNode, tNode);
-
-            if (edgeHaveWeight) {
-                edge.weight = edgeWeightArr[i];
-            }
+            edge.weight = e.weight;
 
             this.edges.push(edge);
         }
@@ -406,6 +395,9 @@ define(function __echartsForceLayoutWorker(require) {
         if (this.gravity > 0) {
             this.updateGravityForce();
         }
+        if (this.layerConstraint > 0) {
+            this.updateLayerConstraintForce();
+        }
 
         this.updateEdgeForce();
 
@@ -429,11 +421,34 @@ define(function __echartsForceLayoutWorker(require) {
             vec2.scale(node.force, node.force, 1 / 30);
 
             // contraint force
-            var df = vec2.len(node.force) + 0.01;
-            var scale = Math.min(df, 1.0) / df;
+            var df = vec2.len(node.force) + 0.1;
+            var scale = Math.min(df, 500.0) / df;
             vec2.scale(node.force, node.force, scale);
 
-            vec2.add(node.position, node.position, node.force);
+            vec2.add(speed, speed, node.force);
+            vec2.scale(speed, speed, this.temperature);
+
+            // Prevent swinging
+            // Limited the increase of speed up to 100% each step
+            // TODO adjust by nodes number
+            // TODO First iterate speed control
+            vec2.sub(v, speed, node.speedPrev);
+            var swing = vec2.len(v);
+            if (swing > 0) {
+                vec2.scale(v, v, 1 / swing);
+                var base = vec2.len(node.speedPrev);
+                if (base > 0) {
+                    swing = Math.min(swing / base, this.maxSpeedIncrease) * base;
+                    vec2.scaleAndAdd(speed, node.speedPrev, v, swing);
+                }
+            }
+
+            // constraint speed
+            var ds = vec2.len(speed);
+            var scale = Math.min(ds, 100.0) / (ds + 0.1);
+            vec2.scale(speed, speed, scale);
+
+            vec2.add(node.position, node.position, speed);
         }
     };
 
@@ -458,6 +473,12 @@ define(function __echartsForceLayoutWorker(require) {
     ForceLayout.prototype.updateGravityForce = function () {
         for (var i = 0; i < this.nodes.length; i++) {
             this.applyNodeGravity(this.nodes[i]);
+        }
+    };
+
+    ForceLayout.prototype.updateLayerConstraintForce = function () {
+        for (var i = 0; i < this.nodes.length; i++) {
+            this.applyNodeLayerConstraint(this.nodes[i]);
         }
     };
 
@@ -597,24 +618,27 @@ define(function __echartsForceLayoutWorker(require) {
             // vec2.sub(v, this._rootRegion.centerOfMass, node.position);
             // vec2.negate(v, node.position);
             vec2.sub(v, this.center, node.position);
-            if (this.width > this.height) {
-                // Stronger gravity on y axis
-                v[1] *= this.width / this.height;
-            }
-            else {
-                // Stronger gravity on x axis
-                v[0] *= this.height / this.width;
-            }
             var d = vec2.len(v) / 100;
             
             if (this.strongGravity) {
-                vec2.scaleAndAdd(node.force, node.force, v, d * this.gravity * node.mass);
+                vec2.scaleAndAdd(node.force, node.force, v, d * this.gravity);
             }
             else {
                 vec2.scaleAndAdd(node.force, node.force, v, this.gravity * node.mass / (d + 1));
             }
         };
     })();
+
+    ForceLayout.prototype.applyNodeLayerConstraint = (function () {
+        var v = vec2.create();
+        return function (node) {
+            vec2.sub(v, this.center, node.position);
+            var d = vec2.len(v) + 1e-3;
+            vec2.scale(v, v, 1 / d);
+            d -= this.layerDistance[node.layer];
+            vec2.scaleAndAdd(node.force, node.force, v, d * d * this.layerConstraint * node.mass);
+        }
+    }) ();
 
     ForceLayout.prototype.applyEdgeToNodeRepulsion = (function () {
         var v12 = vec2.create();
@@ -624,7 +648,9 @@ define(function __echartsForceLayoutWorker(require) {
             var n1 = e.node1;
             var n2 = e.node2;
 
-            if (n1 === n3 || n2 === n3) return;
+            if (n1 === n3 || n2 === n3) {
+                return;
+            }
 
             vec2.sub(v12, n2.position, n1.position);
             vec2.sub(v13, n3.position, n1.position);
@@ -654,7 +680,7 @@ define(function __echartsForceLayoutWorker(require) {
             // PENDING
             vec2.scaleAndAdd(n1.force, n1.force, v12, -factor);
             vec2.scaleAndAdd(n2.force, n2.force, v12, -factor);
-        }
+        };
     })();
 
     ForceLayout.prototype.updateBBox = function() {
@@ -716,8 +742,8 @@ define(function __echartsForceLayoutWorker(require) {
                     if (!forceLayout) {
                         forceLayout = new ForceLayout();
                     }
-                    forceLayout.initNodes(e.data.nodesPosition, e.data.nodesMass, e.data.nodesSize);
-                    forceLayout.initEdges(e.data.edges, e.data.edgesWeight);
+                    forceLayout.initNodes(e.data.nodes);
+                    forceLayout.initEdges(e.data.edges);
                     forceLayout._token = e.data.token;
                     break;
                 case 'updateConfig':

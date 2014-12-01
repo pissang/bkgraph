@@ -47,11 +47,11 @@ define({
     voteProjectHuoying: 'ks_huoying',
 
     layout: {
-        edgeFactorLayers: [65, 20, 2.5, 2.5, 2.5, 2.5]
+        layerDistance: [0, 100, 300, 300, 300, 300, 300],
+        layerConstraint: 0.3
     },
 
     defaultNodeImage: 'img/default-avatar.png',
 
     isPlat: false
-    
 });
