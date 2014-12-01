@@ -276,9 +276,9 @@ define(function (require) {
         line.style.yEnd = v2[1];
         line.style.cx = (v1[0] + v2[0]) / 2;
         line.style.cy = (v1[1] + v2[1]) / 2;
-        line.style.r = (
-            this.sourceEntity.radius + this.targetEntity.radius
-        ) / 20 + 3;
+        // line.style.r = (
+        //     this.sourceEntity.radius + this.targetEntity.radius
+        // ) / 20 + 3;
         line.style.a = 10;
         line.style.b = 15;
     }

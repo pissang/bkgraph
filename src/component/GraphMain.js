@@ -1558,7 +1558,7 @@ define(function (require) {
             self._lastHoverNode = null;
         });
         nodeEntity.bind('click', function () {
-            // self.showEntityDetail(node, true);
+            self.showEntityDetail(node, true);
 
             if (self._lastClickNode !== node) {
                 self._lastClickNode = node;

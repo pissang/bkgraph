@@ -2,25 +2,21 @@ define(function (require) {
 
     var ShapeBase = require('zrender/shape/Base');
     var LineShape = require('zrender/shape/Line');
-    var PathProxy = require('zrender/shape/util/PathProxy');
     var zrUtil = require('zrender/tool/util');
     var area = require('zrender/tool/area');
 
     var LabelLine = function (opts) {
         ShapeBase.call(this, opts);
-        this._pathProxy = new PathProxy();
     }
 
     LabelLine.prototype.type = 'labelline';
 
     LabelLine.prototype.buildDropletPath = function(ctx, style) {
-        var path = this._pathProxy || new PathProxy();
-        path.begin(ctx);
 
         var dropletPadding = style.dropletPadding || 0;
         var cy = style.cy - dropletPadding;
-        path.moveTo(style.cx, cy - style.a);
-        path.bezierCurveTo(
+        ctx.moveTo(style.cx, cy - style.a);
+        ctx.bezierCurveTo(
             style.cx + style.a,
             cy - style.a,
             style.cx + style.a * 3 / 2,
@@ -28,7 +24,7 @@ define(function (require) {
             style.cx,
             cy + style.b
         );
-        path.bezierCurveTo(
+        ctx.bezierCurveTo(
             style.cx - style.a * 3 / 2,
             cy + style.a / 3,
             style.cx - style.a,
@@ -36,7 +32,6 @@ define(function (require) {
             style.cx,
             cy - style.a
         );
-        path.closePath();
     };
 
     LabelLine.prototype.brush = function (ctx, isHighlight) {
@@ -64,11 +59,11 @@ define(function (require) {
         ctx.lineTo(style.xEnd, style.yEnd);
         ctx.stroke();
 
-        // 画Label圆
+        // 画Label水滴
         ctx.globalAlpha = 1;
         var cx = style.cx;
         var cy = style.cy;
-        var r = style.r || 10;
+        // var r = style.r || 10;
         if (cx == null) {
             cx = (style.xStart + style.xEnd) / 2;
             cy = (style.yStart + style.yEnd) / 2;
@@ -93,24 +88,24 @@ define(function (require) {
         var height = area.getTextWidth('国', style.textFont);
         ctx.textBaseline = 'top';
         if (angle < 0.2 || angle > 2.94) {
-            y -= style.a + textPadding + height;
+            y -= style.b + textPadding + height;
             x -= width / 2;
             // 顺便保存rect
             this.__rect = {
-                x: Math.min(x, cx - style.a * 2),
-                y: y - height,
-                width: Math.max(width, style.a * 4),
-                height: height + textPadding + style.a * 4
+                x: Math.min(x, cx - style.a),
+                y: y,
+                width: Math.max(width, style.a * 2),
+                height: height + textPadding + style.b * 2
             };
         } else {
             x += style.a + textPadding;
             y -= height / 2;
             // 顺便保存rect
             this.__rect = {
-                x: cx - style.a * 2,
-                y: cy - Math.max(style.a * 2, height / 2),
-                width: width + style.a * 4 + textPadding,
-                height: Math.max(height, style.a * 4)
+                x: cx - style.a,
+                y: cy - Math.max(style.b, height / 2),
+                width: width + style.a * 2 + textPadding,
+                height: Math.max(height, style.b * 2)
             };
         }
         ctx.fillText(text, x, y);

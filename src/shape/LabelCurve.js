@@ -37,7 +37,7 @@ define(function (require) {
         ctx.quadraticCurveTo(style.cpX1, style.cpY1, style.xEnd, style.yEnd);
         ctx.stroke();
 
-        // 画Label圆
+        // 画Label水滴
         ctx.globalAlpha = 1;
         var cx = style.cx;
         var cy = style.cy;
@@ -65,10 +65,10 @@ define(function (require) {
         ctx.fillText(text, x, y);
         // 顺便保存rect
         this.__rect = {
-            x: cx - style.a * 2,
-            y: cy - Math.max(style.a * 2, height / 2),
-            width: width + style.a * 4 + textPadding,
-            height: Math.max(height, style.a * 4)
+            x: cx - style.a,
+            y: cy - Math.max(style.b, height / 2),
+            width: width + style.a * 2 + textPadding,
+            height: Math.max(height, style.b * 2)
         };
 
         ctx.restore();
