@@ -37,7 +37,7 @@
                 <li>
                     <a href="http://www.baidu.com/s?wd=${recTag.name}%20${recTag.reason}" target="_blank" data-area="entity-recommendation" title="${recTag.name} ${recTag.reason}_百度搜索">
                         <img src="${recTag.image}" alt="">
-                        <h5>${recTag.name}</h5>
+                        <h5>${recTag.name|truncate(6)}</h5>
                     </a>
                     <a href="http://www.baidu.com/s?wd=${recTag.name}%20${recTag.reason}" target="_blank" data-area="entity-recommendation" title="${recTag.name} ${recTag.reason}_百度搜索">
                         <span>${recTag.reason|truncate(10)}</span>
