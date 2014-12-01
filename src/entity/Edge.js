@@ -28,13 +28,15 @@ define(function (require) {
 
         this.label = opts.label || '';
 
+        this._animatingSkiping = false;
+
         this.style = {
-            color: '#0e90fe',
+            color: '#00a2ff',
             labelColor: '#0e90fe',
             lineWidth: 0.7
         };
         this.highlightStyle = {
-            color: '#f9dd05',
+            color: '#fffc00',
             labelColor: '#f9dd05',
             lineWidth: 1.5
         };
@@ -54,7 +56,8 @@ define(function (require) {
                 strokeColor: this.style.color,
                 text: util.truncate(this.label, 6),
                 textFont: '13px 微软雅黑',
-                textPadding: 5
+                textPadding: 5,
+                dropletPadding: 0
             },
             z: 0,
             zlevel: 0,
@@ -150,6 +153,7 @@ define(function (require) {
     EdgeEntity.prototype.highlightLabel = function () {
         if (!this._isHighlight) {
             this.el.style.color = this.highlightStyle.color;
+            this.el.style.strokeColor = this.highlightStyle.color;
         }
         // 显示全文
         this.el.style.text = this.label;
@@ -159,6 +163,7 @@ define(function (require) {
     EdgeEntity.prototype.lowlightLabel = function () {
         if (!this._isHighlight) {
             this.el.style.color = this.style.color;
+            this.el.style.strokeColor = this.style.color;
         }
         // 隐藏多余文字
         this.el.style.text = util.truncate(this.label, 6);
@@ -179,6 +184,69 @@ define(function (require) {
             })
             .done(cb)
             .start('ElasticOut');
+    };
+
+    EdgeEntity.prototype.startActiveAnimation = function (zr) {
+
+        if (this._animatingSkiping) {
+            return;
+        }
+
+        var self = this;
+        var dropletPadding = this.el.style.dropletPadding;
+
+        this.addAnimation('dropletskip', zr.animation.animate(this.el.style, {loop: true})
+            .when(100, {
+                dropletPadding: dropletPadding + 6
+            })
+            .when(400, {
+                dropletPadding: dropletPadding
+            })
+            .when(800, {
+                dropletPadding: dropletPadding + 4
+            })
+            .when(1150, {
+                dropletPadding: dropletPadding
+            })
+            .when(1450, {
+                dropletPadding: dropletPadding + 3
+            })
+            .when(1750, {
+                dropletPadding: dropletPadding
+            })
+            .when(2100, {
+                dropletPadding: dropletPadding + 2
+            })
+            .when(2450, {
+                dropletPadding: dropletPadding
+            })
+            .when(2700, {
+                dropletPadding: dropletPadding + 1
+            })
+            .when(2950, {
+                dropletPadding: dropletPadding
+            })
+            .when(3200, {
+                dropletPadding: dropletPadding
+            })
+            .during(function () {
+                self.el.modSelf();
+                zr.refreshNextFrame();
+            })
+            .start('SinusoidalInOut')
+        );
+
+        this._animatingSkiping = true;
+    };
+
+    EdgeEntity.prototype.stopActiveAnimation = function (zr) {
+        this._animatingSkiping = false;
+
+        this.stopAnimation('dropletskip');
+
+        this.el.style.dropletPadding = 0;
+
+        zr.refreshNextFrame();
     };
 
     EdgeEntity.prototype._computeLinePoints = function (v1, v2) {
@@ -211,6 +279,8 @@ define(function (require) {
         line.style.r = (
             this.sourceEntity.radius + this.targetEntity.radius
         ) / 20 + 3;
+        line.style.a = 10;
+        line.style.b = 15;
     }
 
     EdgeEntity.prototype.intersectRect = function (rect) {

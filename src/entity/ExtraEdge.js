@@ -36,12 +36,12 @@ define(function (require) {
         this.label = opts.label || '';
 
         this.style = {
-            color: '#0e90fe',
+            color: '#00a2ff',
             opacity: 0.8,
             hidden: true
         };
         this.highlightStyle = {
-            color: '#f9dd05',
+            color: '#fffc00',
             opacity: 1,
             hidden: false
         };
@@ -67,7 +67,8 @@ define(function (require) {
                 strokeColor: this.style.color,
                 text: util.truncate(this.label, 10),
                 textFont: '13px 微软雅黑',
-                textPadding: 5
+                textPadding: 5,
+                dropletPadding: 0
             },
             z: 0,
             zlevel: 0,
@@ -201,6 +202,10 @@ define(function (require) {
 
     ExtraEdgeEntity.prototype.animateTextPadding = EdgeEntity.prototype.animateTextPadding;
 
+    ExtraEdgeEntity.prototype.startActiveAnimation = EdgeEntity.prototype.startActiveAnimation;
+
+    ExtraEdgeEntity.prototype.stopActiveAnimation = EdgeEntity.prototype.stopActiveAnimation;
+
     ExtraEdgeEntity.prototype._setCurvePoints = function (p1, p2, inv) {
         var sourceEntity = this.sourceEntity;
         var targetEntity = this.targetEntity;
@@ -222,6 +227,8 @@ define(function (require) {
         curve.style.cy = curveTool.quadraticAt(
             curve.style.yStart, curve.style.cpY1, curve.style.yEnd, 0.5
         );
+        curve.style.a = 10;
+        curve.style.b = 15;
 
         inv = inv || 1;
     }

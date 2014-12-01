@@ -47,7 +47,8 @@ define(function (require) {
             cy = curveTool.quadraticAt(style.yStart, style.cpY1, style.yEnd, 0.5);
         }
         ctx.beginPath();
-        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        // ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        this.buildDropletPath(ctx, style);
         ctx.fill();
 
         // 画Label标签
@@ -59,19 +60,21 @@ define(function (require) {
         var width = area.getTextWidth(text, style.textFont);
         var height = area.getTextWidth('国', style.textFont);
         ctx.textBaseline = 'top';
-        var x = cx + r + textPadding;
+        var x = cx + style.a + textPadding;
         var y = cy - height / 2;
         ctx.fillText(text, x, y);
         // 顺便保存rect
         this.__rect = {
-            x: cx - r * 2,
-            y: cy - Math.max(r * 2, height / 2),
-            width: width + r * 4 + textPadding,
-            height: Math.max(height, r * 4)
+            x: cx - style.a * 2,
+            y: cy - Math.max(style.a * 2, height / 2),
+            width: width + style.a * 4 + textPadding,
+            height: Math.max(height, style.a * 4)
         };
 
         ctx.restore();
     }
+
+    LabelCurve.prototype.buildDropletPath = LabelLineShape.prototype.buildDropletPath;
 
     LabelCurve.prototype.getRect = LabelLineShape.prototype.getRect;
 

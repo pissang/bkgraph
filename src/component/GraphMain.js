@@ -1641,12 +1641,14 @@ define(function (require) {
             edgeEntity.bind('mouseover', function () {
                 if (config.enableAnimation) {
                     edgeEntity.animateTextPadding(zr, 300, 12);
+                    edgeEntity.startActiveAnimation(zr);
                 }
                 edgeEntity.highlightLabel();
             });
             edgeEntity.bind('mouseout', function () {
                 if (config.enableAnimation) {
                     edgeEntity.animateTextPadding(zr, 300, 5);
+                    edgeEntity.stopActiveAnimation(zr);
                 }
                 edgeEntity.lowlightLabel();
             });
