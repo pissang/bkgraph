@@ -33,13 +33,13 @@
         <div class="bkg-rec-tags">
             <p class="bkg-tag-title">您可能感兴趣那些人儿</p>
             <ul>
-                <!-- for: ${recommendation.content} as ${recTag}, ${index} -->
+                <!-- for: ${recommendation} as ${recTag}, ${index} -->
                 <li>
-                    <a href="http://www.baidu.com/s?wd=${recTag.name}%20${recTag.reason}" target="_blank" data-area="entity-recommendation" title="${recTag.name} ${recTag.reason}_百度搜索">
+                    <a href="http://www.baidu.com/s?wd=${recTag.name}" target="_blank" data-area="entity-recommendation" title="${recTag.name}_百度搜索">
                         <img src="${recTag.image}" alt="">
                         <h5>${recTag.name|truncate(6)}</h5>
                     </a>
-                    <a href="http://www.baidu.com/s?wd=${recTag.name}%20${recTag.reason}" target="_blank" data-area="entity-recommendation" title="${recTag.name} ${recTag.reason}_百度搜索">
+                    <a href="http://www.baidu.com/s?wd=${recTag.name}" target="_blank" data-area="entity-recommendation" title="${recTag.name}_百度搜索">
                         <span>${recTag.reason|truncate(10)}</span>
                     </a>
                 </li>
