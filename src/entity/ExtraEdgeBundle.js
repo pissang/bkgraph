@@ -44,8 +44,8 @@ define(function (require) {
         var len = 0;
         for (var i = 0; i < this.edges.length; i++) {
             var e = this.edges[i];
-            var sourceEntity = e.source.entity;
-            var targetEntity = e.target.entity;
+            var sourceEntity = e.node1.entity;
+            var targetEntity = e.node2.entity;
 
             var segs = this.el.style.segments;
             var seg = segs[i];

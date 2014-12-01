@@ -7,7 +7,9 @@
         <link rel="stylesheet/less" type="text/css" href="./css/bkgraph.less" />
         <script src="../dep/esl.js"></script>
         <script src="../dep/less.min.js"></script>
+        <!--
         <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+    -->
     </head>
     <body>
         <div id='viewport'></div>
@@ -39,7 +41,10 @@
                 'bkgraph'
             ], function (bkg, data) {
                 var name = window.location.hash.slice(1);
-                var g = bkg.init('viewport', name, function (g) {
+
+                var url = 'http://nj02-wd-knowledge45-ssd1l.nj02.baidu.com:8866/api/tupu?id=335&callback=jsonp1417408887890';
+
+                var g = bkg.init('viewport', url, function (g) {
                     var graphMain = g.getComponentByType('GRAPH');
                     graphMain.enableDrag();
 

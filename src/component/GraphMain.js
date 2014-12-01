@@ -1,7 +1,6 @@
 define(function (require) {
 
     var zrender = require('zrender');
-    var ForceLayout = require('echarts/layout/Force');
     var Graph = require('echarts/data/Graph');
     var Tree = require('echarts/data/Tree');
     var TreeLayout = require('echarts/layout/Tree');
@@ -11,6 +10,7 @@ define(function (require) {
     var Component = require('./Component');
     var vec2 = require('zrender/tool/vector');
 
+    var ForceLayout = require('../layout/ForceLayout');
     var NodeEntity = require('../entity/Node');
     var EdgeEntity = require('../entity/Edge');
     var ExtraEdgeEntity = require('../entity/ExtraEdge');
@@ -535,7 +535,7 @@ define(function (require) {
             this._kgraph.getWidth() / 2,
             this._kgraph.getHeight() / 2
         ];
-        // forceLayout.gravity = 0.8;
+        forceLayout.gravity = 0;
         forceLayout.scaling = 12;
         forceLayout.coolDown = 0.99999;
         // forceLayout.enableAcceleration = false;
@@ -547,11 +547,19 @@ define(function (require) {
         graph.eachNode(function (n) {
             // if (n.data.layerCounter === 1) {
                 n.layout.mass = 10;
+                n.layout.layer = n.data.layerCounter;
             // } else {
             //     n.layout.mass = n.degree() * 3;
             // }
         });
-        var wFactors = [10, 2, 0.5, 0.5, 0.5, 0.5];
+        var layerDistance = config.layout.layerDistance.slice();
+        for (var i = 1; i < layerDistance.length; i++) {
+            layerDistance[i] = layerDistance[i - 1] + layerDistance[i];
+        }
+
+        forceLayout.layerConstraint = config.layout.layerConstraint;
+        forceLayout.layerDistance = layerDistance;
+
         max = -Infinity;
         min = Infinity;
         graph.eachEdge(function (e) {
@@ -564,7 +572,7 @@ define(function (require) {
                 (e.data.relationWeight - min) / diff * (this.maxRelationWeight - this.minRelationWeight) + this.minRelationWeight
                 : (this.maxRelationWeight + this.minRelationWeight) / 2;
             e.layout = {
-                weight: w * config.layout.edgeFactorLayers[e.node1.data.layerCounter]
+                weight: w
             };
         }, this);
 
@@ -1521,9 +1529,6 @@ define(function (require) {
         });
         nodeEntity.initialize(this._zr);
 
-        vec2.min(this._min, this._min, node.layout.position);
-        vec2.max(this._max, this._max, node.layout.position);
-        
         vec2.copy(nodeEntity.el.position, node.layout.position);
         var self = this;
         nodeEntity.bind('mouseover', function () {
@@ -1553,7 +1558,7 @@ define(function (require) {
             self._lastHoverNode = null;
         });
         nodeEntity.bind('click', function () {
-            self.showEntityDetail(node, true);
+            // self.showEntityDetail(node, true);
 
             if (self._lastClickNode !== node) {
                 self._lastClickNode = node;
@@ -1683,6 +1688,10 @@ define(function (require) {
             }
         }
 
+        if (config.enableAnimation) {
+            this._extraEdgeBundle.update(zr);
+        }
+
         zr.refreshNextFrame();
     };
 
@@ -1708,8 +1717,6 @@ define(function (require) {
         var nodeLayer = zr.painter.getLayer(1);
         var width = zr.getWidth();
         var height = zr.getHeight();
-        var min = [0, 0];
-        var max = [0, 0];
         nodeLayer.updateTransform();
 
         var layer0 = this._zr.painter.getLayer(0);
@@ -1727,6 +1734,8 @@ define(function (require) {
                 if (!n.entity.el.ignore) {
                     n.entity.loadImage(zr);
                 }
+                vec2.min(this._min, this._min, n.entity.el.position);
+                vec2.max(this._max, this._max, n.entity.el.position);
             }
         }
         for (var i = 0; i < graph.edges.length; i++) {
