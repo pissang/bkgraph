@@ -191,7 +191,6 @@
   left: 0px;
   top: 0px;
   /** 图片不换行 */
-
   white-space: nowrap;
   -webkit-transition: left 0.5s ease-in-out;
   -moz-transition: left 0.5s ease-in-out;
@@ -210,6 +209,7 @@
   margin-left: 1px;
 }
 .bkg-searchbar .bkg-person-list li.bkg-person img {
+  border: none;
   width: 85px;
   cursor: pointer;
 }
@@ -258,17 +258,11 @@
   font-size: 13px;
   line-height: 21px;
   /**人物基本信息模块**/
-
   /******* 微博模块 ***********/
-
   /******* 新闻和脉络模块 ***********/
-
   /******* 新闻模块 ***********/
-
   /******* 关系脉络 ***********/
-
   /** 作品模块 */
-
 }
 .bkg-sidebar .bkg-hoverable {
   -webkit-transition: -webkit-transform 0.1s linear;
@@ -369,14 +363,12 @@
   border-left: 1px solid #1c7bcc;
   position: relative;
   /** tag **/
-
 }
 .bkg-sidebar .bkg-entity-detail .bkg-taglist,
 .bkg-sidebar .bkg-relation-detail .bkg-taglist {
   margin-top: 10px;
   margin-bottom: 18px;
   /** 实体推荐tag **/
-
 }
 .bkg-sidebar .bkg-entity-detail .bkg-taglist .bkg-tags,
 .bkg-sidebar .bkg-relation-detail .bkg-taglist .bkg-tags {
@@ -434,6 +426,7 @@
 }
 .bkg-sidebar .bkg-entity-detail .bkg-taglist .bkg-rec-tags li a img,
 .bkg-sidebar .bkg-relation-detail .bkg-taglist .bkg-rec-tags li a img {
+  border: none;
   width: 67px;
   height: 67px;
 }
@@ -502,15 +495,14 @@
 }
 .bkg-sidebar .bkg-person-info .bkg-person-description p {
   /* margin: 4px 0px; */
-
 }
 .bkg-sidebar .bkg-relation-detail .bkg-relation-info {
   position: relative;
   /*没有关系摘要的暂时替代方案*/
-
   margin-bottom: 10px;
 }
 .bkg-sidebar .bkg-relation-detail .bkg-relation-info img {
+  border: none;
   width: 91px;
   height: 124px;
 }
@@ -700,6 +692,7 @@
   vertical-align: top;
 }
 .bkg-sidebar .bkg-works li img {
+  border: none;
   width: 67px;
   height: 87px;
 }
@@ -976,7 +969,6 @@
 }
 .bkg-intro .bkg-mask {
   /* http://stackoverflow.com/questions/6480774/z-index-problem-in-ie-with-transparent-div */
-
   filter: alpha(opacity=1);
   opacity: 0.01;
   z-index: 11;

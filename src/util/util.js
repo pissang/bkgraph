@@ -26,9 +26,47 @@ define(function (require) {
             }
         },
 
+        _mouseFn: {}, //保存“onmouseenter”和“onmouseleave”所绑定的方法
+
+        _mouseHandle: function (fn) {
+            // 转换方法，符合条件时才会执行
+            var func = function (event) {
+                var target = event.target;
+                var parent = event.relatedTarget;
+                while(parent && parent != this){
+                    try {
+                        parent = parent.parentNode;
+                    }
+                    catch (e) {
+                        break;
+                    }
+                }
+                // 只有当相关节点跟绑定节点不是父子关系时才调用fn
+                ( parent != this ) && (fn.call(target, event));
+            };
+            return func;
+        },
+
         addEventListener: function (el, name, func, useCapture) {
             if (window.addEventListener) {
-                el.addEventListener(name, func, useCapture);
+
+                if (el.onmouseenter !== undefined){
+                    //for opera11，firefox10
+                    el.addEventListener(name, func, useCapture);
+                    return;
+                }
+                if (name == "mouseenter" || name == "mouseleave"){
+                    var ename = (name == "mouseenter") ? "mouseover" : "mouseout";
+                    var fnNew = this._mouseHandle(func);
+                    el.addEventListener(ename, fnNew, useCapture);
+                     /* 将方法存入this._mouseFn，以便以后remove */
+                    if(!this._mouseFn[el]) this._mouseFn[el] = {};
+                    if(!this._mouseFn[el][ename]) this._mouseFn[el][ename] = {};
+                    this._mouseFn[el][ename][func] = fnNew;
+                }
+                else {
+                    el.addEventListener(name, func, useCapture);
+                }
             }
             else {
                 el.attachEvent('on' + name, func);
@@ -37,7 +75,19 @@ define(function (require) {
 
         removeEventListener: function (el, name, func, useCapture) {
             if (window.removeEventListener) {
-                el.removeEventListener(name, func, useCapture);
+                if (el.onmouseenter !== undefined) {
+                    el.removeEventListener(name, fn, useCapture);
+                    return;
+                }
+                if (name == "mouseenter" || name == "mouseleave" ) {
+                    var ename = (name == "mouseenter") ? "mouseover" : "mouseout";
+                    if(!events._mouseFn[el][ename][fn]) return;
+                    el.removeEventListener(ename, events._mouseFn[el][ename][fn], useCapture);
+                    events._mouseFn[el][ename][fn] = null;
+                }
+                else {
+                    el.removeEventListener(name, fn, useCapture);
+                }
             }
             else {
                 el.detachEvent('on' + name, func);

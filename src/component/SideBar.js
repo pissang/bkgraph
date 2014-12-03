@@ -21,6 +21,14 @@ define(function (require) {
         util.addEventListener(this.el, 'click', function (e) {
             self._dispatchClick(e);
         });
+
+        util.addEventListener(this.el, 'mouseenter', function (e) {
+            bkgLog({
+                type: 'zhishitupuhover',
+                target: self._logParam,
+                area: 'sidebar'
+            });
+        });
     }
 
     SideBar.prototype.type = 'SIDEBAR';
@@ -104,7 +112,7 @@ define(function (require) {
             // 图谱部分右移
             var graphMain = this._kgraph.getComponentByType('GRAPH');
             if (graphMain) {
-                graphMain.el.style.left = -this.el.clientWidth + 'px';
+                graphMain.el.style.left = -(this.el.clientWidth / 2) + 'px';
             }
 
             this._$toggleBtn.innerHTML = '隐<br />藏<br />>';
