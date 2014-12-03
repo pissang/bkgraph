@@ -28,6 +28,14 @@
     </ul>
 </div>
 
+<!-- target: sidebarRelationNews(master=sidebarNews) -->
+<!-- block: newsModuleTitle -->
+<div class="bkg-module-title">
+    <div class="bkg-circle"></div>
+    <h4 class="bkg-title"><a href="${newsRedir}" title="${fromEntity.name} 和 ${toEntity.name} 的最新动态" data-area="relation-news" target="_blank">${fromEntity.name} 和 ${toEntity.name} 的最新动态</a></h4>
+</div>
+<!-- /block -->
+
 <!-- target: sidebarWeibo -->
 <div class="bkg-weibo bkg-sidebar-module">
     <div class="bkg-module-title">
@@ -67,21 +75,13 @@
     <!-- for: ${representativeWork} as ${work}, ${idx} -->
         <li>
             <a href="${work.movieRedir}" target="_blank" title="${work.movieName}" data-area="entity-representativeWork">
-                <img src="${work.movieImage}" alt="" />
+                <img src="${work.movieImage}" class="bkg-hoverable" alt="" />
                 <span class="bkg-work-title">${work.movieName}</span>
             </a>
         </li>
     <!-- /for -->
     </ul>
 </div>
-
-<!-- target: sidebarRelationNews(master=sidebarNews) -->
-<!-- block: newsModuleTitle -->
-<div class="bkg-module-title">
-    <div class="bkg-circle"></div>
-    <h4 class="bkg-title"><a href="${newsRedir}" title="${fromEntity.name} 和 ${toEntity.name} 的最新动态" data-area="relation-news" target="_blank">${fromEntity.name} 和 ${toEntity.name} 的最新动态</a></h4>
-</div>
-<!-- /block -->
 
 <!-- target: sidebarMailuo -->
 <div class="bkg-mailuo bkg-sidebar-module">

@@ -191,6 +191,7 @@
   left: 0px;
   top: 0px;
   /** 图片不换行 */
+
   white-space: nowrap;
   -webkit-transition: left 0.5s ease-in-out;
   -moz-transition: left 0.5s ease-in-out;
@@ -257,11 +258,32 @@
   font-size: 13px;
   line-height: 21px;
   /**人物基本信息模块**/
+
   /******* 微博模块 ***********/
+
   /******* 新闻和脉络模块 ***********/
+
   /******* 新闻模块 ***********/
+
   /******* 关系脉络 ***********/
+
   /** 作品模块 */
+
+}
+.bkg-sidebar .bkg-hoverable {
+  -webkit-transition: -webkit-transform 0.1s linear;
+  -moz-transition: -moz-transform 0.1s linear;
+  -ms-transition: -ms-transform 0.1s linear;
+  -o-transition: -o-transform 0.1s linear;
+  transition: transform 0.1s linear;
+}
+.bkg-sidebar .bkg-hoverable:hover {
+  -webkit-transform: scale(1.15);
+  -moz-transform: scale(1.15);
+  -ms-transform: scale(1.15);
+  -o-transform: scale(1.15);
+  transform: scale(1.15);
+  box-shadow: 0px 0px 5px black;
 }
 .bkg-sidebar .bkg-sidebar-viewport {
   box-sizing: border-box;
@@ -347,12 +369,14 @@
   border-left: 1px solid #1c7bcc;
   position: relative;
   /** tag **/
+
 }
 .bkg-sidebar .bkg-entity-detail .bkg-taglist,
 .bkg-sidebar .bkg-relation-detail .bkg-taglist {
   margin-top: 10px;
   margin-bottom: 18px;
   /** 实体推荐tag **/
+
 }
 .bkg-sidebar .bkg-entity-detail .bkg-taglist .bkg-tags,
 .bkg-sidebar .bkg-relation-detail .bkg-taglist .bkg-tags {
@@ -410,18 +434,8 @@
 }
 .bkg-sidebar .bkg-entity-detail .bkg-taglist .bkg-rec-tags li a img,
 .bkg-sidebar .bkg-relation-detail .bkg-taglist .bkg-rec-tags li a img {
-  border: none;
   width: 67px;
   height: 67px;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
-  box-sizing: border-box;
-}
-.bkg-sidebar .bkg-entity-detail .bkg-taglist .bkg-rec-tags li a img:hover,
-.bkg-sidebar .bkg-relation-detail .bkg-taglist .bkg-rec-tags li a img:hover {
-  border: 1px solid #0e90fe;
 }
 .bkg-sidebar .bkg-entity-detail .bkg-taglist .bkg-rec-tags li a h5,
 .bkg-sidebar .bkg-relation-detail .bkg-taglist .bkg-rec-tags li a h5 {
@@ -488,10 +502,12 @@
 }
 .bkg-sidebar .bkg-person-info .bkg-person-description p {
   /* margin: 4px 0px; */
+
 }
 .bkg-sidebar .bkg-relation-detail .bkg-relation-info {
   position: relative;
   /*没有关系摘要的暂时替代方案*/
+
   margin-bottom: 10px;
 }
 .bkg-sidebar .bkg-relation-detail .bkg-relation-info img {
@@ -686,15 +702,6 @@
 .bkg-sidebar .bkg-works li img {
   width: 67px;
   height: 87px;
-  border: none;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  -ms-box-sizing: border-box;
-  -o-box-sizing: border-box;
-  box-sizing: border-box;
-}
-.bkg-sidebar .bkg-works li img:hover {
-  border: 1px solid #0e90fe;
 }
 .bkg-sidebar .bkg-works li:nth-child(4n) {
   margin-right: 0;
@@ -969,6 +976,7 @@
 }
 .bkg-intro .bkg-mask {
   /* http://stackoverflow.com/questions/6480774/z-index-problem-in-ie-with-transparent-div */
+
   filter: alpha(opacity=1);
   opacity: 0.01;
   z-index: 11;
