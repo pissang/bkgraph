@@ -76,17 +76,17 @@ define(function (require) {
         removeEventListener: function (el, name, func, useCapture) {
             if (window.removeEventListener) {
                 if (el.onmouseenter !== undefined) {
-                    el.removeEventListener(name, fn, useCapture);
+                    el.removeEventListener(name, func, useCapture);
                     return;
                 }
                 if (name == "mouseenter" || name == "mouseleave" ) {
                     var ename = (name == "mouseenter") ? "mouseover" : "mouseout";
-                    if(!events._mouseFn[el][ename][fn]) return;
-                    el.removeEventListener(ename, events._mouseFn[el][ename][fn], useCapture);
-                    events._mouseFn[el][ename][fn] = null;
+                    if(!events._mouseFn[el][ename][func]) return;
+                    el.removeEventListener(ename, events._mouseFn[el][ename][func], useCapture);
+                    events._mouseFn[el][ename][func] = null;
                 }
                 else {
-                    el.removeEventListener(name, fn, useCapture);
+                    el.removeEventListener(name, func, useCapture);
                 }
             }
             else {

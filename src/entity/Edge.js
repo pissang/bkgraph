@@ -154,6 +154,7 @@ define(function (require) {
         if (!this._isHighlight) {
             this.el.style.color = this.highlightStyle.color;
             this.el.style.strokeColor = this.highlightStyle.color;
+            this.el.style.lineWidth = this.highlightStyle.lineWidth;
         }
         // 显示全文
         this.el.style.text = this.label;
@@ -164,6 +165,7 @@ define(function (require) {
         if (!this._isHighlight) {
             this.el.style.color = this.style.color;
             this.el.style.strokeColor = this.style.color;
+            this.el.style.lineWidth = this.style.lineWidth;
         }
         // 隐藏多余文字
         this.el.style.text = util.truncate(this.label, 6);
