@@ -74,6 +74,8 @@ define(function (require) {
 
         this._lastHoverNode = null;
 
+        this._lastHoverEdge = null;
+
         // 当前关注的节点, 可能是点击，也可能是搜索定位
         this._activeNode = null;
 
@@ -1553,6 +1555,9 @@ define(function (require) {
                 return;
             }
             if (self._lastHoverNode !== node) {
+
+                self.dispatch('mouseover:entity', node.data);
+
                 self.hoverNode(node);
                 self.expandNode(node);
 
@@ -1575,6 +1580,8 @@ define(function (require) {
             self._lastHoverNode = null;
         });
         nodeEntity.bind('click', function () {
+            self.dispatch('click:entity', node.data);
+
             self.showEntityDetail(node, true);
 
             if (self._lastClickNode !== node) {
@@ -1619,6 +1626,7 @@ define(function (require) {
 
     GraphMain.prototype._createEdgeEntity = function (e, style) {
         var edgeEntity;
+        var self = this;
         var zr = this._zr;
         if (e.node1.entity && e.node2.entity) {
             if (e.isExtra) {
@@ -1641,6 +1649,8 @@ define(function (require) {
             edgeEntity.initialize(this._zr);
 
             edgeEntity.bind('click', function () {
+                self.dispatch('click:relation', e.data);
+
                 this.showRelationDetail(e);
                 this.highlightEdge(e);
                 bkgLog({
@@ -1661,11 +1671,18 @@ define(function (require) {
 
             }, this);
             edgeEntity.bind('mouseover', function () {
-                if (config.enableAnimation) {
-                    edgeEntity.animateTextPadding(zr, 300, 12);
-                    edgeEntity.startActiveAnimation(zr);
+
+                if (self._lastHoverEdge !== e) {
+                    self.dispatch('mouseover:relation', e.data);
+
+                    if (config.enableAnimation) {
+                        edgeEntity.animateTextPadding(zr, 300, 12);
+                        edgeEntity.startActiveAnimation(zr);
+                    }
+                    edgeEntity.highlightLabel();
                 }
-                edgeEntity.highlightLabel();
+
+                self._lastHoverEdge = e;
             });
             edgeEntity.bind('mouseout', function () {
                 if (config.enableAnimation) {
@@ -1673,6 +1690,7 @@ define(function (require) {
                     edgeEntity.stopActiveAnimation(zr);
                 }
                 edgeEntity.lowlightLabel();
+                self._lastHoverEdge = null;
             });
 
             e.entity = edgeEntity;
