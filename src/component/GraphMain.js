@@ -383,23 +383,6 @@ define(function (require) {
             this._entryAnimation();
         }
 
-        // 默认高亮中心节点权重最高的边
-        var mainRelations = [];
-        var mainEntity = data.mainEntity;
-        for (var i = 0, len = data.relations.length; i < len; i++) {
-            if (data.relations[i].fromID == mainEntity.id) {
-                mainRelations.push(data.relations[i]);
-            }
-        }
-        mainRelations.sort(function (a, b) {
-            return b.relationWeight - a.relationWeight;
-        });
-        var self = this;
-        setTimeout(function () {
-            self.highlightEdge(mainRelations[0].id);
-            self.showRelationDetail(mainRelations[0].id);
-        });
-
         // 发送首屏展现日志
         var title = [];
         this._graph.eachNode(function (node) {
