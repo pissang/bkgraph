@@ -47,7 +47,7 @@ define(function (require) {
 
         this.draggable = false;
 
-        this.entryAnimation = true;
+        this.enableEntryAnimation = true;
 
         this._kgraph = null;
         
