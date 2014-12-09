@@ -140,6 +140,13 @@ define(function (require) {
                 graphMain.showRelationDetail(params['relation']);
             });
         }
+        else if (params['entity']) {
+            setTimeout(function () {
+                graphMain.highlightNode(params['entity']);
+                graphMain.moveToEntity(params['entity']);
+                graphMain.showEntityDetail(params['entity'], true);
+            });
+        }
         else {
             // 默认高亮中心节点权重最高的边
             var mainRelations = [];
@@ -159,10 +166,10 @@ define(function (require) {
         }
 
         // Intro Component is defaultly included (except location has releation param)
-        if (!params['relation']) {
-            var intro = new Intro();
-            this.addComponent(intro);
-        }
+        // if (!params['relation']) {
+        //     var intro = new Intro();
+        //     this.addComponent(intro);
+        // }
     }
 
     BKGraph.prototype.addComponent = function (component) {

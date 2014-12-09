@@ -54,8 +54,8 @@ define(function (require) {
         this._kgraph = kg;
 
         // 默认显示主要实体
-        var graphMain = this._kgraph.getComponentByType('GRAPH');
-        graphMain.showEntityDetail(rawData.mainEntity, false);
+        // var graphMain = this._kgraph.getComponentByType('GRAPH');
+        // graphMain.showEntityDetail(rawData.mainEntity, false);
 
         var headerBar = kg.getComponentByType('HEADERBAR');
         if (headerBar) {

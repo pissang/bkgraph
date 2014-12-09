@@ -726,6 +726,9 @@ define(function (require) {
      * 高亮指定节点
      */
     GraphMain.prototype.highlightNode = function (node) {
+        if (typeof(node) === 'string') {
+            node = this._graph.getNodeById(node);
+        }
         if (node.entity && !node._isHighlight) {
             node.entity.highlight();
             node._isHighlight = true;
@@ -735,7 +738,7 @@ define(function (require) {
     /**
      * 高亮节点与邻接节点, 点击触发
      */
-    GraphMain.prototype.highlightNodeAndAdjeceny = function (node) {
+    GraphMain.prototype.highlightNodeAndAdjacency = function (node) {
         if (typeof(node) === 'string') {
             node = this._graph.getNodeById(node);
         }
@@ -1570,7 +1573,7 @@ define(function (require) {
             if (self._lastClickNode !== node) {
                 self._lastClickNode = node;
                 self._syncOutTipEntities();
-                self.highlightNodeAndAdjeceny(node);
+                self.highlightNodeAndAdjacency(node);
 
                 bkgLog({
                     type: 'zhishitupuclick',
