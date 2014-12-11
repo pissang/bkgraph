@@ -409,7 +409,7 @@ define(function (require) {
                 type: 'zhishitupuse',
                 target: logParam.join(','),
                 page: sendLogTimes + '-' + (times + 1),
-                extend: params['srcid']
+                extend: (params['srcid'] ? params['srcid'] : '')
             });
         }
     };
@@ -1188,6 +1188,7 @@ define(function (require) {
      */
     GraphMain.prototype.expandNode = function (node) {
         var zr = this._zr;
+        var self = this;
 
         var logTitle = [];
         for (var i = 0; i < node.edges.length; i++) {
@@ -1224,7 +1225,7 @@ define(function (require) {
 
         var expandedSum = 0;
         this._graph.eachNode(function (n) {
-            if (n.data.layerCounter > this._defaultLayerCount) {
+            if (n.data.layerCounter > self._defaultLayerCount) {
                 expandedSum ++;
             }
         });
