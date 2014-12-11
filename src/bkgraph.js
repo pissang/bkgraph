@@ -148,21 +148,25 @@ define(function (require) {
             });
         }
         else {
-            // 默认高亮中心节点权重最高的边
-            var mainRelations = [];
-            var mainEntity = data.mainEntity;
-            for (var i = 0, len = data.relations.length; i < len; i++) {
-                if (data.relations[i].fromID == mainEntity.id) {
-                    mainRelations.push(data.relations[i]);
-                }
-            }
-            mainRelations.sort(function (a, b) {
-                return b.relationWeight - a.relationWeight;
-            });
-            setTimeout(function () {
-                graphMain.highlightEdge(mainRelations[0].id);
-                graphMain.showRelationDetail(mainRelations[0].id);
-            });
+        //     // 默认高亮中心节点权重最高的边
+        //     var mainRelations = [];
+        //     var mainEntity = data.mainEntity;
+        //     for (var i = 0, len = data.relations.length; i < len; i++) {
+        //         if (data.relations[i].fromID == mainEntity.id) {
+        //             mainRelations.push(data.relations[i]);
+        //         }
+        //     }
+        //     mainRelations.sort(function (a, b) {
+        //         return b.relationWeight - a.relationWeight;
+        //     });
+        //     setTimeout(function () {
+        //         graphMain.highlightEdge(mainRelations[0].id);
+        //         graphMain.showRelationDetail(mainRelations[0].id);
+        //     });
+                // 默认显示主要实体
+                setTimeout(function () {
+                    graphMain.showEntityDetail(data.mainEntity, false);
+                });
         }
 
         // Intro Component is defaultly included (except location has releation param)

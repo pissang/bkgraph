@@ -84,6 +84,9 @@ define(function (require) {
         // 第一次展现的节点数，用于计算用户探索的百分比
         this._baseEntityCount = 0;
 
+        // 默认展开层数
+        this._defaultLayerCount = 1;
+
         this._parallax = null;
     };
 
@@ -394,6 +397,7 @@ define(function (require) {
         var nodeNum = 200; // 每条日志中传的最大节点个数
         var sendLogTimes = Math.ceil(title.length / nodeNum); // 发送次数
         var logParam = [];
+        var params = util.getURLSearch();
         for (var times = 0; times < sendLogTimes; times++) {
             logParam = [];
             var len = (times + 1) * nodeNum > title.length ? title.length : (times + 1) * nodeNum;
@@ -404,7 +408,8 @@ define(function (require) {
             bkgLog({
                 type: 'zhishitupuse',
                 target: logParam.join(','),
-                page: sendLogTimes + '-' + (times + 1)
+                page: sendLogTimes + '-' + (times + 1),
+                extend: params['srcid']
             });
         }
     };
@@ -430,8 +435,8 @@ define(function (require) {
         // 所有边都在 zlevel-0 层
         graph.eachEdge(function (e) {
             if (
-                e.node1.data.layerCounter <= 1 &&
-                e.node2.data.layerCounter <= 1
+                e.node1.data.layerCounter <= this._defaultLayerCount &&
+                e.node2.data.layerCounter <= this._defaultLayerCount
             ) {
                 if (!e.isExtra) {
                     if (!e.node1.entity) {
@@ -1217,11 +1222,19 @@ define(function (require) {
             }
         }
 
+        var expandedSum = 0;
+        this._graph.eachNode(function (n) {
+            if (n.data.layerCounter > this._defaultLayerCount) {
+                expandedSum ++;
+            }
+        });
+
         if (logTitle.length) {
             bkgLog({
                 type: 'zhishitupuexpand',
                 target: logTitle.join(','),
-                area: 'entity'
+                area: 'entity',
+                extend: expandedSum
             });
         }
 
