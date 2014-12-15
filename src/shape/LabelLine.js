@@ -32,6 +32,7 @@ define(function (require) {
             style.cx,
             cy - style.a
         );
+        ctx.closePath();
     };
 
     LabelLine.prototype.brush = function (ctx, isHighlight) {
