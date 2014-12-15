@@ -68,7 +68,7 @@ define(function (require) {
         this._$toggleBtn.innerHTML = '搜 索<span class="arrow"></span>';
 
         bkgLog({
-            type: 'hide',
+            type: 'zhishitupuhide',
             area: 'searchbar'
         });
     }
@@ -86,7 +86,7 @@ define(function (require) {
         }
         
         bkgLog({
-            type: 'show',
+            type: 'zhishitupushow',
             area: 'searchbar'
         });
     }
@@ -126,7 +126,7 @@ define(function (require) {
         this._loadImage();
 
         bkgLog({
-            type: 'click',
+            type: 'zhishitupuclick',
             target: 'next',
             area: 'searchbar'
         });
@@ -155,7 +155,7 @@ define(function (require) {
         this._loadImage();
 
         bkgLog({
-            type: 'click',
+            type: 'zhishitupuclick',
             target: 'pre',
             area: 'searchbar'
         });
@@ -186,7 +186,7 @@ define(function (require) {
         this._updateSlider();
 
         bkgLog({
-            type: 'search',
+            type: 'zhishitupusearch',
             target: name
         });
     }
@@ -202,7 +202,7 @@ define(function (require) {
             graphMain.moveToEntity(id);
 
             bkgLog({
-                type: 'click',
+                type: 'zhishitupuclick',
                 target: id,
                 area: 'searchbar'
             });

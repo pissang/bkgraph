@@ -21,7 +21,7 @@
     </div>
 
     <div class="bkg-taglist">
-        <!-- if: ${singleTag} -->
+        <!-- if: ${singleTag} && ${singleTag.length}-->
         <div class="bkg-tags bkg-tags-highlight">
             <span>TA的那些事儿:</span>
             <!-- for: ${singleTag} as ${tag}, ${index} -->
@@ -29,7 +29,7 @@
             <!-- /for -->
         </div>
         <!-- /if -->
-        <!-- if: ${recommendation} -->
+        <!-- if: ${recommendation} && ${recommendation.length} -->
         <div class="bkg-rec-tags">
             <p class="bkg-tag-title">您可能感兴趣那些人儿</p>
             <ul>

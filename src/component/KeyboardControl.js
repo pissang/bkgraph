@@ -30,7 +30,7 @@ define(function (require) {
                 case 87: //w
                 case 38: //up arrow
                     bkgLog({
-                        type: 'keyboard',
+                        type: 'zhishitupukeyboard',
                         target: 'up'
                     });
                     graphMain.moveTop();
@@ -38,7 +38,7 @@ define(function (require) {
                 case 83: //s
                 case 40: //down arrow
                     bkgLog({
-                        type: 'keyboard',
+                        type: 'zhishitupukeyboard',
                         target: 'down'
                     });
                     graphMain.moveDown();
@@ -46,7 +46,7 @@ define(function (require) {
                 case 65: //a
                 case 37: //left arrow
                     bkgLog({
-                        type: 'keyboard',
+                        type: 'zhishitupukeyboard',
                         target: 'left'
                     });
                     graphMain.moveLeft();
@@ -54,21 +54,21 @@ define(function (require) {
                 case 68: //d
                 case 39: //right arrow
                     bkgLog({
-                        type: 'keyboard',
+                        type: 'zhishitupukeyboard',
                         target: 'right'
                     });
                     graphMain.moveRight();
                     break;
                 case 81: //Q
                     bkgLog({
-                        type: 'keyboard',
+                        type: 'zhishitupukeyboard',
                         target: 'zoomout'
                     });
                     graphMain.zoomOut();
                     break;
                 case 69: //E
                     bkgLog({
-                        type: 'keyboard',
+                        type: 'zhishitupukeyboard',
                         target: 'zoomin'
                     });
                     graphMain.zoomIn();

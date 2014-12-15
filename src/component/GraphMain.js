@@ -929,6 +929,7 @@ define(function (require) {
         if (sideBar) {
 
             jsonp(this._kgraph._detailAPI, { detail_id: n.id }, 'callback', function (data) {
+                data._datatype = 'entity'; // for ubs log
                 sideBar.setData(data);
             });
             if (showSidebar) {
@@ -958,6 +959,7 @@ define(function (require) {
 
                 data.fromEntity = self._graph.getNodeById(data.fromID).data;
                 data.toEntity = self._graph.getNodeById(data.toID).data;
+                data._datatype = 'relation'; // for ubs log
 
                 sideBar.setData(data, true);
                 var logParam = [
@@ -1223,10 +1225,13 @@ define(function (require) {
             }
         }
 
-        var expandedSum = 0;
-        this._graph.eachNode(function (n) {
-            if (n.data.layerCounter > self._defaultLayerCount) {
-                expandedSum ++;
+        var expandedSum = [];
+        this._graph.eachNode(function (n, index) {
+            if (expandedSum[n.data.layerCounter]) {
+                expandedSum[n.data.layerCounter] ++;
+            }
+            else {
+                expandedSum[n.data.layerCounter] = 1;
             }
         });
 
@@ -1235,7 +1240,7 @@ define(function (require) {
                 type: 'zhishitupuexpand',
                 target: logTitle.join(','),
                 area: 'entity',
-                extend: expandedSum
+                extend: expandedSum.join(',')
             });
         }
 
