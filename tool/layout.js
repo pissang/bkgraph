@@ -6,6 +6,7 @@ program
     .version('0.1')
     .option('-i, --input [url]', 'Input json url or path')
     .option('-o, --output [url]', 'Output json url or path')
+    .option('-I, --ID [id]', 'Graph id')
     .parse(process.argv);
 
 var layout = require('./layout/index');
@@ -29,7 +30,14 @@ if (inputFile.indexOf('http://') >= 0 || inputFile.indexOf('https://') >= 0) {
 
 function writeBack(data) {
     if (outputFile.indexOf('http://') >= 0 || outputFile.indexOf('https://') >= 0) {
-
+        request.post(outputFile, {
+            form: {
+                id: program.ID,
+                data: JSON.stringify(data)
+            }
+        }, function (args, response, body) {
+            console.log(body);
+        });
     } else {
         fs.writeFileSync(outputFile, JSON.stringify(data), 'UTF-8');
     }

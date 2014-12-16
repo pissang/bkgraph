@@ -31,7 +31,7 @@ var ForceLayout = function(opts) {
     this.onupdate = opts.onupdate || function () {};
     this.onstable = opts.onstable || function () {};
 
-    this.stableThreshold = 1;
+    this.stableThreshold = 10;
 
     this._layout = null;
 
