@@ -463,32 +463,6 @@ define(function (require) {
     };
 
     /**
-     * 简单的摆放成放射状
-     */
-    GraphMain.prototype.naiveLayout = function (mainNode) {
-        graph.breadthFirstTraverse(function (n2, n1) {
-            if (n1) {
-                if (!n2.layout.position) {
-                    var cx = n1.layout.position[0];
-                    var cy = n1.layout.position[1];
-                    var r = 1000 / Math.pow(n1.data.layerCounter + 1, 2);
-                    n1.__count = n1.__count || 0;
-                    var angle = Math.PI * 2 * n1.__count / n1.outDegree();
-                    n1.__count ++;
-                    if (n1.__count === n1.outDegree()) {
-                        // 置零
-                        n1.__count = 0;
-                    }
-                    n2.layout.position = [
-                        Math.cos(angle) * r + cx,
-                        Math.sin(angle) * r + cy
-                    ];
-                }
-            }
-        }, mainNode, 'out');
-    };
-
-    /**
      * 放射树状布局
      */
     GraphMain.prototype.radialTreeLayout = function () {
@@ -503,9 +477,9 @@ define(function (require) {
             };
         }, this);
         var layout = new TreeLayout();
-        var layerPadding = [100, 200, 200, 200, 200, 200, 200];
+
         layout.layerPadding = function (level) {
-            return layerPadding[level] || 200;
+            return config.layout.layerDistance[level] || 200;
         };
         layout.run(tree);
 
@@ -544,7 +518,6 @@ define(function (require) {
         ];
         forceLayout.gravity = 0;
         forceLayout.scaling = 12;
-        forceLayout.coolDown = 0.99999;
         // forceLayout.enableAcceleration = false;
         forceLayout.maxSpeedIncrease = 100;
         // 这个真是不好使

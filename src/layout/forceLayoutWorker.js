@@ -225,10 +225,6 @@ define(function __echartsForceLayoutWorker(require) {
         this.position = vec2.create();
 
         this.force = vec2.create();
-        this.forcePrev = vec2.create();
-
-        this.speed = vec2.create();
-        this.speedPrev = vec2.create();
 
         // If repulsionByDegree is true
         //  mass = inDegree + outDegree + 1
@@ -385,8 +381,6 @@ define(function __echartsForceLayoutWorker(require) {
         // Reset forces
         for (var i = 0; i < nNodes; i++) {
             var node = this.nodes[i];
-            vec2.copy(node.forcePrev, node.force);
-            vec2.copy(node.speedPrev, node.speed);
             vec2.set(node.force, 0, 0);
         }
 
@@ -413,42 +407,13 @@ define(function __echartsForceLayoutWorker(require) {
         var v = vec2.create();
         for (var i = 0; i < nNodes; i++) {
             var node = this.nodes[i];
-            var speed = node.speed;
 
-            // var swing = vec2.dist(node.force, node.forcePrev);
-            // // var swing = 30;
-            // vec2.scale(node.force, node.force, 1 / (1 + Math.sqrt(swing)));
-            vec2.scale(node.force, node.force, 1 / 30);
+            var len = vec2.len(node.force);
 
-            // contraint force
-            var df = vec2.len(node.force) + 0.1;
-            var scale = Math.min(df, 500.0) / df;
-            vec2.scale(node.force, node.force, scale);
+            var scale = Math.min(len / 10, 1) * 10 / len;
+            vec2.scale(node.force, node.force, scale)
 
-            vec2.add(speed, speed, node.force);
-            vec2.scale(speed, speed, this.temperature);
-
-            // Prevent swinging
-            // Limited the increase of speed up to 100% each step
-            // TODO adjust by nodes number
-            // TODO First iterate speed control
-            vec2.sub(v, speed, node.speedPrev);
-            var swing = vec2.len(v);
-            if (swing > 0) {
-                vec2.scale(v, v, 1 / swing);
-                var base = vec2.len(node.speedPrev);
-                if (base > 0) {
-                    swing = Math.min(swing / base, this.maxSpeedIncrease) * base;
-                    vec2.scaleAndAdd(speed, node.speedPrev, v, swing);
-                }
-            }
-
-            // constraint speed
-            var ds = vec2.len(speed);
-            var scale = Math.min(ds, 100.0) / (ds + 0.1);
-            vec2.scale(speed, speed, scale);
-
-            vec2.add(node.position, node.position, speed);
+            vec2.add(node.position, node.position, node.force);
         }
     };
 
