@@ -113,6 +113,7 @@ define(function (require) {
             var relation = data.relations[j];
             if (relation.isExtra) {
                 data.relations.splice(j, 1);
+                j--;
             }
         }
 
