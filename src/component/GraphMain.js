@@ -489,7 +489,7 @@ define(function (require) {
             vec2.min(min, min, treeNode.layout.position);
             vec2.max(max, max, treeNode.layout.position);
         });
-        var width = max[0] - min[0];
+        var width = max[0] - min[0] + 0.1;
         var height = max[1] - min[1];
         tree.traverse(function (treeNode) {
             var graphNode = this._graphLayout.getNodeById(treeNode.id);
