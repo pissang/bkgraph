@@ -108,6 +108,14 @@ define(function (require) {
             }
         }
 
+        for (var j = 0; j < data.relations.length; j++) {
+            // 去掉补边
+            var relation = data.relations[j];
+            if (relation.isExtra) {
+                data.relations.splice(j, 1);
+            }
+        }
+
         return data;
     }
 

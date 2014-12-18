@@ -375,11 +375,11 @@ define(function (require) {
         
         this._loadStorage();
 
-        var circles = this._findCircles(config.circleKeywords.split(','));
-        this._circles = circles;
-        for (var i = 0; i < circles.length; i++) {
-            this._highlightCircle(circles[i]);
-        }
+        // var circles = this._findCircles(config.circleKeywords.split(','));
+        // this._circles = circles;
+        // for (var i = 0; i < circles.length; i++) {
+        //     this._highlightCircle(circles[i]);
+        // }
 
         // 刚打开时的展开动画
         if (config.enableAnimation && this.enableEntryAnimation) {
@@ -707,6 +707,9 @@ define(function (require) {
         if (typeof(node) === 'string') {
             node = this._graph.getNodeById(node);
         }
+        this.lowlightAll();
+
+        this.hoverNode(node);
         if (node.entity && !node._isHighlight) {
             node.entity.highlight();
             node._isHighlight = true;
@@ -1565,7 +1568,7 @@ define(function (require) {
             if (self._lastClickNode !== node) {
                 self._lastClickNode = node;
                 self._syncOutTipEntities();
-                self.highlightNodeAndAdjacency(node);
+                self.highlightNode(node);
 
                 bkgLog({
                     type: 'zhishitupuclick',
