@@ -25,7 +25,7 @@
         <div class="bkg-tags bkg-tags-highlight">
             <span>TA的那些事儿:</span>
             <!-- for: ${singleTag} as ${tag}, ${index} -->
-            <a href="http://www.baidu.com/s?wd=${name}%20${tag.text}" title="${name} ${tag.text}_百度搜索" data-area="entity-singleTag" target="_blank">${tag.text}</a>
+            <a href="http://www.baidu.com/s?wd=${name|url}%20${tag.text|url}" title="${name} ${tag.text}_百度搜索" data-area="entity-singleTag" target="_blank">${tag.text}</a>
             <!-- /for -->
         </div>
         <!-- /if -->
@@ -35,11 +35,11 @@
             <ul>
                 <!-- for: ${recommendation} as ${recTag}, ${index} -->
                 <li>
-                    <a href="http://www.baidu.com/s?wd=${recTag.name}" target="_blank" data-area="entity-recommendation" title="${recTag.name}_百度搜索" class="bkg-hoverable">
+                    <a href="http://www.baidu.com/s?wd=${recTag.name|url}" target="_blank" data-area="entity-recommendation" title="${recTag.name}_百度搜索" class="bkg-hoverable">
                         <img src="${recTag.image}" alt="">
                         <h5>${recTag.name|truncate(6)}</h5>
                     </a>
-                    <a href="http://www.baidu.com/s?wd=${recTag.name}" target="_blank" data-area="entity-recommendation" title="${recTag.name}_百度搜索">
+                    <a href="http://www.baidu.com/s?wd=${recTag.name|url}" target="_blank" data-area="entity-recommendation" title="${recTag.name}_百度搜索">
                         <span>${recTag.reason|truncate(10)}</span>
                     </a>
                 </li>
