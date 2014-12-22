@@ -17,6 +17,7 @@ define(function (require) {
     var KeyboardControl = require('./component/KeyboardControl');
     var Loading = require('./component/Loading');
     var Intro = require('./component/Intro');
+    var Tip = require('./component/Tip');
     var etpl = require('etpl');
     var jsonp = require('./util/jsonp');
     var util = require('./util/util');
@@ -183,6 +184,10 @@ define(function (require) {
         //     var intro = new Intro();
         //     this.addComponent(intro);
         // }
+
+        // add Tip
+        var tip = new Tip();
+        this.addComponent(tip);
     }
 
     BKGraph.prototype.addComponent = function (component) {
@@ -277,6 +282,7 @@ define(function (require) {
         KeyboardControl: KeyboardControl,
         HeaderBar: HeaderBar,
         Intro: Intro,
+        Tip: Tip,
 
         init: init
     };

@@ -109,10 +109,16 @@ define(function (require) {
         if (util.hasClass(this.el, 'hidden')) {
             util.removeClass(this.el, 'hidden');
 
-            // 图谱部分右移
+            // 图谱部分左移
             var graphMain = this._kgraph.getComponentByType('GRAPH');
             if (graphMain) {
                 graphMain.el.style.left = -(this.el.clientWidth / 2) + 'px';
+            }
+
+            // tip左移
+            var tip = this._kgraph.getComponentByType('TIP');
+            if (tip) {
+                tip.el.style.left = (parseInt(tip.el.style.left) - this.el.clientWidth / 2) + 'px';
             }
 
             this._$toggleBtn.innerHTML = '隐<br />藏<br />>';

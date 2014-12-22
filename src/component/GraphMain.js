@@ -24,6 +24,7 @@ define(function (require) {
     var jsonp = require('../util/jsonp');
 
     var Cycle = require('./Cycle');
+    var Tip = require('./Tip');
 
     var config = require('../config');
 
@@ -88,6 +89,9 @@ define(function (require) {
         this._defaultLayerCount = 1;
 
         this._parallax = null;
+
+        // 小浮层
+        this._tipActive = null;
     };
 
     GraphMain.prototype.type = 'GRAPH';
@@ -956,6 +960,60 @@ define(function (require) {
     };
 
     /**
+     * 显示实体摘要
+     */
+    GraphMain.prototype.showEntityTip = function (n) {
+        var graph = this._graphLayout;
+        if (typeof(n) === 'string') {
+            n = graph.getNodeById(n);
+        }
+
+        this._tipActive = n.id;
+
+        var tip = this._kgraph.getComponentByType('TIP');
+        if (tip) {
+            var self = this;
+            jsonp(this._kgraph._detailAPI, { detail_id: n.id }, 'callback', function (data) {
+                if (self._tipActive == n.id) {
+                    tip.setData(data, n);
+                }
+            });
+        }
+    };
+
+    /**
+     * 显示关系摘要
+     */
+    GraphMain.prototype.showRelationTip = function (e) {
+        if (typeof(e) === 'string') {
+            e = this._getEdgeByID(e);
+        }
+
+        this._tipActive = e.data.id;
+
+        var tip = this._kgraph.getComponentByType('TIP');
+        if (tip) {
+            var self = this;
+            jsonp(this._kgraph._detailAPI, { detail_id: e.data.id }, 'callback', function (data) {
+                if (self._tipActive == e.data.id) {
+                    data.fromEntity = self._graph.getNodeById(data.fromID).data;
+                    data.toEntity = self._graph.getNodeById(data.toID).data;
+                    tip.setData(data, e, true);
+                }
+            });
+        }
+    };
+
+    /**
+     * 隐藏摘要
+     */
+    GraphMain.prototype.hideTip = function () {
+        var tip = this._kgraph.getComponentByType('TIP');
+        tip.hide();
+        this._tipActive = null;
+    };
+
+    /**
      * 移动视图到指定的实体位置
      */
     GraphMain.prototype.moveToEntity = function (n, cb) {
@@ -1539,6 +1597,7 @@ define(function (require) {
 
                 self.dispatch('mouseover:entity', node.data);
 
+                self.showEntityTip(node);
                 self.hoverNode(node);
                 self.expandNode(node);
 
@@ -1552,6 +1611,7 @@ define(function (require) {
         });
         nodeEntity.bind('mouseout', function () {
             if (node !== self._activeNode) {
+                self.hideTip();
                 self.unhoverNode(node);
                 //  回复到高亮状态
                 if (node._isHighlight) {
@@ -1656,6 +1716,8 @@ define(function (require) {
                 if (self._lastHoverEdge !== e) {
                     self.dispatch('mouseover:relation', e.data);
 
+                    self.showRelationTip(e);
+
                     if (config.enableAnimation) {
                         edgeEntity.animateTextPadding(zr, 300, 12);
                         edgeEntity.startActiveAnimation(zr);
@@ -1666,6 +1728,7 @@ define(function (require) {
                 self._lastHoverEdge = e;
             });
             edgeEntity.bind('mouseout', function () {
+                self.hideTip();
                 if (config.enableAnimation) {
                     edgeEntity.animateTextPadding(zr, 300, 5);
                     edgeEntity.stopActiveAnimation(zr);
