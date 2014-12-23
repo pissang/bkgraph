@@ -908,7 +908,7 @@ define(function (require) {
         var sideBar = this._kgraph.getComponentByType('SIDEBAR');
         if (sideBar) {
 
-            jsonp(this._kgraph._detailAPI, { detail_id: n.id }, 'callback', function (data) {
+            jsonp(this._kgraph.getDetailAPI(), { detail_id: n.id }, 'callback', function (data) {
                 data._datatype = 'entity'; // for ubs log
                 sideBar.setData(data);
             });
@@ -935,7 +935,7 @@ define(function (require) {
             //     data[name] = e.data[name];
             // }
             var self = this;
-            jsonp(this._kgraph._detailAPI, { detail_id: e.data.id }, 'callback', function (data) {
+            jsonp(this._kgraph.getDetailAPI(), { detail_id: e.data.id }, 'callback', function (data) {
 
                 data.fromEntity = self._graph.getNodeById(data.fromID).data;
                 data.toEntity = self._graph.getNodeById(data.toID).data;
@@ -973,7 +973,7 @@ define(function (require) {
         var tip = this._kgraph.getComponentByType('TIP');
         if (tip) {
             var self = this;
-            jsonp(this._kgraph._detailAPI, { detail_id: n.id }, 'callback', function (data) {
+            jsonp(this._kgraph.getDetailAPI(), { detail_id: n.id }, 'callback', function (data) {
                 if (self._tipActive == n.id) {
                     tip.setData(data, n);
                 }
@@ -994,7 +994,7 @@ define(function (require) {
         var tip = this._kgraph.getComponentByType('TIP');
         if (tip) {
             var self = this;
-            jsonp(this._kgraph._detailAPI, { detail_id: e.data.id }, 'callback', function (data) {
+            jsonp(this._kgraph.getDetailAPI(), { detail_id: e.data.id }, 'callback', function (data) {
                 if (self._tipActive == e.data.id) {
                     data.fromEntity = self._graph.getNodeById(data.fromID).data;
                     data.toEntity = self._graph.getNodeById(data.toID).data;

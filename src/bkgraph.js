@@ -255,6 +255,10 @@ define(function (require) {
         return this._root;
     }
 
+    BKGraph.prototype.getDetailAPI = function () {
+        return this._detailAPI;
+    };
+
     /**
      * 初始化图
      * @param {string|HTMLElement} dom
