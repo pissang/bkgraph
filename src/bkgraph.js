@@ -63,6 +63,11 @@ define(function (require) {
         // if (typeof(url) === 'string' && url.indexOf('http') == 0) {
 
             jsonp(url, 'callback', function (data) {
+
+                if (!data) {
+                    self.removeComponent(loading);
+                    return;
+                }
                 data = self._fixData(data);
                 self._rawData = data;
 
@@ -98,6 +103,9 @@ define(function (require) {
     }
 
     BKGraph.prototype._fixData = function (data) {
+        if (!data.entities || !data.relations) {
+            return;
+        }
         for (var i = 0; i < data.entities.length; i++) {
             var entity = data.entities[i];
             // 数据修正
@@ -109,12 +117,26 @@ define(function (require) {
             }
         }
 
+        var isExtraRelation = {};
         for (var j = 0; j < data.relations.length; j++) {
-            // 去掉补边
+            // 每个实体最多3条补边
             var relation = data.relations[j];
             if (relation.isExtra) {
-                data.relations.splice(j, 1);
-                j--;
+                if (!isExtraRelation[relation.fromID]) {
+                    isExtraRelation[relation.fromID] = [];
+                }
+                if (!isExtraRelation[relation.toID]) {
+                    isExtraRelation[relation.toID] = [];
+                }
+                if (isExtraRelation[relation.fromID].length > 2
+                    || isExtraRelation[relation.toID].length > 2
+                ) {
+                    data.relations.splice(j--, 1);
+                }
+                else {
+                    isExtraRelation[relation.fromID].push(relation.id);
+                    isExtraRelation[relation.toID].push(relation.id);
+                }
             }
         }
 
