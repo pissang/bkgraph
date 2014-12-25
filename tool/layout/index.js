@@ -78,6 +78,7 @@ function forceLayout(graph, opts) {
 
     var forceLayout = new ForceLayout();
     forceLayout.scaling = Math.sqrt(graph.nodes.length / 100) * 12;
+    forceLayout.edgeLength = Math.max(graph.nodes.length / 100 * 150, 100);
     forceLayout.preventNodeOverlap = true;
     forceLayout.preventNodeEdgeOverlap = true;
     forceLayout.center = [opts.width / 2, opts.height / 2];
@@ -92,8 +93,8 @@ function forceLayout(graph, opts) {
     forceLayout.init(graph);
 
     var count = 0;
-    while (count < 20 && !forceLayout.isStable()) {
-        forceLayout.step(10);
+    while (count < 500 && !forceLayout.isStable()) {
+        forceLayout.step(1);
         count++;
     }
 }

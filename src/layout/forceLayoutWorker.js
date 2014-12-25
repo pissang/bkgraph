@@ -280,6 +280,8 @@ define(function __echartsForceLayoutWorker(require) {
         this.layerDistance = [0];
         this.layerConstraint = 0;
 
+        this.edgeLength = 150;
+
         this._rootRegion = new Region();
         this._rootRegion.centerOfMass = vec2.create();
 
@@ -295,12 +297,10 @@ define(function __echartsForceLayoutWorker(require) {
     };
 
     ForceLayout.prototype.attractionFactor = function (w, d, k) {
-        return w * d / k;
+        return w * d / k * d / this.edgeLength;
     };
 
     ForceLayout.prototype.initNodes = function(nodes) {
-
-        this.temperature = 1.0;
 
         var nNodes = nodes.length;
         this.nodes.length = 0;
@@ -561,7 +561,7 @@ define(function __echartsForceLayoutWorker(require) {
 
             var factor;
 
-            if (this.preventOverlap) {
+            if (this.preventNodeOverlap) {
                 d = d - na.size - nb.size;
                 if (d <= 0) {
                     // No attraction
@@ -725,11 +725,8 @@ define(function __echartsForceLayoutWorker(require) {
                         var nNodes = forceLayout.nodes.length;
                         var positionArr = new Float32Array(nNodes * 2 + 1);
 
-                        forceLayout.temperature = e.data.temperature;
-
                         for (var i = 0; i < steps; i++) {
                             forceLayout.update();
-                            forceLayout.temperature *= e.data.coolDown;
                         }
                         // Callback
                         for (var i = 0; i < nNodes; i++) {

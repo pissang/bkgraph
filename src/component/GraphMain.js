@@ -43,9 +43,6 @@ define(function (require) {
         this.minRadius = 30;
         this.maxRadius = 40;
 
-        this.minRelationWeight = 20;
-        this.maxRelationWeight = 20;
-
         this.draggable = false;
 
         this.enableEntryAnimation = true;
@@ -522,6 +519,7 @@ define(function (require) {
         ];
         forceLayout.gravity = 0;
         forceLayout.scaling = Math.sqrt(graph.nodes.length / 100) * 12;
+        forceLayout.edgeLength = Math.max(graph.nodes.length / 100 * 150, 100);
         forceLayout.preventNodeOverlap = true;
         forceLayout.preventNodeEdgeOverlap = true;
 
@@ -537,23 +535,14 @@ define(function (require) {
         forceLayout.layerConstraint = config.layout.layerConstraint;
         forceLayout.layerDistance = layerDistance;
 
-        max = -Infinity;
-        min = Infinity;
+        var factor = Math.sqrt(graph.nodes.length);
         graph.eachEdge(function (e) {
-            min = Math.min(min, e.data.relationWeight);
-            max = Math.max(max, e.data.relationWeight);
-        });
-        diff = max - min;
-        graph.eachEdge(function (e) {
-            var w = diff > 0 ? 
-                (e.data.relationWeight - min) / diff * (this.maxRelationWeight - this.minRelationWeight) + this.minRelationWeight
-                : (this.maxRelationWeight + this.minRelationWeight) / 2;
             e.layout = {
-                weight: w
+                weight: 20
             };
         }, this);
 
-        forceLayout.init(graph, true);
+        forceLayout.init(graph, false);
         forceLayout.temperature = 0.04;
         this._layouting = true;
         var self = this;

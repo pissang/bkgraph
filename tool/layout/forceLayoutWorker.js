@@ -3,142 +3,6 @@ var vec2 = require('../common/vector');
 var ArrayCtor = typeof(Float32Array) == 'undefined' ? Array : Float32Array;
 
 /****************************
- * Class: Region
- ***************************/
-
-function Region() {
-
-    this.subRegions = [];
-
-    this.nSubRegions = 0;
-
-    this.node = null;
-
-    this.mass = 0;
-
-    this.centerOfMass = null;
-
-    this.bbox = new ArrayCtor(4);
-
-    this.size = 0;
-}
-
-// Reset before update
-Region.prototype.beforeUpdate = function() {
-    for (var i = 0; i < this.nSubRegions; i++) {
-        this.subRegions[i].beforeUpdate();
-    }
-    this.mass = 0;
-    if (this.centerOfMass) {
-        this.centerOfMass[0] = 0;
-        this.centerOfMass[1] = 0;
-    }
-    this.nSubRegions = 0;
-    this.node = null;
-};
-// Clear after update
-Region.prototype.afterUpdate = function() {
-    this.subRegions.length = this.nSubRegions;
-    for (var i = 0; i < this.nSubRegions; i++) {
-        this.subRegions[i].afterUpdate();
-    }
-};
-
-Region.prototype.addNode = function(node) {
-    if (this.nSubRegions === 0) {
-        if (this.node == null) {
-            this.node = node;
-            return;
-        }
-        else {
-            this._addNodeToSubRegion(this.node);
-            this.node = null;
-        }
-    }
-    this._addNodeToSubRegion(node);
-
-    this._updateCenterOfMass(node);
-};
-
-Region.prototype.findSubRegion = function(x, y) {
-    for (var i = 0; i < this.nSubRegions; i++) {
-        var region = this.subRegions[i];
-        if (region.contain(x, y)) {
-            return region;
-        }
-    }
-};
-
-Region.prototype.contain = function(x, y) {
-    return this.bbox[0] <= x
-        && this.bbox[2] >= x
-        && this.bbox[1] <= y
-        && this.bbox[3] >= y;
-};
-
-Region.prototype.setBBox = function(minX, minY, maxX, maxY) {
-    // Min
-    this.bbox[0] = minX;
-    this.bbox[1] = minY;
-    // Max
-    this.bbox[2] = maxX;
-    this.bbox[3] = maxY;
-
-    this.size = (maxX - minX + maxY - minY) / 2;
-};
-
-Region.prototype._newSubRegion = function() {
-    var subRegion = this.subRegions[this.nSubRegions];
-    if (!subRegion) {
-        subRegion = new Region();
-        this.subRegions[this.nSubRegions] = subRegion;
-    }
-    this.nSubRegions++;
-    return subRegion;
-};
-
-Region.prototype._addNodeToSubRegion = function(node) {
-    var subRegion = this.findSubRegion(node.position[0], node.position[1]);
-    var bbox = this.bbox;
-    if (!subRegion) {
-        var cx = (bbox[0] + bbox[2]) / 2;
-        var cy = (bbox[1] + bbox[3]) / 2;
-        var w = (bbox[2] - bbox[0]) / 2;
-        var h = (bbox[3] - bbox[1]) / 2;
-        
-        var xi = node.position[0] >= cx ? 1 : 0;
-        var yi = node.position[1] >= cy ? 1 : 0;
-
-        var subRegion = this._newSubRegion();
-        // Min
-        subRegion.setBBox(
-            // Min
-            xi * w + bbox[0],
-            yi * h + bbox[1],
-            // Max
-            (xi + 1) * w + bbox[0],
-            (yi + 1) * h + bbox[1]
-        );
-    }
-
-    subRegion.addNode(node);
-};
-
-Region.prototype._updateCenterOfMass = function(node) {
-    // Incrementally update
-    if (this.centerOfMass == null) {
-        this.centerOfMass = vec2.create();
-    }
-    var x = this.centerOfMass[0] * this.mass;
-    var y = this.centerOfMass[1] * this.mass;
-    x += node.position[0] * node.mass;
-    y += node.position[1] * node.mass;
-    this.mass += node.mass;
-    this.centerOfMass[0] = x / this.mass;
-    this.centerOfMass[1] = y / this.mass;
-};
-
-/****************************
  * Class: Graph Node
  ***************************/
 function GraphNode() {
@@ -170,10 +34,6 @@ function GraphEdge(node1, node2) {
  * Class: ForceLayout
  ***************************/
 function ForceLayout() {
-
-    this.barnesHutOptimize = false;
-    this.barnesHutTheta = 1.5;
-
     this.repulsionByDegree = false;
 
     this.preventNodeOverlap = false;
@@ -198,8 +58,7 @@ function ForceLayout() {
     this.layerDistance = [0];
     this.layerConstraint = 0;
 
-    this._rootRegion = new Region();
-    this._rootRegion.centerOfMass = vec2.create();
+    this.edgeLength = 150;
 
     this._k = 0;
 }
@@ -213,7 +72,7 @@ ForceLayout.prototype.edgeToNodeRepulsionFactor = function (mass, d, k) {
 };
 
 ForceLayout.prototype.attractionFactor = function (w, d, k) {
-    return w * d / k;
+    return w * d / k * d / this.edgeLength;
 };
 
 ForceLayout.prototype.initNodes = function(nodes) {
@@ -264,32 +123,6 @@ ForceLayout.prototype.update = function() {
     this.updateBBox();
 
     this._k = 0.4 * this.scaling * Math.sqrt(this.width * this.height / nNodes);
-
-    if (this.barnesHutOptimize) {
-        this._rootRegion.setBBox(
-            this.bbox[0], this.bbox[1],
-            this.bbox[2], this.bbox[3]
-        );
-        this._rootRegion.beforeUpdate();
-        for (var i = 0; i < nNodes; i++) {
-            this._rootRegion.addNode(this.nodes[i]);
-        }
-        this._rootRegion.afterUpdate();
-    }
-    else {
-        // Update center of mass of whole graph
-        var mass = 0;
-        var centerOfMass = this._rootRegion.centerOfMass;
-        vec2.set(centerOfMass, 0, 0);
-        for (var i = 0; i < nNodes; i++) {
-            var node = this.nodes[i];
-            mass += node.mass;
-            vec2.scaleAndAdd(centerOfMass, centerOfMass, node.position, node.mass);
-        }
-        if (mass > 0) {
-            vec2.scale(centerOfMass, centerOfMass, 1 / mass);
-        }
-    }
 
     this.updateForce();
 
@@ -375,32 +208,6 @@ ForceLayout.prototype.updateNodeEdgeForce = function () {
         }
     }
 };
-
-ForceLayout.prototype.applyRegionToNodeRepulsion = (function() {
-    var v = vec2.create();
-    return function applyRegionToNodeRepulsion(region, node) {
-        if (region.node) { // Region is a leaf 
-            this.applyNodeToNodeRepulsion(region.node, node, true);
-        }
-        else {
-            // Static region and node
-            if (region.mass === 0 && node.mass === 0) {
-                return;
-            }
-            vec2.sub(v, node.position, region.centerOfMass);
-            var d2 = v[0] * v[0] + v[1] * v[1];
-            if (d2 > this.barnesHutTheta * region.size * region.size) {
-                var factor = this._k * this._k * (node.mass + region.mass) / (d2 + 1);
-                vec2.scaleAndAdd(node.force, node.force, v, factor * 2);
-            }
-            else {
-                for (var i = 0; i < region.nSubRegions; i++) {
-                    this.applyRegionToNodeRepulsion(region.subRegions[i], node);
-                }
-            }
-        }
-    };
-})();
 
 ForceLayout.prototype.applyNodeToNodeRepulsion = (function() {
     var v = vec2.create();

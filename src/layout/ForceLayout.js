@@ -60,8 +60,7 @@ define(function(require) {
         this.layerDistance = [0];
 
         this.onupdate = opts.onupdate || function () {};
-        this.temperature = opts.temperature || 1;
-        this.coolDown = opts.coolDown || 0.99;
+        this.edgeLength = 150;
 
         this._layout = null;
         this._layoutWorker = null;
@@ -90,7 +89,8 @@ define(function(require) {
             preventNodeOverlap: this.preventNodeOverlap,
             preventNodeEdgeOverlap: this.preventNodeEdgeOverlap,
             layerConstraint: this.layerConstraint,
-            layerDistance: this.layerDistance
+            layerDistance: this.layerDistance,
+            edgeLength: this.edgeLength
         };
 
         if (this._layoutWorker) {
@@ -202,12 +202,8 @@ define(function(require) {
             this._layoutWorker.postMessage({
                 cmd: 'update',
                 steps: steps,
-                temperature: this.temperature,
-                coolDown: this.coolDown
+                temperature: this.temperature
             });
-            for (var i = 0; i < steps; i++) {
-                this.temperature *= this.coolDown;
-            }
         }
         else {
             
@@ -220,7 +216,6 @@ define(function(require) {
             for (var i = 0; i < steps; i++) {
                 this._layout.temperature = this.temperature;
                 this._layout.update();
-                this.temperature *= this.coolDown;
             }
         }
     };

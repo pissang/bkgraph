@@ -28,6 +28,8 @@ var ForceLayout = function(opts) {
     this.layerConstraint = 0;
     this.layerDistance = [0];
 
+    this.edgeLength = 150;
+
     this.onupdate = opts.onupdate || function () {};
     this.onstable = opts.onstable || function () {};
 
@@ -54,11 +56,11 @@ ForceLayout.prototype.updateConfig = function () {
         width: this.ratioScaling ? width : size,
         height: this.ratioScaling ? height : size,
         scaling: this.scaling || 1.0,
-        barnesHutOptimize: this.large,
         preventNodeOverlap: this.preventNodeOverlap,
         preventNodeEdgeOverlap: this.preventNodeEdgeOverlap,
         layerConstraint: this.layerConstraint,
-        layerDistance: this.layerDistance
+        layerDistance: this.layerDistance,
+        edgeLength: this.edgeLength
     };
 
     for (var name in config) {
