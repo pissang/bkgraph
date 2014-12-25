@@ -707,6 +707,66 @@ define(function (require) {
     };
 
     /**
+     * 高亮节点+显示邻接节点, 点击触发
+     */
+    GraphMain.prototype.highlightNodeAndShowAdjacency = function (node) {
+        if (typeof(node) === 'string') {
+            node = this._graph.getNodeById(node);
+        }
+        var zr = this._zr;
+
+        this.lowlightAll();
+
+        this.hoverNode(node);
+        node._isHighlight = true;
+
+        for (var i = 0; i < node.edges.length; i++) {
+            var e = node.edges[i];
+            var other = e.node1 === node ? e.node2 : e.node1;
+
+            //中心节点不出补边
+            if (node.data.layerCounter === 0 && e.isExtra) {
+                continue;
+            }
+
+            var newNodeEntity = false;
+            var newEdgeEntity = false;
+            if (!other.entity) {
+                // 动态添加
+                this._createNodeEntity(other);
+                newNodeEntity = true;
+            }
+            // other.entity.highlight();
+
+            if (!e.entity) {
+                // 动态添加
+                this._createEdgeEntity(e);
+                newEdgeEntity = true;
+            }
+
+            if (e.isExtra) {
+                e.entity.show();
+            }
+
+            if (config.enableAnimation) {
+                if (newNodeEntity) {
+                    this._growNodeAnimation(other, node, Math.random() * 500);
+                }
+                else if (newEdgeEntity) {
+                    e.entity.animateLength(zr, 300, 0, node.entity);
+                }
+            }
+
+            // other._isHighlight = true;
+
+            this._syncOutTipEntities();
+        }
+
+        this._syncHeaderBarExplorePercent();
+        zr.refreshNextFrame();
+    };
+
+    /**
      * 高亮节点与邻接节点, 点击触发
      */
     GraphMain.prototype.highlightNodeAndAdjacency = function (node) {
@@ -954,10 +1014,10 @@ define(function (require) {
             n = graph.getNodeById(n);
         }
 
-        this._tipActive = n.id;
-
         var tip = this._kgraph.getComponentByType('TIP');
         if (tip) {
+            this._tipActive = n.id;
+
             var self = this;
             jsonp(this._kgraph.getDetailAPI(), { detail_id: n.id }, 'callback', function (data) {
                 if (self._tipActive == n.id) {
@@ -975,10 +1035,11 @@ define(function (require) {
             e = this._getEdgeByID(e);
         }
 
-        this._tipActive = e.data.id;
-
         var tip = this._kgraph.getComponentByType('TIP');
         if (tip) {
+
+            this._tipActive = e.data.id;
+
             var self = this;
             jsonp(this._kgraph.getDetailAPI(), { detail_id: e.data.id }, 'callback', function (data) {
                 if (self._tipActive == e.data.id) {
@@ -995,8 +1056,10 @@ define(function (require) {
      */
     GraphMain.prototype.hideTip = function () {
         var tip = this._kgraph.getComponentByType('TIP');
-        tip.hide();
-        this._tipActive = null;
+        if (tip) {
+            tip.hide();
+            this._tipActive = null;
+        }
     };
 
     /**
@@ -1607,14 +1670,14 @@ define(function (require) {
             self._lastHoverNode = null;
         });
         nodeEntity.bind('click', function () {
-            self.dispatch('click:entity', node.data);
+            self.dispatch('click:entity', node);
 
             self.showEntityDetail(node, true);
 
             if (self._lastClickNode !== node) {
                 self._lastClickNode = node;
                 self._syncOutTipEntities();
-                self.highlightNode(node);
+                self.highlightNodeAndShowAdjacency(node);
 
                 bkgLog({
                     type: 'zhishitupuclick',
@@ -1676,7 +1739,7 @@ define(function (require) {
             edgeEntity.initialize(this._zr);
 
             edgeEntity.bind('click', function () {
-                self.dispatch('click:relation', e.data);
+                self.dispatch('click:relation', e);
 
                 this.showRelationDetail(e);
                 this.highlightEdge(e);

@@ -40,6 +40,11 @@ define(function (require) {
             opacity: 0.8,
             hidden: true
         };
+        this.showStyle = {
+            color: '#00a2ff',
+            opacity: 1,
+            hidden: false
+        };
         this.highlightStyle = {
             color: '#fffc00',
             opacity: 1,
@@ -122,6 +127,15 @@ define(function (require) {
                 this.hidden = value;
         }
     }
+
+    ExtraEdgeEntity.prototype.show = function () {
+        this.hidden = this.showStyle.hidden;
+        this.el.zlevel = 1;
+        this.el.style.color = this.showStyle.color;
+        this.el.style.strokeColor = this.showStyle.color;
+        this.el.style.opacity = this.showStyle.opacity;
+        this.el.modSelf();
+    };
 
     ExtraEdgeEntity.prototype.highlight = function () {
         this.hidden = this.highlightStyle.hidden;
