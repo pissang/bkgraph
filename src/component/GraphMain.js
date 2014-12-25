@@ -524,7 +524,7 @@ define(function (require) {
         forceLayout.preventNodeEdgeOverlap = true;
 
         graph.eachNode(function (n) {
-            n.layout.mass = Math.max(15 - (n.degree() - 1) * 2, 2);
+            n.layout.mass = 15;
             n.layout.layer = n.data.layerCounter;
         });
         var layerDistance = config.layout.layerDistance.slice();

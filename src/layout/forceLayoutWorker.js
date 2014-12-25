@@ -140,9 +140,7 @@ ForceLayout.prototype.updateForce = function () {
 
     this.updateNodeNodeForce();
 
-    if (this.layerConstraint > 0) {
-        this.updateLayerConstraintForce();
-    }
+    this.updateLayerConstraintForce();
 
     this.updateEdgeForce();
 
@@ -305,7 +303,8 @@ ForceLayout.prototype.applyNodeLayerConstraint = (function () {
         var d = vec2.len(v) + 1e-3;
         vec2.scale(v, v, 1 / d);
         d -= this.layerDistance[node.layer];
-        vec2.scaleAndAdd(node.force, node.force, v, d * d * this.layerConstraint * node.mass);
+        var constraint = this.layerConstraint[node.layer];
+        vec2.scaleAndAdd(node.force, node.force, v, d * d * constraint * node.mass);
     }
 }) ();
 

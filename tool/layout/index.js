@@ -91,7 +91,7 @@ function forceLayout(graph, opts) {
     forceLayout.layerDistance = layerDistance;
 
     graph.eachNode(function (n) {
-        n.layout.mass = Math.max(15 - (n.degree() - 1) * 2, 2);
+        n.layout.mass = 15;
     });
     forceLayout.init(graph);
 

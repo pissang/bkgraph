@@ -47,8 +47,8 @@ define({
     voteProjectHuoying: 'ks_huoying',
 
     layout: {
-        layerDistance: [0, 150, 300, 300, 300, 300, 300],
-        layerConstraint: 0.3
+        layerDistance: [0, 200, 300, 300, 300, 300, 300],
+        layerConstraint: [100, 1, 0.3, 0.2, 0.1, 0.1, 0.1]
     },
 
     defaultNodeImage: 'img/default-avatar.png',
