@@ -342,7 +342,7 @@ ForceLayout.prototype.applyEdgeToNodeRepulsion = (function () {
         // n3 distance to line n1-n2
         var dist = vec2.dist(p, n3.position) - n3.size;
         var factor = this.edgeToNodeRepulsionFactor(
-            n3.mass, Math.max(dist, 0.1), 500
+            n3.mass, Math.max(dist, 0.1), 100
         );
         // Use v12 as normal vector
         vec2.sub(v12, n3.position, p);

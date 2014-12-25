@@ -48,7 +48,7 @@ define({
 
     layout: {
         layerDistance: [0, 200, 300, 300, 300, 300, 300],
-        layerConstraint: [100, 1, 0.3, 0.2, 0.1, 0.1, 0.1]
+        layerConstraint: [100, 1, 0.3, 0.3, 0.2, 0.2, 0.1]
     },
 
     defaultNodeImage: 'img/default-avatar.png',
