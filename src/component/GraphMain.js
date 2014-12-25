@@ -542,11 +542,14 @@ define(function (require) {
             };
         }, this);
 
-        forceLayout.init(graph, false);
+    graph.eachNode(function (n) {
+        console.log(n.layout);
+    });
+        forceLayout.init(graph);
         forceLayout.temperature = 0.04;
         this._layouting = true;
         var self = this;
-
+        var count = 0;
         forceLayout.onupdate = function () {
             for (var i = 0; i < graph.nodes.length; i++) {
                 var n = graph.nodes[i];
@@ -556,13 +559,17 @@ define(function (require) {
             }
             self._updateNodePositions();   
 
-            if (forceLayout.temperature < 0.0001) {
+            if (forceLayout.isStable()) {
                 self.stopForceLayout();
                 cb && cb.call(self);
+                console.log(count);
             }
             else {
                 if (self._layouting) {
-                    forceLayout.step(10);
+                    requestAnimationFrame(function () {
+                        forceLayout.step(10);
+                    });
+                    count += 10;
                 }
             }
         }

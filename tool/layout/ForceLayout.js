@@ -33,7 +33,7 @@ var ForceLayout = function(opts) {
     this.onupdate = opts.onupdate || function () {};
     this.onstable = opts.onstable || function () {};
 
-    this.stableThreshold = 10;
+    this.stableThreshold = 1;
 
     this._layout = null;
 
@@ -102,28 +102,13 @@ ForceLayout.prototype.init = function (graph) {
 
     this._token = getToken();
 
-    if (this._layoutWorker) {
-
-        this._layoutWorker.postMessage({
-            cmd: 'init',
-            nodes: graph.nodes.map(function (n) {
-                return n.layout;
-            }),
-            edges: graph.edges.map(function (e) {
-                return e.layout;
-            }),
-            token: this._token
-        });
-    }
-    else {
-        this._layout.setToken(this._token);
-        this._layout.initNodes(graph.nodes.map(function (n) {
-            return n.layout;
-        }));
-        this._layout.initEdges(graph.edges.map(function (e) {
-            return e.layout;
-        }));   
-    }
+    this._layout.setToken(this._token);
+    this._layout.initNodes(graph.nodes.map(function (n) {
+        return n.layout;
+    }));
+    this._layout.initEdges(graph.edges.map(function (e) {
+        return e.layout;
+    }));
 
     this.updateConfig();
 };

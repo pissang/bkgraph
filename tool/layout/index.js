@@ -22,9 +22,9 @@ function layout(data, opts) {
 
     var graph = getGraph(data, opts);
 
-    if (noPosition) {
+    // if (noPosition) {
         radialTreeLayout(graph, opts);
-    }
+    // }
     forceLayout(graph, opts);
 
     graph.eachNode(function (node) {
@@ -90,13 +90,19 @@ function forceLayout(graph, opts) {
     forceLayout.layerConstraint = opts.layerConstraint;
     forceLayout.layerDistance = layerDistance;
 
+    graph.eachNode(function (n) {
+        n.layout.mass = Math.max(15 - (n.degree() - 1) * 2, 2);
+        console.log(n.layout);
+    });
+    
     forceLayout.init(graph);
 
     var count = 0;
-    while (count < 500 && !forceLayout.isStable()) {
-        forceLayout.step(1);
-        count++;
+    while (count < 50 && !forceLayout.isStable()) {
+        forceLayout.step(10);
+        count += 1;
     }
+    console.log(count * 10);
 }
 
 function getGraph(data, opts) {
@@ -118,15 +124,17 @@ function getGraph(data, opts) {
         var r = diff > 0 ?
             (entity.hotValue - min) * (maxRadius - minRadius) / diff + minRadius
             : (maxRadius + minRadius) / 2;
+
         n.layout = {
             position: entity.position,
-            mass: Math.max(15 - (n.degree() - 1) * 2, 2),
             size: r,
+            mass: 1,
             layer: +entity.layerCounter
         };
 
         if (+entity.layerCounter === 0) {
             n.layout.position = [opts.width / 2, opts.height / 2];
+            n.layout.size = 70;
         }
     });
 

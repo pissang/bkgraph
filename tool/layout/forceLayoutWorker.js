@@ -120,8 +120,6 @@ ForceLayout.prototype.update = function() {
 
     var nNodes = this.nodes.length;
 
-    this.updateBBox();
-
     this._k = 0.4 * this.scaling * Math.sqrt(this.width * this.height / nNodes);
 
     this.updateForce();
@@ -354,24 +352,6 @@ ForceLayout.prototype.applyEdgeToNodeRepulsion = (function () {
         vec2.scaleAndAdd(n2.force, n2.force, v12, -factor);
     };
 })();
-
-ForceLayout.prototype.updateBBox = function() {
-    var minX = Infinity;
-    var minY = Infinity;
-    var maxX = -Infinity;
-    var maxY = -Infinity;
-    for (var i = 0; i < this.nodes.length; i++) {
-        var pos = this.nodes[i].position;
-        minX = Math.min(minX, pos[0]);
-        minY = Math.min(minY, pos[1]);
-        maxX = Math.max(maxX, pos[0]);
-        maxY = Math.max(maxY, pos[1]);
-    }
-    this.bbox[0] = minX;
-    this.bbox[1] = minY;
-    this.bbox[2] = maxX;
-    this.bbox[3] = maxY;
-};
 
 ForceLayout.prototype.setToken = function(token) {
     this._token = token;
