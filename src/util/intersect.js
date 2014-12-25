@@ -135,51 +135,26 @@ define(function (require) {
         var y1 = curve.cpY1;
         var x2 = curve.xEnd;
         var y2 = curve.yEnd;
-        var interval = 0.005;
+        var interval = 0.1;
 
         var d = Infinity;
-        var t;
-        for (var _t = 0; _t < 1; _t += 0.05) {
-            v1[0] = curveTool.quadraticAt(x0, x1, x2, _t);
-            v1[1] = curveTool.quadraticAt(y0, y1, y2, _t);
-            var d2 = Math.abs(vec2.dist(center, v1) - radius);
-            if (d2 < d) {
-                d = d2;
-                t = _t;
-            }
-        }
-
-        d = Infinity;
-        // At most 32 iteration
-        for (var i = 0; i < 32; i++) {
-            if (interval < EPSILON) {
-                break;
-            }
-            var prev = t - interval;
-            var next = t + interval;
-            // t - interval
-            v2[0] = curveTool.quadraticAt(x0, x1, x2, prev);
-            v2[1] = curveTool.quadraticAt(y0, y1, y2, prev);
-
-            var d2 = Math.abs(vec2.dist(center, v1) - radius);
-
-            if (prev >= 0 && d2 < d) {
-                t = prev;
-                d = d2;
-            }
-            else {
-                // t + interval
-                v2[0] = curveTool.quadraticAt(x0, x1, x2, next);
-                v2[1] = curveTool.quadraticAt(y0, y1, y2, next);
-                var d2 = Math.abs(vec2.dist(center, v2) - radius);
-                if (next <= 1 && d2 < d) {
-                    t = next;
+        var t, start = 0, end = 1;
+        for (var i = 0; i < 2; i++) {
+            for (var _t = start; _t < end; _t += interval) {
+                v1[0] = curveTool.quadraticAt(x0, x1, x2, _t);
+                v1[1] = curveTool.quadraticAt(y0, y1, y2, _t);
+                var d2 = Math.abs(vec2.dist(center, v1) - radius);
+                if (d2 < 1) {
+                    break;
+                }
+                if (d2 < d) {
                     d = d2;
-                }
-                else {
-                    interval *= 0.5;
+                    t = _t;
                 }
             }
+            start = Math.max(t - interval, 0);
+            end = Math.min(t + interval, 1);
+            interval /= 10;
         }
 
         return [

@@ -1607,7 +1607,7 @@ define(function (require) {
 
     GraphMain.prototype._growNodeAnimation = function (toNode, fromNode, delay) {
         var zr = this._zr;
-        var e = this._graph.getEdge(fromNode.id, toNode.id);
+        var e = this._graph.getEdge(fromNode.id, toNode.id) || this._graph.getEdge(toNode.id, fromNode.id);
         var self = this;
 
         var radius = toNode.entity.radius;
