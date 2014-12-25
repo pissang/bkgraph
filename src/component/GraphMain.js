@@ -320,7 +320,6 @@ define(function (require) {
             }
             n.layout = {
                 position: entity.position,
-                mass: 1,
                 size: r
             };
             // Fix the center node
@@ -473,6 +472,7 @@ define(function (require) {
         var cx = this._zr.getWidth() / 2;
         var cy = this._zr.getHeight() / 2;
         var tree = Tree.fromGraph(this._graphLayout)[0];
+
         tree.traverse(function (treeNode) {
             var graphNode = this._graphLayout.getNodeById(treeNode.id);
             treeNode.layout = {
@@ -521,20 +521,13 @@ define(function (require) {
             this._kgraph.getHeight() / 2
         ];
         forceLayout.gravity = 0;
-        forceLayout.scaling = 12;
-        // forceLayout.enableAcceleration = false;
-        forceLayout.maxSpeedIncrease = 100;
-        // 这个真是不好使
+        forceLayout.scaling = Math.sqrt(graph.nodes.length / 100) * 12;
         forceLayout.preventNodeOverlap = true;
         forceLayout.preventNodeEdgeOverlap = true;
 
         graph.eachNode(function (n) {
-            // if (n.data.layerCounter === 1) {
-                n.layout.mass = 10;
-                n.layout.layer = n.data.layerCounter;
-            // } else {
-            //     n.layout.mass = n.degree() * 3;
-            // }
+            n.layout.mass = Math.max(15 - (n.degree() - 1) * 2, 2);
+            n.layout.layer = n.data.layerCounter;
         });
         var layerDistance = config.layout.layerDistance.slice();
         for (var i = 1; i < layerDistance.length; i++) {

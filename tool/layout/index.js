@@ -77,8 +77,7 @@ function radialTreeLayout(graph, opts) {
 function forceLayout(graph, opts) {
 
     var forceLayout = new ForceLayout();
-    forceLayout.maxSpeedIncrease = 100;
-    forceLayout.scaling = opts.scaling || 12;
+    forceLayout.scaling = Math.sqrt(graph.nodes.length / 100) * 12;
     forceLayout.preventNodeOverlap = true;
     forceLayout.preventNodeEdgeOverlap = true;
     forceLayout.center = [opts.width / 2, opts.height / 2];
@@ -120,7 +119,7 @@ function getGraph(data, opts) {
             : (maxRadius + minRadius) / 2;
         n.layout = {
             position: entity.position,
-            mass: 10,
+            mass: Math.max(15 - (n.degree() - 1) * 2, 2),
             size: r,
             layer: +entity.layerCounter
         };
