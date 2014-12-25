@@ -224,6 +224,7 @@ define(function (require) {
         var sourceEntity = this.sourceEntity;
         var targetEntity = this.targetEntity;
 
+
         var curve = this.el;
         curve.style.xStart = p1[0];
         curve.style.yStart = p1[1];
@@ -231,9 +232,13 @@ define(function (require) {
         curve.style.yEnd = p2[1];
         curve.style.cpX1 = (p1[0] + p2[0]) / 2 - inv * (p2[1] - p1[1]) / 4;
         curve.style.cpY1 = (p1[1] + p2[1]) / 2 - inv * (p1[0] - p2[0]) / 4;
-        // curve.style.r = (
-        //     sourceEntity.radius + targetEntity.radius
-        // ) / 20 + 3;
+
+        p1 = intersect.curveCircle(curve.style, p1, sourceEntity.radius);
+        p2 = intersect.curveCircle(curve.style, p2, sourceEntity.radius);
+        curve.style.xStart = p1[0];
+        curve.style.yStart = p1[1];
+        curve.style.xEnd = p2[0];
+        curve.style.yEnd = p2[1];
         
         curve.style.cx = curveTool.quadraticAt(
             curve.style.xStart, curve.style.cpX1, curve.style.xEnd, 0.5

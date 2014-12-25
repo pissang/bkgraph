@@ -3,6 +3,8 @@ define(function (require) {
     var vec2 =  require('zrender/tool/vector');
     var curveTool = require('zrender/tool/curve');
 
+    var EPSILON = 1e-4;
+
     var v1 = vec2.create();
     var v2 = vec2.create();
     var v3 = vec2.create();
@@ -126,9 +128,71 @@ define(function (require) {
         return out;
     }
 
+    var curveCircle = function(curve, center, radius) {
+        var x0 = curve.xStart;
+        var y0 = curve.yStart;
+        var x1 = curve.cpX1;
+        var y1 = curve.cpY1;
+        var x2 = curve.xEnd;
+        var y2 = curve.yEnd;
+        var interval = 0.005;
+
+        var d = Infinity;
+        var t;
+        for (var _t = 0; _t < 1; _t += 0.05) {
+            v1[0] = curveTool.quadraticAt(x0, x1, x2, _t);
+            v1[1] = curveTool.quadraticAt(y0, y1, y2, _t);
+            var d2 = Math.abs(vec2.dist(center, v1) - radius);
+            if (d2 < d) {
+                d = d2;
+                t = _t;
+            }
+        }
+
+        d = Infinity;
+        // At most 32 iteration
+        for (var i = 0; i < 32; i++) {
+            if (interval < EPSILON) {
+                break;
+            }
+            var prev = t - interval;
+            var next = t + interval;
+            // t - interval
+            v2[0] = curveTool.quadraticAt(x0, x1, x2, prev);
+            v2[1] = curveTool.quadraticAt(y0, y1, y2, prev);
+
+            var d2 = Math.abs(vec2.dist(center, v1) - radius);
+
+            if (prev >= 0 && d2 < d) {
+                t = prev;
+                d = d2;
+            }
+            else {
+                // t + interval
+                v2[0] = curveTool.quadraticAt(x0, x1, x2, next);
+                v2[1] = curveTool.quadraticAt(y0, y1, y2, next);
+                var d2 = Math.abs(vec2.dist(center, v2) - radius);
+                if (next <= 1 && d2 < d) {
+                    t = next;
+                    d = d2;
+                }
+                else {
+                    interval *= 0.5;
+                }
+            }
+        }
+
+        return [
+            curveTool.quadraticAt(x0, x1, x2, t),
+            curveTool.quadraticAt(y0, y1, y2, t)
+        ];
+    }
+
     return {
         lineRect: lineRect,
 
-        curveRect: curveRect
+        curveRect: curveRect,
+
+        curveCircle: curveCircle
     }
 });
