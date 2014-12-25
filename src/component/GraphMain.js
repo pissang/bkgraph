@@ -542,9 +542,6 @@ define(function (require) {
             };
         }, this);
 
-    graph.eachNode(function (n) {
-        console.log(n.layout);
-    });
         forceLayout.init(graph);
         forceLayout.temperature = 0.04;
         this._layouting = true;

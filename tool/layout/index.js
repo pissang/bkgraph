@@ -92,9 +92,7 @@ function forceLayout(graph, opts) {
 
     graph.eachNode(function (n) {
         n.layout.mass = Math.max(15 - (n.degree() - 1) * 2, 2);
-        console.log(n.layout);
     });
-    
     forceLayout.init(graph);
 
     var count = 0;
