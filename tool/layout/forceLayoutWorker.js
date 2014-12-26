@@ -68,7 +68,7 @@ ForceLayout.prototype.nodeToNodeRepulsionFactor = function (mass, d, k) {
 };
 
 ForceLayout.prototype.edgeToNodeRepulsionFactor = function (mass, d, k) {
-    return k * mass / Math.sqrt(d);
+    return k * mass / d;
 };
 
 ForceLayout.prototype.attractionFactor = function (w, d, k) {
@@ -338,17 +338,22 @@ ForceLayout.prototype.applyEdgeToNodeRepulsion = (function () {
 
         // n3 distance to line n1-n2
         var dist = vec2.dist(p, n3.position) - n3.size;
-        var factor = this.edgeToNodeRepulsionFactor(
-            n3.mass, Math.max(dist, 0.1), 100
-        );
+        if (dist < 10) {
+            // A extreme strong force
+            var factor = 1e5 * (20 - dist);
+        } else {
+            var factor = this.edgeToNodeRepulsionFactor(
+                n3.mass, dist, 1000
+            );
+        }
         // Use v12 as normal vector
         vec2.sub(v12, n3.position, p);
         vec2.normalize(v12, v12);
         vec2.scaleAndAdd(n3.force, n3.force, v12, factor);
 
         // PENDING
-        vec2.scaleAndAdd(n1.force, n1.force, v12, -factor);
-        vec2.scaleAndAdd(n2.force, n2.force, v12, -factor);
+        // vec2.scaleAndAdd(n1.force, n1.force, v12, -factor);
+        // vec2.scaleAndAdd(n2.force, n2.force, v12, -factor);
     };
 })();
 
