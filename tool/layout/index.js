@@ -36,6 +36,25 @@ function radialTreeLayout(graph, opts) {
     var cx = opts.width / 2;
     var cy = opts.height / 2;
     var tree = Tree.fromGraph(graph)[0];
+    
+    var root = tree.root;
+    // 第一层节点均匀排布，大的子树相离尽量远
+    if (root.children.length > 2) {
+        root.children.sort(function (a, b) {
+            return b.children.length - a.children.length;
+        });
+        var res = [root.children[0], root.children[1]];
+        var currentIdx = 1;
+        for (i = 2; i < root.children.length; i++) {
+            res.splice(currentIdx, 0, root.children[i]);
+            currentIdx += 2;
+            if (currentIdx > res.length) {
+                currentIdx = 1;
+            }
+        }
+        root.children = res;
+    }
+
     tree.traverse(function (treeNode) {
         var graphNode = graph.getNodeById(treeNode.id);
         treeNode.layout = {
@@ -71,7 +90,29 @@ function radialTreeLayout(graph, opts) {
             r * Math.cos(rad) + cx,
             r * Math.sin(rad) + cy
         ];
+        treeNode.layout.angle = rad;
     }, this);
+
+    // 第一层节点均匀分布
+    if (tree.root.children.length <= 4) {
+        var gap = Math.PI * 2 / tree.root.children.length;
+        var angle = 0;
+        for (var i = 0; i < tree.root.children.length; i++) {
+            var child = tree.root.children[i];
+            var r = child.layout.position[1];
+            var graphNode = graph.getNodeById(child.id);
+            if (i === 0) {
+                angle = child.layout.angle;
+            } else {
+                angle += gap;
+            }
+
+            graphNode.layout.position = [
+                r * Math.cos(angle) + cx,
+                r * Math.sin(angle) + cy
+            ];
+        }
+    }
 }
 
 function forceLayout(graph, opts) {

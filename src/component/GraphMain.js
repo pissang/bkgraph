@@ -470,6 +470,24 @@ define(function (require) {
         var cy = this._zr.getHeight() / 2;
         var tree = Tree.fromGraph(this._graphLayout)[0];
 
+        var root = tree.root;
+        // 第一层节点均匀排布，大的子树相离尽量远
+        if (root.children.length > 2) {
+            root.children.sort(function (a, b) {
+                return b.children.length - a.children.length;
+            });
+            var res = [root.children[0], root.children[1]];
+            var currentIdx = 1;
+            for (i = 2; i < root.children.length; i++) {
+                res.splice(currentIdx, 0, root.children[i]);
+                currentIdx += 2;
+                if (currentIdx > res.length) {
+                    currentIdx = 1;
+                }
+            }
+            root.children = res;
+        }
+
         tree.traverse(function (treeNode) {
             var graphNode = this._graphLayout.getNodeById(treeNode.id);
             treeNode.layout = {
@@ -508,7 +526,29 @@ define(function (require) {
                 r * Math.cos(rad) + cx,
                 r * Math.sin(rad) + cy
             ];
+            treeNode.layout.angle = rad;
         }, this);
+        // 第一层节点均匀分布
+        // 这个是针对类似昆凌的图谱
+        if (tree.root.children.length <= 4) {
+            var gap = Math.PI * 2 / tree.root.children.length;
+            var angle = 0;
+            for (var i = 0; i < tree.root.children.length; i++) {
+                var child = tree.root.children[i];
+                var r = child.layout.position[1];
+                var graphNode = this._graphLayout.getNodeById(child.id);
+                if (i === 0) {
+                    angle = child.layout.angle;
+                } else {
+                    angle += gap;
+                }
+
+                graphNode.layout.position = [
+                    r * Math.cos(angle) + cx,
+                    r * Math.sin(angle) + cy
+                ];
+            }
+        }
     }
 
     /**
