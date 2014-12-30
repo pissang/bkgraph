@@ -6,6 +6,8 @@ define(function (require) {
 
     var CurveBundleShape = require('../shape/CurveBundle');
 
+    var intersect = require('../util/intersect');
+
     var vec2 = require('zrender/tool/vector');
 
     var ExtraEdgeBundleEntity = function (opts) {
@@ -54,8 +56,8 @@ define(function (require) {
             }
             if (sourceEntity && targetEntity) {
                 this._calCurvePoints(
-                    sourceEntity.el.position,
-                    targetEntity.el.position,
+                    sourceEntity,
+                    targetEntity,
                     seg
                 );
 
@@ -75,8 +77,8 @@ define(function (require) {
         var seg = [];
         if (sourceEntity && targetEntity) {
             this._calCurvePoints(
-                sourceEntity.el.position,
-                targetEntity.el.position,
+                sourceEntity,
+                targetEntity,
                 seg
             );
 
@@ -95,7 +97,23 @@ define(function (require) {
         }
     }
 
-    ExtraEdgeBundleEntity.prototype._calCurvePoints = function (p1, p2, out) {
+    ExtraEdgeBundleEntity.prototype._calCurvePoints = function (sourceEntity, targetEntity, out) {
+
+        var inv = 1;
+        var curve = this.el;
+        var p1 = sourceEntity.el.position;
+        var p2 = targetEntity.el.position;
+
+        curve.style.xStart = p1[0];
+        curve.style.yStart = p1[1];
+        curve.style.xEnd = p2[0];
+        curve.style.yEnd = p2[1];
+        curve.style.cpX1 = (p1[0] + p2[0]) / 2 - inv * (p2[1] - p1[1]) / 4;
+        curve.style.cpY1 = (p1[1] + p2[1]) / 2 - inv * (p1[0] - p2[0]) / 4;
+
+        p1 = intersect.curveCircle(curve.style, p1, sourceEntity.radius);
+        p2 = intersect.curveCircle(curve.style, p2, targetEntity.radius);
+
         out[0] = p1[0];
         out[1] = p1[1];
         out[2] = (p1[0] + p2[0]) / 2 - (p2[1] - p1[1]) / 4;

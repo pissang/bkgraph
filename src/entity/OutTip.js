@@ -13,7 +13,7 @@ define(function (require) {
 
         this.label = opts.label || '';
 
-        this.color = opts.color || '#f9dd05';
+        this.color = opts.color || '#00a2ff';
 
         this.el = new RectShape({
             style: {
@@ -23,7 +23,7 @@ define(function (require) {
                 height: 25,
                 radius: 5,
                 textPosition: 'inside',
-                textColor: 'black',
+                textColor: 'white',
                 textFont: '12px 微软雅黑',
                 opacity: 0.7
             },
