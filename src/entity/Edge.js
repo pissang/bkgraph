@@ -261,8 +261,8 @@ define(function (require) {
         vec2.sub(v, p1, p2);
         vec2.normalize(v, v);
 
-        vec2.scaleAndAdd(v1, p1, v, -sourceEntity.radius);
-        vec2.scaleAndAdd(v2, p2, v, targetEntity.radius);
+        vec2.scaleAndAdd(v1, p1, v, -sourceEntity.originalRadius);
+        vec2.scaleAndAdd(v2, p2, v, targetEntity.originalRadius);
         
         // vec2.copy(v1, p1);
         // vec2.copy(v2, p2);

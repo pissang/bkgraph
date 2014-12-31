@@ -28,6 +28,9 @@ define(function (require) {
 
         this.radius = opts.radius || 20;
 
+        // radius的值会因为hover动画等发生改变，计算连线的两个端点的时候需要使用originalRadius
+        this.originalRadius = opts.originalRadius || opts.radius || 20;
+
         this.label = opts.label || '';
 
         this.image = opts.image || '';

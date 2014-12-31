@@ -103,7 +103,7 @@ define(function (require) {
 
     ExtraEdgeEntity.prototype.update = function () {
         if (this.sourceEntity && this.targetEntity) {
-            this._setCurvePoints(
+            this._computeCurvePoints(
                 this.sourceEntity.el.position,
                 this.targetEntity.el.position,
                 1,
@@ -160,26 +160,24 @@ define(function (require) {
     };
 
     ExtraEdgeEntity.prototype.animateLength = function (zr, time, delay, fromEntity, cb) {
-        var inv = 1;
-        if (fromEntity === this.targetEntity) {
-            vec2.copy(v1, this.targetEntity.el.position);
-            vec2.copy(v2, this.sourceEntity.el.position);
-            inv = -1;
+        var curve = this.el;
+        var x0, y0, x2, y2;
+        var x1 = curve.style.cpX1;
+        var y1 = curve.style.cpY1;
+        var animateFromSource = fromEntity === this.sourceEntity;
+        if (animateFromSource) {
+            var x0 = curve.style.xStart;
+            var x2 = curve.style.xEnd;
+            var y0 = curve.style.yStart;
+            var y2 = curve.style.yEnd;
         } else {
-            vec2.copy(v1, this.sourceEntity.el.position);
-            vec2.copy(v2, this.targetEntity.el.position);
+            var x0 = curve.style.xEnd;
+            var x2 = curve.style.xStart;
+            var y0 = curve.style.yEnd;
+            var y2 = curve.style.yStart;
         }
         var self = this;
         var obj = {t: 0};
-        var curve = this.el;
-        this._setCurvePoints(v1, v2, inv);
-
-        var x0 = curve.style.xStart;
-        var x1 = curve.style.cpX1;
-        var x2 = curve.style.xEnd;
-        var y0 = curve.style.yStart;
-        var y1 = curve.style.cpY1;
-        var y2 = curve.style.yEnd;
         
         this.addAnimation('length', zr.animation.animate(obj)
             .when(time || 1000, {
@@ -193,11 +191,15 @@ define(function (require) {
                 var y01 = lerp(y0, y1, t);
                 var y12 = lerp(y1, y2, t);
                 var y012 = lerp(y01, y12, t);
-
                 curve.style.cpX1 = x01;
                 curve.style.cpY1 = y01;
-                curve.style.xEnd = x012;
-                curve.style.yEnd = y012;
+                if (animateFromSource) {
+                    curve.style.xEnd = x012;
+                    curve.style.yEnd = y012;   
+                } else {
+                    curve.style.xStart = x012;
+                    curve.style.yStart = y012;
+                }
 
                 self.el.modSelf();
                 zr.refreshNextFrame();
@@ -220,26 +222,16 @@ define(function (require) {
 
     ExtraEdgeEntity.prototype.stopActiveAnimation = EdgeEntity.prototype.stopActiveAnimation;
 
-    ExtraEdgeEntity.prototype._setCurvePoints = function (p1, p2, inv) {
+    ExtraEdgeEntity.prototype._computeCurvePoints = function (p1, p2) {
         var sourceEntity = this.sourceEntity;
         var targetEntity = this.targetEntity;
 
-
         var curve = this.el;
-        curve.style.xStart = p1[0];
-        curve.style.yStart = p1[1];
-        curve.style.xEnd = p2[0];
-        curve.style.yEnd = p2[1];
-        curve.style.cpX1 = (p1[0] + p2[0]) / 2 - inv * (p2[1] - p1[1]) / 4;
-        curve.style.cpY1 = (p1[1] + p2[1]) / 2 - inv * (p1[0] - p2[0]) / 4;
+        this._setCurvePoints(curve, p1, p2);
 
-        p1 = intersect.curveCircle(curve.style, p1, sourceEntity.radius);
-        p2 = intersect.curveCircle(curve.style, p2, targetEntity.radius);
-        curve.style.xStart = p1[0];
-        curve.style.yStart = p1[1];
-        curve.style.xEnd = p2[0];
-        curve.style.yEnd = p2[1];
-        
+        p1 = intersect.curveCircle(curve.style, p1, sourceEntity.originalRadius);
+        p2 = intersect.curveCircle(curve.style, p2, targetEntity.originalRadius);
+
         curve.style.cx = curveTool.quadraticAt(
             curve.style.xStart, curve.style.cpX1, curve.style.xEnd, 0.5
         );
@@ -248,12 +240,18 @@ define(function (require) {
         );
         curve.style.a = 10;
         curve.style.b = 15;
+    };
 
-        inv = inv || 1;
-    }
+    ExtraEdgeEntity.prototype._setCurvePoints = function (curve, p1, p2) {
+        curve.style.xStart = p1[0];
+        curve.style.yStart = p1[1];
+        curve.style.xEnd = p2[0];
+        curve.style.yEnd = p2[1];
+        curve.style.cpX1 = (p1[0] + p2[0]) / 2 - (p2[1] - p1[1]) / 4;
+        curve.style.cpY1 = (p1[1] + p2[1]) / 2 - (p1[0] - p2[0]) / 4;
+    };
 
     ExtraEdgeEntity.prototype.intersectRect = function (rect) {
-
         return intersect.curveRect(this.el.style, rect);
     }
 
