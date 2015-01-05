@@ -121,9 +121,9 @@ define(function (require) {
         this._contentHeight = parseInt(this._$content.clientHeight);
         this._viewportHeight = parseInt(this._$viewport.clientHeight);
 
+        this.scrollTo(0);
         if (this._viewportHeight > this._contentHeight) {
             this._$scrollBar.style.display = 'none';
-            this.scrollTo(0);
             return;
         } else {
             this._$scrollBar.style.display = 'block';
