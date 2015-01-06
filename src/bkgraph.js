@@ -119,7 +119,7 @@ define(function (require) {
 
         var isExtraRelation = {};
         for (var j = 0; j < data.relations.length; j++) {
-            // 每个实体最多3条补边
+            // 每个实体最多2条补边
             var relation = data.relations[j];
             if (relation.isExtra) {
                 if (!isExtraRelation[relation.fromID]) {
@@ -128,8 +128,8 @@ define(function (require) {
                 if (!isExtraRelation[relation.toID]) {
                     isExtraRelation[relation.toID] = [];
                 }
-                if (isExtraRelation[relation.fromID].length > 2
-                    || isExtraRelation[relation.toID].length > 2
+                if (isExtraRelation[relation.fromID].length >= 2
+                    || isExtraRelation[relation.toID].length >= 2
                 ) {
                     data.relations.splice(j--, 1);
                 }
