@@ -108,6 +108,10 @@ define(function (require) {
         var self = this;
         util.addEventListener(el, 'mousedown', function () {
             self._mouseDown = true;
+
+            if (self._tipActive) {
+                self.hideTip();
+            }
         });
         util.addEventListener(el, 'mouseup', function () {
             self._mouseDown = false;
@@ -990,6 +994,7 @@ define(function (require) {
      * 在边栏中显示实体详细信息
      */
     GraphMain.prototype.showEntityDetail = function (n, showSidebar) {
+        var self = this;
         var graph = this._graphLayout;
         if (typeof(n) === 'string') {
             n = graph.getNodeById(n);
@@ -997,11 +1002,18 @@ define(function (require) {
 
         var sideBar = this._kgraph.getComponentByType('SIDEBAR');
         if (sideBar) {
+            var detailData = this._loadDetailFromStorage(n.id);
+            if (detailData) {
+                sideBar.setData(detailData);
+            }
+            else {
+                jsonp(this._kgraph.getDetailAPI(), { detail_id: n.id }, 'callback', function (data) {
+                    data._datatype = 'entity'; // for ubs log
+                    sideBar.setData(data);
 
-            jsonp(this._kgraph.getDetailAPI(), { detail_id: n.id }, 'callback', function (data) {
-                data._datatype = 'entity'; // for ubs log
-                sideBar.setData(data);
-            });
+                    self._saveDetailToStorage(n.id, data);
+                });
+            }
             if (showSidebar) {
                 sideBar.show(n.id + ',' + n.data.layerCounter);
             }
@@ -1025,27 +1037,35 @@ define(function (require) {
             //     data[name] = e.data[name];
             // }
             var self = this;
-            jsonp(this._kgraph.getDetailAPI(), { detail_id: e.data.id }, 'callback', function (data) {
 
-                data.fromEntity = self._graph.getNodeById(data.fromID).data;
-                data.toEntity = self._graph.getNodeById(data.toID).data;
-                data._datatype = 'relation'; // for ubs log
+            var detailData = this._loadDetailFromStorage(e.data.id);
+            if (detailData) {
+                sideBar.setData(detailData, true);
+            }
+            else {
+                jsonp(this._kgraph.getDetailAPI(), { detail_id: e.data.id }, 'callback', function (data) {
 
-                sideBar.setData(data, true);
-                var logParam = [
-                                // from entity
-                                e.node1.id,
-                                e.node1.data.layerCounter,
-                                // to entity
-                                e.node2.id,
-                                e.node2.data.layerCounter,
-                                e.data.id,
-                                e.isExtra ? 1 : 0,
-                                e.isSpecial ? 1 : 0
-                            ].join(',');
-                sideBar.show(logParam);
+                    data.fromEntity = self._graph.getNodeById(data.fromID).data;
+                    data.toEntity = self._graph.getNodeById(data.toID).data;
+                    data._datatype = 'relation'; // for ubs log
 
-            });
+                    sideBar.setData(data, true);
+
+                    self._saveDetailToStorage(e.data.id, data);
+                });
+            }
+            var logParam = [
+                            // from entity
+                            e.node1.id,
+                            e.node1.data.layerCounter,
+                            // to entity
+                            e.node2.id,
+                            e.node2.data.layerCounter,
+                            e.data.id,
+                            e.isExtra ? 1 : 0,
+                            e.isSpecial ? 1 : 0
+                        ].join(',');
+            sideBar.show(logParam);
         }
     };
 
@@ -1063,11 +1083,20 @@ define(function (require) {
             this._tipActive = n.id;
 
             var self = this;
-            jsonp(this._kgraph.getDetailAPI(), { detail_id: n.id }, 'callback', function (data) {
-                if (self._tipActive == n.id) {
-                    tip.setData(data, n);
-                }
-            });
+            var detailData = this._loadDetailFromStorage(n.id);
+            if (detailData) {
+                tip.setData(detailData, n);
+            }
+            else {
+                jsonp(this._kgraph.getDetailAPI(), { detail_id: n.id }, 'callback', function (data) {
+                    data._datatype = 'entity'; // for ubs log
+                    if (self._tipActive == n.id) {
+                        tip.setData(data, n);
+                    }
+
+                    self._saveDetailToStorage(n.id, data);
+                });
+            }
         }
     };
 
@@ -1085,13 +1114,23 @@ define(function (require) {
             this._tipActive = e.data.id;
 
             var self = this;
-            jsonp(this._kgraph.getDetailAPI(), { detail_id: e.data.id }, 'callback', function (data) {
-                if (self._tipActive == e.data.id) {
-                    data.fromEntity = self._graph.getNodeById(data.fromID).data;
-                    data.toEntity = self._graph.getNodeById(data.toID).data;
-                    tip.setData(data, e, true);
-                }
-            });
+            var detailData = this._loadDetailFromStorage(e.data.id);
+            if (detailData) {
+                tip.setData(detailData, e, true);
+            }
+            else {
+                jsonp(this._kgraph.getDetailAPI(), { detail_id: e.data.id }, 'callback', function (data) {
+                    if (self._tipActive == e.data.id) {
+                        data.fromEntity = self._graph.getNodeById(data.fromID).data;
+                        data.toEntity = self._graph.getNodeById(data.toID).data;
+                        data._datatype = 'relation'; // for ubs log
+
+                        tip.setData(data, e, true);
+
+                        self._saveDetailToStorage(e.data.id, data);
+                    }
+                });
+            }
         }
     };
 
@@ -1179,6 +1218,10 @@ define(function (require) {
             zr.refreshNextFrame();
             cb && cb();
         }
+
+        if (this._tipActive) {
+            this.hideTip();
+        }
     };
 
     GraphMain.prototype.moveLeft = function (cb) {
@@ -1263,6 +1306,10 @@ define(function (require) {
                 cb && cb();
             })
             .start('CubicInOut');
+
+        if (this._tipActive) {
+            this.hideTip();
+        }
     }
 
     GraphMain.prototype.uncollapse = function () {
@@ -1373,6 +1420,11 @@ define(function (require) {
 
         this._syncHeaderBarExplorePercent();
         zr.refreshNextFrame();
+
+        if (logTitle.length) {
+            return true;
+        }
+        return false;
     }
 
     GraphMain.prototype.toJSON = function () {
@@ -1478,6 +1530,49 @@ define(function (require) {
         };
 
         localStorage['BKGraph_expanded'] = JSON.stringify(bkg);
+    };
+
+    // 从sessionStorage获取浮层数据
+    GraphMain.prototype._loadDetailFromStorage = function (key) {
+        if (!window.sessionStorage) {
+            return;
+        }
+
+        var detailData = sessionStorage['BKGraph_detail_data'];
+        var result = null;
+        if (!detailData) {
+            return;
+        }
+        detailData = JSON.parse(detailData);
+        if (detailData[key]) {
+            result = detailData[key];
+        }
+
+        return result;
+    };
+
+    // 保存浮层数据到sessionStorage
+    GraphMain.prototype._saveDetailToStorage = function (key, val) {
+        if (!window.sessionStorage) {
+            return;
+        }
+
+        var detailData = sessionStorage['BKGraph_detail_data'];
+        if (!detailData) {
+            detailData = {};
+        }
+        else {
+            detailData = JSON.parse(detailData);
+        }
+        detailData[key] = val;
+
+        try {
+            sessionStorage['BKGraph_detail_data'] = JSON.stringify(detailData);
+        } catch (oException) {
+            if(oException.name == 'QuotaExceededError'){
+                sessionStorage.removeItem('BKGraph_detail_data');
+            }
+        }
     };
 
     GraphMain.prototype._findCircles = function (keywords) {
@@ -1690,8 +1785,11 @@ define(function (require) {
 
                 self.dispatch('mouseover:entity', node.data);
 
-                self.showEntityTip(node);
-                self.expandNode(node);
+                // expand 与小浮层
+                if (!self.expandNode(node)) {
+                    self.showEntityTip(node);
+                }
+
                 self.hoverNode(node);
 
                 bkgLog({
