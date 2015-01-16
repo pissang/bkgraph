@@ -281,8 +281,8 @@ define(function (require) {
         // line.style.r = (
         //     this.sourceEntity.radius + this.targetEntity.radius
         // ) / 20 + 3;
-        line.style.a = 10;
-        line.style.b = 15;
+        line.style.a = 8;
+        line.style.b = 14;
     }
 
     EdgeEntity.prototype.intersectRect = function (rect) {

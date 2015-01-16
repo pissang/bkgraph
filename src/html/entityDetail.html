@@ -5,16 +5,20 @@
     <div class="bkg-sidebar-module bkg-person-info">
         <div class="bkg-module-title">
             <div class="bkg-circle"></div>
-            <h4><a href="${sourceUrl}" title="基本信息 百度百科" data-area="entity-baike" target="_blank">基本信息</a></h4>
+            <h4><a href="http://www.baidu.com/s?wd=${name|url}" title="${name}_百度搜索" data-area="entity-baike" target="_blank">${name}知多少</a></h4>
         </div>
-        <a class="bkg-person-pic" href="${sourceUrl}" data-area="entity-baike" target="_blank" title="${name}_百度百科"><img src="${imageIcon}" /></a>
+        <a class="bkg-person-pic" href="http://www.baidu.com/s?wd=${name|url}" data-area="entity-baike" target="_blank" title="${name}_百度搜索"><img src="${imageIcon}" /></a>
         <div class="bkg-person-description">
+            <!-- var: introLength = 73 -->
             <!-- if: ${birthDate} -->
+            <!-- var: introLength = 58 -->
             <p><b>出生:</b> ${birthDate}</p>
             <!-- /if -->
             <p>
-                <b>简介:</b> ${introduction.content|truncate(68)}
-                <a href="${sourceUrl}" class="bkg-more" data-area="entity-baike" title="更多" target="_blank">更多>></a>
+                <!-- <b>简介:</b> -->
+                ${introduction.content|truncate(${introLength})}
+                <br>
+                <a href="http://www.baidu.com/s?wd=${name|url}" class="bkg-more" data-area="entity-baike" title="了解更多" target="_blank">了解${name}更多内容>></a>
             </p>
         </div>
         <div style="clear:both;"></div>

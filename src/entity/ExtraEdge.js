@@ -238,8 +238,8 @@ define(function (require) {
         curve.style.cy = curveTool.quadraticAt(
             curve.style.yStart, curve.style.cpY1, curve.style.yEnd, 0.5
         );
-        curve.style.a = 10;
-        curve.style.b = 15;
+        curve.style.a = 8;
+        curve.style.b = 14;
     };
 
     ExtraEdgeEntity.prototype._setCurvePoints = function (curve, p1, p2) {

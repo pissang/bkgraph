@@ -208,8 +208,8 @@ define(function (require) {
         // }
 
         // add Tip
-        var tip = new Tip();
-        this.addComponent(tip);
+        // var tip = new Tip();
+        // this.addComponent(tip);
     }
 
     BKGraph.prototype.addComponent = function (component) {

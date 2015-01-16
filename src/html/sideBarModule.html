@@ -69,7 +69,7 @@
 <div class="bkg-works bkg-sidebar-module">
     <div class="bkg-module-title">
         <div class="bkg-circle"></div>
-        <h4><a href="http://www.baidu.com/s?wd=${name|url}%20代表作品" title="主要代表作品" data-area="entity-representativeWork" target="_blank">主要代表作品</a></h4>
+        <h4><a href="http://www.baidu.com/s?wd=${name|url}%20热门作品" title="热门作品" data-area="entity-representativeWork" target="_blank">热门作品</a></h4>
     </div>
     <ul>
     <!-- for: ${representativeWork} as ${work}, ${idx} -->
@@ -98,3 +98,134 @@
         <!-- /for -->
     </ul>
 </div>
+
+<!-- target: sidebarLatestWorks -->
+<div class="bkg-works bkg-sidebar-module">
+    <div class="bkg-module-title">
+        <div class="bkg-circle"></div>
+        <h4><a href="http://www.baidu.com/s?wd=${name|url}%20最新影视作品" title="更多" data-area="entity-latestwork" target="_blank">最新影视作品</a></h4>
+    </div>
+    <ul>
+    <!-- for: ${representativeWork} as ${work}, ${idx} -->
+        <li>
+            <a href="${work.movieRedir}" target="_blank" title="${work.movieName}" data-area="entity-latestwork">
+                <img src="${work.movieImage}" class="bkg-hoverable" alt="" />
+                <span class="bkg-work-title">${work.movieName}</span>
+            </a>
+        </li>
+    <!-- /for -->
+    </ul>
+</div>
+
+<!-- target: sidebarShow -->
+<div class="bkg-show bkg-sidebar-module">
+    <div class="bkg-module-title">
+        <h4>最新综艺</h4>
+        <a href="http://www.baidu.com/s?wd=${name|url}%20最新综艺" title="更多" data-area="entity-show" target="_blank">更多>></a>
+    </div>
+    <ul>
+    <!-- for: ${show} as ${item}, ${idx} -->
+        <li>
+            <a href="${item.videoRedir}" target="_blank" title="${item.videoName}" data-area="entity-show">
+                <img src="${item.videoImage}" class="bkg-hoverable" alt="" />
+                <span class="bkg-show-title">${item.videoName}</span>
+            </a>
+        </li>
+    <!-- /for -->
+    </ul>
+</div>
+
+<!-- target: sidebarTag -->
+<div class="bkg-taglist bkg-sidebar-module">
+    <div class="bkg-module-title">
+        <h4><!-- block: tagModuleTitle -->Ta的那些事儿<!-- /block --></h4>
+    </div>
+    <!-- block: taglist -->
+    <!-- if: ${singleTag} && ${singleTag.length}-->
+    <div class="bkg-tags">
+        <!-- <span>TA的那些事儿:</span> -->
+        <!-- for: ${singleTag} as ${tag}, ${index} -->
+        <a href="http://www.baidu.com/s?wd=${name|url}%20${tag.text|url}" title="${name} ${tag.text}_百度搜索" data-area="entity-singleTag" target="_blank">${tag.text}</a>
+        <!-- /for -->
+    </div>
+    <!-- /if -->
+    <!-- /block -->
+</div>
+
+<!-- target: sidebarRelationTag(master=sidebarTag) -->
+<!-- block: tagModuleTitle -->Ta俩那些事儿<!-- /block -->
+<!-- block: taglist -->
+<!-- if: ${pairTag} && ${pairTag.length} -->
+<div class="bkg-tags">
+    <!-- for: ${pairTag} as ${tag}, ${index} -->
+    <a href="http://www.baidu.com/s?wd=${fromEntity.name|url}%20${toEntity.name|url}%20${tag.text|url}" title="${fromEntity.name} ${toEntity.name} ${tag.text}_百度搜索" data-area="relation-pairTag" target="_blank">${tag.text}</a>
+    <!-- /for -->
+</div>
+<!-- /if -->
+<!-- /block -->
+
+<!-- target: sidebarRecommendation -->
+<div class="bkg-taglist bkg-sidebar-module">
+    <!-- block: tagModuleTitle -->
+    <div class="bkg-module-title">
+        <h4>您可能感兴趣的那些人儿</h4>
+    </div>
+    <!-- /block -->
+    <!-- block: taglist -->
+    <!-- if: ${recommendation} && ${recommendation.length} -->
+    <div class="bkg-rec-tags">
+        <ul>
+            <!-- for: ${recommendation} as ${recTag}, ${index} -->
+            <li>
+                <a href="http://www.baidu.com/s?wd=${recTag.name|url}" target="_blank" data-area="entity-recommendation" title="${recTag.name}_百度搜索" class="bkg-hoverable">
+                    <img src="${recTag.image}" alt="">
+                    <h5>${recTag.name|truncate(6)}</h5>
+                </a>
+                <a href="http://www.baidu.com/s?wd=${recTag.name|url}" target="_blank" data-area="entity-recommendation" title="${recTag.name}_百度搜索">
+                    <span>${recTag.reason|truncate(10)}</span>
+                </a>
+            </li>
+            <!-- /for -->
+        </ul>
+    </div>
+    <!-- /if -->
+    <!-- /block -->
+</div>
+
+<!-- target: sidebarRelationRecommendation(master=sidebarRecommendation) -->
+<!-- block: tagModuleTitle -->
+<div class="bkg-module-title">
+    <h4>${recommendation.title}</h4>
+</div>
+<!-- /block -->
+<!-- block: taglist -->
+<!-- if: ${recommendation} -->
+<div class="bkg-tags">
+    <p class="bkg-tag-title"></p>
+    <!-- for: ${recommendation.content} as ${rec}, ${index} -->
+    <a href="http://www.baidu.com/s?wd=${rec.fromName|url}%20${rec.toName|url}%20${rec.relationName|url}" target="_blank" data-area="relation-recommendation" title="${rec.fromName} ${rec.toName} ${rec.relationName}_百度搜索">
+        ${rec.fromName|truncate(5)}-${rec.toName|truncate(5)}
+    </a>
+    <!-- /for -->
+</div>
+<!-- /if -->
+
+<!-- if: ${recommendationnnn} -->
+<div class="bkg-rec-tags">
+    <p class="bkg-tag-title">${recommendation.title}</p>
+    <ul>
+        <!-- for: ${recommendation.content} as ${rec}, ${index} -->
+        <li>
+            <a class="bkg-rec-tag-pic" href="http://www.baidu.com/s?wd=${rec.fromName|url}%20${rec.toName|url}%20${rec.relationName|url}" target="_blank" data-area="relation-recommendation" title="${rec.fromName} ${rec.toName} ${rec.relationName}_百度搜索">
+                <img src="${rec.image}" class="bkg-hoverable" alt="">
+                <!-- <h5></h5> -->
+            </a>
+            <a href="http://www.baidu.com/s?wd=${rec.fromName|url}%20${rec.toName|url}%20${rec.relationName|url}" target="_blank" data-area="relation-recommendation" title="${rec.fromName} ${rec.toName} ${rec.relationName}_百度搜索">
+                <span>${rec.fromName|truncate(5)}<br>${rec.toName|truncate(5)}</span>
+            </a>
+        </li>
+        <!-- /for -->
+    </ul>
+</div>
+<!-- /if -->
+<!-- /block -->

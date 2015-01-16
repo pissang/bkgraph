@@ -45,6 +45,17 @@
         </div>
         <!-- /if -->
         <!-- if: ${recommendation} -->
+        <div class="bkg-tags">
+            <p class="bkg-tag-title">${recommendation.title}</p>
+            <!-- for: ${recommendation.content} as ${rec}, ${index} -->
+            <a href="http://www.baidu.com/s?wd=${rec.fromName|url}%20${rec.toName|url}%20${rec.relationName|url}" target="_blank" data-area="relation-recommendation" title="${rec.fromName} ${rec.toName} ${rec.relationName}_百度搜索">
+                ${rec.fromName|truncate(5)}-${rec.toName|truncate(5)}
+            </a>
+            <!-- /for -->
+        </div>
+        <!-- /if -->
+
+        <!-- if: ${recommendationnnnnn} -->
         <div class="bkg-rec-tags">
             <p class="bkg-tag-title">${recommendation.title}</p>
             <ul>

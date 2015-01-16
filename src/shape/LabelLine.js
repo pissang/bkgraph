@@ -13,26 +13,15 @@ define(function (require) {
 
     LabelLine.prototype.buildDropletPath = function(ctx, style) {
 
+        var angle = style.angle || 0;
         var dropletPadding = style.dropletPadding || 0;
+        var cx = style.cx;
         var cy = style.cy - dropletPadding;
-        ctx.moveTo(style.cx, cy - style.a);
-        ctx.bezierCurveTo(
-            style.cx + style.a,
-            cy - style.a,
-            style.cx + style.a * 3 / 2,
-            cy + style.a / 3,
-            style.cx,
-            cy + style.b
-        );
-        ctx.bezierCurveTo(
-            style.cx - style.a * 3 / 2,
-            cy + style.a / 3,
-            style.cx - style.a,
-            cy - style.a,
-            style.cx,
-            cy - style.a
-        );
-        ctx.closePath();
+
+        ctx.arc(cx, cy, style.a, 0, 2 * Math.PI);
+        ctx.moveTo(cx + style.a * Math.cos((30 + angle) * Math.PI / 180), cy + style.a * Math.sin((30 + angle) * Math.PI / 180));
+        ctx.lineTo(cx - style.b * Math.sin(Math.PI / 180 * angle), cy + style.b * Math.cos(Math.PI / 180 * angle));
+        ctx.lineTo(cx - style.a * Math.sin(Math.PI / 180 * (60 + angle)), cy + style.a * Math.cos(Math.PI / 180 * (60 + angle)));
     };
 
     LabelLine.prototype.brush = function (ctx, isHighlight) {
