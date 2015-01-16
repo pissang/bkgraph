@@ -232,6 +232,8 @@ define(function (require) {
         p1 = intersect.curveCircle(curve.style, p1, sourceEntity.originalRadius);
         p2 = intersect.curveCircle(curve.style, p2, targetEntity.originalRadius);
 
+        this._setCurvePoints(curve, p1, p2);
+
         curve.style.cx = curveTool.quadraticAt(
             curve.style.xStart, curve.style.cpX1, curve.style.xEnd, 0.5
         );
