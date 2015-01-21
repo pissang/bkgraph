@@ -40,8 +40,15 @@ function radialTreeLayout(graph, opts) {
     var root = tree.root;
     // 第一层节点均匀排布，大的子树相离尽量远
     if (root.children.length > 2) {
+        for (var i = 0; i < root.children.length; i++) {
+            var child = root.children[i];
+            child.__size = 0;
+            root.children[i].traverse(function () {
+                child.__size++;
+            });
+        }
         root.children.sort(function (a, b) {
-            return b.children.length - a.children.length;
+            return b.__size - a.__size;
         });
         var res = [root.children[0], root.children[1]];
         var currentIdx = 1;
