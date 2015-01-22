@@ -44,6 +44,13 @@
             <!-- /for -->
         </div>
         <!-- /if -->
+    </div>
+
+    <!-- if: ${eventMaiLuo} -->
+        <!-- import: sidebarMailuo -->
+    <!-- /if -->
+
+    <div class="bkg-taglist">
         <!-- if: ${recommendation} -->
         <div class="bkg-tags">
             <p class="bkg-tag-title">${recommendation.title}</p>
@@ -74,10 +81,6 @@
         </div>
         <!-- /if -->
     </div>
-
-    <!-- if: ${eventMaiLuo} -->
-        <!-- import: sidebarMailuo -->
-    <!-- /if -->
 
     <!-- if: ${news} -->
         <!-- import: sidebarRelationNews -->

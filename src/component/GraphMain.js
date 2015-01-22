@@ -1019,6 +1019,7 @@ define(function (require) {
             else {
                 jsonp(this._kgraph.getDetailAPI(), { detail_id: n.id }, 'callback', function (data) {
                     data._datatype = 'entity'; // for ubs log
+                    data.layerCounter = n.data ? n.data.layerCounter : n.layerCounter;
                     sideBar.setData(data);
 
                     self._saveDetailToStorage(n.id, data);
