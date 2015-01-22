@@ -21,6 +21,7 @@ define(function (require) {
     var etpl = require('etpl');
     var jsonp = require('./util/jsonp');
     var util = require('./util/util');
+    var bkgLog = require('./util/log');
 
     var http = require('zrender/tool/http');
 
@@ -291,6 +292,9 @@ define(function (require) {
      * @return {bkgraph~BKGraph}
      */
     function init(dom, url, onsuccess) {
+        bkgLog({
+            type: 'zhishitupuopen'
+        });
         if (typeof(dom) === 'string') {
             dom = document.getElementById(dom);
         }
