@@ -24,7 +24,6 @@ define(function (require) {
     var jsonp = require('../util/jsonp');
 
     var Cycle = require('./Cycle');
-    var Tip = require('./Tip');
 
     var config = require('../config');
 
@@ -87,9 +86,6 @@ define(function (require) {
 
         this._parallax = null;
 
-        // 小浮层
-        this._tipActive = null;
-
         // 是否是第一帧渲染
         this._isFirstFrame = true;
     };
@@ -111,10 +107,6 @@ define(function (require) {
         var self = this;
         util.addEventListener(el, 'mousedown', function () {
             self._mouseDown = true;
-
-            if (self._tipActive) {
-                self.hideTip();
-            }
         });
         util.addEventListener(el, 'mouseup', function () {
             self._mouseDown = false;
@@ -1081,82 +1073,6 @@ define(function (require) {
     };
 
     /**
-     * 显示实体摘要
-     */
-    GraphMain.prototype.showEntityTip = function (n) {
-        var graph = this._graphLayout;
-        if (typeof(n) === 'string') {
-            n = graph.getNodeById(n);
-        }
-
-        var tip = this._kgraph.getComponentByType('TIP');
-        if (tip) {
-            this._tipActive = n.id;
-
-            var self = this;
-            var detailData = this._loadDetailFromStorage(n.id);
-            if (detailData) {
-                tip.setData(detailData, n);
-            }
-            else {
-                jsonp(this._kgraph.getDetailAPI(), { detail_id: n.id }, 'callback', function (data) {
-                    data._datatype = 'entity'; // for ubs log
-                    if (self._tipActive == n.id) {
-                        tip.setData(data, n);
-                    }
-
-                    self._saveDetailToStorage(n.id, data);
-                });
-            }
-        }
-    };
-
-    /**
-     * 显示关系摘要
-     */
-    GraphMain.prototype.showRelationTip = function (e) {
-        if (typeof(e) === 'string') {
-            e = this._getEdgeByID(e);
-        }
-
-        var tip = this._kgraph.getComponentByType('TIP');
-        if (tip) {
-
-            this._tipActive = e.data.id;
-
-            var self = this;
-            var detailData = this._loadDetailFromStorage(e.data.id);
-            if (detailData) {
-                tip.setData(detailData, e, true);
-            }
-            else {
-                jsonp(this._kgraph.getDetailAPI(), { detail_id: e.data.id }, 'callback', function (data) {
-                    if (self._tipActive == e.data.id) {
-                        data.fromEntity = self._graph.getNodeById(data.fromID).data;
-                        data.toEntity = self._graph.getNodeById(data.toID).data;
-                        data._datatype = 'relation'; // for ubs log
-
-                        tip.setData(data, e, true);
-
-                        self._saveDetailToStorage(e.data.id, data);
-                    }
-                });
-            }
-        }
-    };
-
-    /**
-     * 隐藏摘要
-     */
-    GraphMain.prototype.hideTip = function () {
-        var tip = this._kgraph.getComponentByType('TIP');
-        if (tip) {
-            tip.hide();
-            this._tipActive = null;
-        }
-    };
-
-    /**
      * 移动视图到指定的实体位置
      */
     GraphMain.prototype.moveToEntity = function (n, cb) {
@@ -1230,9 +1146,6 @@ define(function (require) {
             cb && cb();
         }
 
-        if (this._tipActive) {
-            this.hideTip();
-        }
     };
 
     GraphMain.prototype.moveLeft = function (cb) {
@@ -1318,9 +1231,6 @@ define(function (require) {
             })
             .start('CubicInOut');
 
-        if (this._tipActive) {
-            this.hideTip();
-        }
     }
 
     GraphMain.prototype.uncollapse = function () {
@@ -1796,10 +1706,7 @@ define(function (require) {
 
                 self.dispatch('mouseover:entity', node.data);
 
-                // expand 与小浮层
-                if (!self.expandNode(node)) {
-                    self.showEntityTip(node);
-                }
+                self.expandNode(node);
 
                 self.hoverNode(node);
 
@@ -1813,7 +1720,6 @@ define(function (require) {
         });
         nodeEntity.bind('mouseout', function () {
             if (node !== self._activeNode) {
-                self.hideTip();
                 self.unhoverNode(node);
                 //  回复到高亮状态
                 if (node._isHighlight) {
@@ -1918,8 +1824,6 @@ define(function (require) {
                 if (self._lastHoverEdge !== e) {
                     self.dispatch('mouseover:relation', e.data);
 
-                    self.showRelationTip(e);
-
                     if (config.enableAnimation) {
                         edgeEntity.animateTextPadding(zr, 300, 12);
                         edgeEntity.startActiveAnimation(zr);
@@ -1930,7 +1834,6 @@ define(function (require) {
                 self._lastHoverEdge = e;
             });
             edgeEntity.bind('mouseout', function () {
-                self.hideTip();
                 if (config.enableAnimation) {
                     edgeEntity.animateTextPadding(zr, 300, 5);
                     edgeEntity.stopActiveAnimation(zr);

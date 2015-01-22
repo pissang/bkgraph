@@ -115,12 +115,6 @@ define(function (require) {
                 graphMain.el.style.left = -(this.el.clientWidth / 2) + 'px';
             }
 
-            // tip左移
-            var tip = this._kgraph.getComponentByType('TIP');
-            if (tip) {
-                tip.el.style.left = (parseInt(tip.el.style.left) - this.el.clientWidth / 2) + 'px';
-            }
-
             this._$toggleBtn.innerHTML = '隐<br />藏<br />>';
 
             // 搜索栏自动隐藏
