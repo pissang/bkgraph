@@ -148,7 +148,7 @@ define(function (require) {
         // this.loadImage(zr);
     }
 
-    NodeEntity.prototype.loadImage = function (zr) {
+    NodeEntity.prototype.loadImage = function (zr, cb) {
         if (this._imageLoaded) {
             return;
         }
@@ -160,6 +160,8 @@ define(function (require) {
             self._imageShape.style.image = image;
             self._imageShape.modSelf();
             zr.refreshNextFrame();
+
+            cb && cb();
         }
         image.src = this.image;
     };

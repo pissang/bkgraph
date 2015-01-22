@@ -89,6 +89,9 @@ define(function (require) {
 
         // 小浮层
         this._tipActive = null;
+
+        // 是否是第一帧渲染
+        this._isFirstFrame = true;
     };
 
     GraphMain.prototype.type = 'GRAPH';
@@ -2004,12 +2007,31 @@ define(function (require) {
             height: zr.getHeight() / layer0.scale[1]
         }
 
+        var imageLoadingCount = 0;
+        var imageLoadedCount = 0;
+
         for (var i = 0; i < graph.nodes.length; i++) {
             var n = graph.nodes[i];
             if (n.entity) {
                 n.entity.el.ignore = !n.entity.isInsideRect(rect);
-                if (!n.entity.el.ignore) {
-                    n.entity.loadImage(zr);
+                if (! n.entity.el.ignore) {
+                    // 需要统计第一帧中所有图片加载完成的时间
+                    if (this._isFirstFrame) {
+                        imageLoadingCount++;
+                        n.entity.loadImage(zr, function () {
+                            imageLoadingCount--;
+                            imageLoadedCount++;
+                            if (imageLoadingCount === 0) {
+                                bkgLog({
+                                    // 首屏渲染完成日志
+                                    type: 'zhishitupuscreenrendered',
+                                    imageCount: imageLoadedCount
+                                });
+                            }
+                        });
+                    } else {
+                        n.entity.loadImage(zr);
+                    }
                 }
                 vec2.min(this._min, this._min, n.entity.el.position);
                 vec2.max(this._max, this._max, n.entity.el.position);
@@ -2021,6 +2043,8 @@ define(function (require) {
                 e.entity.el.ignore = e.entity.hidden || !e.entity.isInsideRect(rect);
             }
         }
+
+        this._isFirstFrame = false;
     }
 
     zrUtil.inherits(GraphMain, Component);
