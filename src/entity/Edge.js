@@ -57,7 +57,8 @@ define(function (require) {
                 text: util.truncate(this.label, 6),
                 textFont: '13px 微软雅黑',
                 textPadding: 5,
-                dropletPadding: 0
+                dropletPadding: 0,
+                angle: 0
             },
             z: 0,
             zlevel: 0,
@@ -188,55 +189,87 @@ define(function (require) {
             .start('ElasticOut');
     };
 
-    EdgeEntity.prototype.startActiveAnimation = function (zr) {
+    EdgeEntity.prototype.startActiveAnimation = function (zr, direction) {
 
         if (this._animatingSkiping) {
             return;
         }
 
         var self = this;
-        var dropletPadding = this.el.style.dropletPadding;
+        var angle = this.el.style.angle;
+        var time = 3500;
 
-        this.addAnimation('dropletskip', zr.animation.animate(this.el.style, {loop: true})
-            .when(100, {
-                dropletPadding: dropletPadding + 6
-            })
-            .when(400, {
-                dropletPadding: dropletPadding
-            })
-            .when(800, {
-                dropletPadding: dropletPadding + 4
-            })
-            .when(1150, {
-                dropletPadding: dropletPadding
-            })
-            .when(1450, {
-                dropletPadding: dropletPadding + 3
-            })
-            .when(1750, {
-                dropletPadding: dropletPadding
-            })
-            .when(2100, {
-                dropletPadding: dropletPadding + 2
-            })
-            .when(2450, {
-                dropletPadding: dropletPadding
-            })
-            .when(2700, {
-                dropletPadding: dropletPadding + 1
-            })
-            .when(2950, {
-                dropletPadding: dropletPadding
-            })
-            .when(3200, {
-                dropletPadding: dropletPadding
+        switch (direction) {
+            case 'top':
+                break;
+
+            case 'right':
+                time = 1500;
+                angle += 90;
+                break;
+
+            case 'bottom':
+                time = 2500;
+                angle += 180;
+                break;
+
+            case 'left':
+                angle += 270;
+                break;
+        }
+
+        this.addAnimation('dropletskip', zr.animation.animate(this.el.style)
+            .when(time, {
+                angle: angle
             })
             .during(function () {
                 self.el.modSelf();
                 zr.refreshNextFrame();
             })
-            .start('SinusoidalInOut')
+            .start('ElasticOut')
         );
+
+        // var dropletPadding = this.el.style.dropletPadding;
+        // this.addAnimation('dropletskip', zr.animation.animate(this.el.style, {loop: true})
+        //     .when(100, {
+        //         dropletPadding: dropletPadding + 6
+        //     })
+        //     .when(400, {
+        //         dropletPadding: dropletPadding
+        //     })
+        //     .when(800, {
+        //         dropletPadding: dropletPadding + 4
+        //     })
+        //     .when(1150, {
+        //         dropletPadding: dropletPadding
+        //     })
+        //     .when(1450, {
+        //         dropletPadding: dropletPadding + 3
+        //     })
+        //     .when(1750, {
+        //         dropletPadding: dropletPadding
+        //     })
+        //     .when(2100, {
+        //         dropletPadding: dropletPadding + 2
+        //     })
+        //     .when(2450, {
+        //         dropletPadding: dropletPadding
+        //     })
+        //     .when(2700, {
+        //         dropletPadding: dropletPadding + 1
+        //     })
+        //     .when(2950, {
+        //         dropletPadding: dropletPadding
+        //     })
+        //     .when(3200, {
+        //         dropletPadding: dropletPadding
+        //     })
+        //     .during(function () {
+        //         self.el.modSelf();
+        //         zr.refreshNextFrame();
+        //     })
+        //     .start('SinusoidalInOut')
+        // );
 
         this._animatingSkiping = true;
     };
@@ -247,6 +280,7 @@ define(function (require) {
         this.stopAnimation('dropletskip');
 
         this.el.style.dropletPadding = 0;
+        this.el.style.angle = 0;
 
         zr.refreshNextFrame();
     };
