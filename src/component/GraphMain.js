@@ -371,7 +371,7 @@ define(function (require) {
         }
 
         this.render();
-        
+
         this._loadStorage();
 
         // var circles = this._findCircles(config.circleKeywords.split(','));
@@ -381,9 +381,9 @@ define(function (require) {
         // }
 
         // 刚打开时的展开动画
-        if (config.enableAnimation && this.enableEntryAnimation) {
-            this._entryAnimation();
-        }
+        // if (config.enableAnimation && this.enableEntryAnimation) {
+            // this._entryAnimation();
+        // }
 
         // 发送首屏展现日志
         var title = [];
@@ -451,7 +451,7 @@ define(function (require) {
             }
         }, this);
 
-        zr.render();
+        zr.refreshNextFrame();
 
         zr.modLayer(0, {
             panable: true,
@@ -1559,7 +1559,7 @@ define(function (require) {
         zr.refreshNextFrame();
 
         zr.animation.animate(clipShape.style)
-            .when(2000, {
+            .when(1000, {
                 r: Math.max(zr.getWidth(), zr.getHeight())
             })
             .during(function () {
@@ -1922,17 +1922,32 @@ define(function (require) {
                     // 需要统计第一帧中所有图片加载完成的时间
                     if (this._isFirstFrame) {
                         imageLoadingCount++;
-                        n.entity.loadImage(zr, function () {
-                            imageLoadingCount--;
-                            imageLoadedCount++;
-                            if (imageLoadingCount === 0) {
-                                bkgLog({
-                                    // 首屏渲染完成日志
-                                    type: 'zhishitupuscreenrendered',
-                                    imageCount: imageLoadedCount
-                                });
+                        n.entity.loadImage(
+                            zr,
+                            // Success
+                            function () {
+                                imageLoadingCount--;
+                                imageLoadedCount++;
+                                if (imageLoadingCount === 0) {
+                                    bkgLog({
+                                        // 首屏渲染完成日志
+                                        type: 'zhishitupuscreenrendered',
+                                        imageCount: imageLoadedCount
+                                    });
+                                }
+                            },
+                            // Error
+                            function () {
+                                imageLoadingCount--;
+                                if (imageLoadingCount === 0) {
+                                    bkgLog({
+                                        // 首屏渲染完成日志
+                                        type: 'zhishitupuscreenrendered',
+                                        imageCount: imageLoadedCount
+                                    });
+                                }
                             }
-                        });
+                        );
                     } else {
                         n.entity.loadImage(zr);
                     }
