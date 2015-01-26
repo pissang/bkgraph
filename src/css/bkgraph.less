@@ -80,7 +80,8 @@
     height: 100px;
     z-index: 1;
     
-    background-image: url(../img/searchbar/search-bg.png);
+    background-image: url(../img/bkg-img.png);
+    background-position: 0 -655px;
 
     -webkit-transition: bottom .5s cubic-bezier(0.23, 1, 0.32, 1);
        -moz-transition: bottom .5s cubic-bezier(0.23, 1, 0.32, 1);
@@ -93,7 +94,10 @@
 
         .bkg-toggle {
             .arrow {
-                background-image: url(../img/searchbar/arrow-hidden.png);
+                width: 18px;
+                height: 10px;
+                background-image: url(../img/bkg-img.png);
+                background-position: -35px -807px;
             }
         }
     }
@@ -131,9 +135,8 @@
             float: left;
             margin-top: 3px;
 
-            background-image: url(../img/searchbar/search-icon.png);
-            background-repeat: no-repeat;
-            background-position: 50% 50%;
+            background-image: url(../img/bkg-img.png);
+            background-position: 0 -857px;
         }
     }
 
@@ -145,7 +148,8 @@
         top: -32px;
         color: white;
 
-        background-image: url(../img/searchbar/toggle-btn.png);
+        background-image: url(../img/bkg-img.png);
+        background-position: 0 -763px;
 
         text-align: center;
         font-size: 16px;
@@ -157,9 +161,10 @@
             display: inline-block;
             margin-left: 6px;
             width: 18px;
-            height: 10px;
+            height: 12px;
 
-            background-image: url(../img/searchbar/arrow-search.png);
+            background-image: url(../img/bkg-img.png);
+            background-position: -35px -827px;
         }
     }
 
@@ -185,19 +190,23 @@
             top: 30px;
             width: 25px;
             height: 43px;
-            background-image: url(../img/searchbar/prev.png);
+            background-image: url(../img/bkg-img.png);
+            background-position: 28px -595px;
             cursor: pointer;
 
             &:hover {
-                background-image: url(../img/searchbar/prev-hover.png);
+                background-image: url(../img/bkg-img.png);
+                background-position: 67px -595px;
             }
 
             &.disable {
                 cursor: default;
-                background-image: url(../img/searchbar/prev-disable.png);
+                background-image: url(../img/bkg-img.png);
+                background-position: 0 -595px;
 
                 &:hover {
-                    background-image: url(../img/searchbar/prev-disable.png);
+                    background-image: url(../img/bkg-img.png);
+                    background-position: 0 -595px;
                 }
             }
         }
@@ -208,18 +217,22 @@
             top: 30px;
             width: 25px;
             height: 43px;
-            background-image: url(../img/searchbar/next.png);
+            background-image: url(../img/bkg-img.png);
+            background-position: -80px -543px;
             cursor: pointer;
 
             &:hover {
-                background-image: url(../img/searchbar/next-hover.png);
+                background-image: url(../img/bkg-img.png);
+                background-position: -41px -543px;
             }
             &.disable {
                 cursor: default;
-                background-image: url(../img/searchbar/next-disable.png);
+                background-image: url(../img/bkg-img.png);
+                background-position: 0 -543px;
 
                 &:hover {
-                    background-image: url(../img/searchbar/next-disable.png);
+                    background-image: url(../img/bkg-img.png);
+                    background-position: 0 -543px;
                 }
             }
         }
@@ -707,7 +720,8 @@
                 font-weight: normal;
             }
             .bkg-weibo-v {
-                background-image: url(../img/sidebar/v.png);
+                background-image: url(../img/bkg-img.png);
+                background-position: 0 -1127px;
                 width: 16px;
                 height: 13px;
                 display: inline-block;
@@ -878,7 +892,8 @@
         left: -20px;
         top: 50%;
         margin-top: -42px;
-        background-image: url(../img/sidebar/toggle-btn.png);
+        background-image: url(../img/bkg-img.png);
+        background-position: 0 -804px;
 
         cursor: pointer;
         color: white;
@@ -905,7 +920,8 @@
     color: white;
     
     .bkg-bg {
-        background-image: url(../img/headerbar/bg.png);
+        background-image: url(../img/bkg-img.png);
+        background-position: 0 0;
         position: absolute;
         top: 0px;
         left: 0px;
@@ -926,6 +942,7 @@
         position: absolute;
         top: 16px;
         right: 15px;
+        height: 17px;
         border-radius: 4px;
         background-color: #8EC8F7;
         color: #295280;
@@ -933,11 +950,10 @@
         cursor: pointer;
         text-align: center;
         font-size: 14px;
-        padding: 2px 10px 2px 28px;
-        background-image: url(../img/headerbar/sina.png);
-        background-repeat: no-repeat;
-        background-position: 3px 50%;
-        line-height: 20px;
+        padding: 4px 10px 3px 28px;
+        background-image: url(../img/bkg-img.png);
+        background-position: 3px -895px;
+        line-height: 19px;
 
         &:hover {
             color: #8ec8f7;
@@ -1027,40 +1043,52 @@
     }
 
     .bkg-level-0 .bkg-level-icon {
-        background-image: url('../img/headerbar/jiangshifen2.png');
+        background-image: url('../img/bkg-img.png');
+        background-position: 19px -349px;
     }
     .bkg-level-0.bkg-active .bkg-level-icon {
-        background-image: url('../img/headerbar/jiangshifen1.png');
+        background-image: url('../img/bkg-img.png');
+        background-position: 19px -311px;
     }
     .bkg-level-1 .bkg-level-icon {
-        background-image: url('../img/headerbar/chujifen2.png');
+        background-image: url('../img/bkg-img.png');
+        background-position: 24px -120px;
     }
     .bkg-level-1.bkg-active .bkg-level-icon {
-        background-image: url('../img/headerbar/chujifen1.png');
+        background-image: url('../img/bkg-img.png');
+        background-position: 24px -83px;
     }
     .bkg-level-2 .bkg-level-icon {
-        background-image: url('../img/headerbar/zhongjifen2.png');
+        background-image: url('../img/bkg-img.png');
+        background-position: 48px -498px;
     }
     .bkg-level-2.bkg-active .bkg-level-icon {
-        background-image: url('../img/headerbar/zhongjifen1.png');
+        background-image: url('../img/bkg-img.png');
+        background-position: 48px -460px;
     }
     .bkg-level-3 .bkg-level-icon {
-        background-image: url('../img/headerbar/gaojifen2.png');
+        background-image: url('../img/bkg-img.png');
+        background-position: 48px -272px;
     }
     .bkg-level-3.bkg-active .bkg-level-icon {
-        background-image: url('../img/headerbar/gaojifen1.png');
+        background-image: url('../img/bkg-img.png');
+        background-position: 48px -235px;
     }
     .bkg-level-4 .bkg-level-icon {
-        background-image: url('../img/headerbar/dingjifen2.png');
+        background-image: url('../img/bkg-img.png');
+        background-position: 78px -197px;
     }
     .bkg-level-4.bkg-active .bkg-level-icon {
-        background-image: url('../img/headerbar/dingjifen1.png');
+        background-image: url('../img/bkg-img.png');
+        background-position: 78px -159px;
     }
     .bkg-level-5 .bkg-level-icon {
-        background-image: url('../img/headerbar/sishengfen2.png');
+        background-image: url('../img/bkg-img.png');
+        background-position: 18px -423px;
     }
     .bkg-level-5.bkg-active .bkg-level-icon {
-        background-image: url('../img/headerbar/sishengfen1.png');
+        background-image: url('../img/bkg-img.png');
+        background-position: 18px -385px;
     }
 }
 
