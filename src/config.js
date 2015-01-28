@@ -34,6 +34,7 @@ define({
         {
             position: 100,
             title: '',
+            content: '我现在对TA已经了如指掌了，你要不要也来看看TA的圈子有哪些人呢？—— 百度知识图谱',
             interval: 0
         }
     ],
