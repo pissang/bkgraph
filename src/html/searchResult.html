@@ -1,0 +1,33 @@
+<!-- target: searchResult -->
+<!-- if: ${interests} -->
+<div class="bkg-search-interest">
+    <p>您可能感兴趣的关系图谱：</p>
+    <ul>
+        <!-- for: ${interests} as ${entity}, ${index} -->
+            <!-- if: ${index} < 4 -->
+            <li>
+                <a href="http://tupu.baidu.com/tupu/${entity.id}.html" target="_blank" data-area="headerbar-interest" title="${entity.name}_人物关系图谱">
+                    <img src="${entity.img}" alt="">
+                    <h5>${entity.name}</h5>
+                </a>
+            </li>
+            <!-- /if -->
+        <!-- /for -->
+    </ul>
+</div>
+<!-- elif: ${entities} -->
+<ul class="bkg-search-list">
+    <!-- if: ${entities.length} > 0 -->
+        <!-- for: ${entities} as ${entity}, ${index} -->
+            <!-- if: ${index} < 10 -->
+            <li title="${entity.n}_人物关系图谱"><a href="http://tupu.baidu.com/tupu/${entity.id}.html" target="_blank">${entity.n}</a></li>
+            <!-- /if -->
+        <!-- /for -->
+    <!-- else -->
+        <li class="bkg-search-nodata">
+            <p>暂时没有Ta的关系图谱</p>
+            <a href="" target="_blank">百度一下 "<span>${name}</span>"</a>
+        </li>
+    <!-- /if -->
+</ul>
+<!-- /if -->

@@ -136,5 +136,13 @@ define(function (require) {
         this._$scrollButton.style.height = thumbHeight + 'px';
     }
 
+    ScrollBar.prototype.destory = function(first_argument) {
+        this._$viewport.removeChild(this._$scrollBar);
+        util.removeEventListener(this._$scrollButton, 'mousedown', this._onMouseDown);
+        util.removeEventListener(this._$viewport, 'mousewheel', this._onMouseScroll);
+        util.removeEventListener(this._$viewport, 'DOMMouseScroll', this._onMouseScroll);
+        util.removeEventListener(this._$viewport, 'keydown', this._onKeyDown);
+    };
+
     return ScrollBar;
 });

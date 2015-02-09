@@ -37,18 +37,11 @@ define(function (require) {
 
         this.draggable = opts.draggable || false;
 
-        this.style = {
-            color: '#0e90fe',
-            lineWidth: 3,
-            labelColor: 'white'
-        };
-        this.highlightStyle = {
-            color: '#f9dd05',
-            lineWidth: 5,
-            labelColor: 'black'
-        };
+        this.style = zrUtil.clone(config.nodeStyle['default']);
+        this.highlightStyle = zrUtil.clone(config.nodeStyle.highlight);
+
         if (opts.style) {
-            zrUtil.merge(this.style, opts.style)
+            zrUtil.merge(this.style, opts.style, true)
         }
         if (opts.highlightStyle) {
             zrUtil.merge(this.highlightStyle, opts.highlightStyle)
@@ -66,7 +59,7 @@ define(function (require) {
         var dragging = false;
         var outlineShape = new CircleShape({
             style: {
-                strokeColor: this.style.color,
+                strokeColor: this.style.borderColor,
                 brushType: 'stroke',
                 r: baseRadius,
                 x: 0,
@@ -115,7 +108,7 @@ define(function (require) {
                     x: 0,
                     y: 0,
                     r: baseRadius,
-                    color: zrColor.alpha(this.style.color, 0.8),
+                    color: zrColor.alpha(this.style.color, this.style.alpha),
                     brushType: 'fill',
                     text: this.label,
                     textPosition: 'inside',
@@ -186,7 +179,7 @@ define(function (require) {
         switch (name) {
             case 'color':
                 this._outlineShape.style.strokeColor = value;
-                this._labelShape.style.color = zrColor.alpha(this.style.color, 0.8);
+                this._labelShape.style.color = zrColor.alpha(this.style.color, this.style.alpha);
                 break;
             case 'lineWidth':
                 this._outlineShape.style.lineWidth = value;
@@ -204,9 +197,9 @@ define(function (require) {
     };
 
     NodeEntity.prototype.highlight = function () {
-        this._outlineShape.style.strokeColor = this.highlightStyle.color;
+        this._outlineShape.style.strokeColor = this.highlightStyle.borderColor;
         this._outlineShape.style.lineWidth = this.highlightStyle.lineWidth;
-        this._labelShape.style.color = zrColor.alpha(this.highlightStyle.color, 0.8);
+        this._labelShape.style.color = zrColor.alpha(this.highlightStyle.color, this.highlightStyle.alpha);
         this._labelShape.style.textColor = this.highlightStyle.labelColor;
 
         this.setZLevel(3);
@@ -215,9 +208,9 @@ define(function (require) {
     };
 
     NodeEntity.prototype.lowlight = function () {
-        this._outlineShape.style.strokeColor = this.style.color;
+        this._outlineShape.style.strokeColor = this.style.borderColor;
         this._outlineShape.style.lineWidth = this.style.lineWidth;
-        this._labelShape.style.color = zrColor.alpha(this.style.color, 0.8);
+        this._labelShape.style.color = zrColor.alpha(this.style.color, this.style.alpha);
         this._labelShape.style.textColor = this.style.labelColor;
 
         this.setZLevel(1);

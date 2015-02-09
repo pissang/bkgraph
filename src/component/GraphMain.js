@@ -13,7 +13,7 @@ define(function (require) {
     var ForceLayout = require('../layout/ForceLayout');
     var NodeEntity = require('../entity/Node');
     var EdgeEntity = require('../entity/Edge');
-    var ExtraEdgeEntity = require('../entity/ExtraEdge');
+    var CurveEdgeEntity = require('../entity/CurveEdge');
     var OutTipEntity = require('../entity/OutTip');
     var ExtraEdgeBundleEntity = require('../entity/ExtraEdgeBundle');
 
@@ -22,6 +22,7 @@ define(function (require) {
     var util = require('../util/util');
     var intersect = require('../util/intersect');
     var jsonp = require('../util/jsonp');
+    var cookies = require('../util/cookies');
 
     var Cycle = require('./Cycle');
 
@@ -75,6 +76,8 @@ define(function (require) {
 
         // 当前关注的节点, 可能是点击，也可能是搜索定位
         this._activeNode = null;
+
+        this._activeEdge = null;
 
         // 图中所有的节点数
         this._nodeEntityCount = 0;
@@ -427,7 +430,7 @@ define(function (require) {
         if (config.enableAnimation) {
             this._extraEdgeBundle = new ExtraEdgeBundleEntity();
             this._extraEdgeBundle.initialize(zr);
-            this._root.addChild(this._extraEdgeBundle.el);   
+            this._root.addChild(this._extraEdgeBundle.el);
         }
 
         // 所有实体都在 zlevel-1 层
@@ -609,7 +612,7 @@ define(function (require) {
             if (forceLayout.isStable()) {
                 self.stopForceLayout();
                 cb && cb.call(self);
-                console.log(count);
+                // console.log(count);
             }
             else {
                 if (self._layouting) {
@@ -710,6 +713,7 @@ define(function (require) {
      * 鼠标 hover 到节点上的特效
      */
     GraphMain.prototype.hoverNode = function (node) {
+        this.unhoverEdge(this._activeEdge);
         if (node._isHover) {
             return;
         }
@@ -754,6 +758,47 @@ define(function (require) {
             node.entity.highlight();
             node._isHighlight = true;
         }
+    };
+
+    /**
+     * 边移除hover特效
+     */
+    GraphMain.prototype.unhoverEdge = function (e) {
+        if (typeof(e) === 'string') {
+            e = this._getEdgeByID(e);
+        }
+        if (!e) {
+            return;
+        }
+
+        if (config.enableAnimation) {
+            e.entity.animateTextPadding(this._zr, 300, 5);
+            e.entity.stopActiveAnimation(this._zr, e.entity);
+        }
+        e.entity.lowlightLabel();
+    };
+
+    /**
+     * 鼠标 hover 到边上的特效
+     */
+    GraphMain.prototype.hoverEdge = function (e) {
+        if (typeof(e) === 'string') {
+            e = this._getEdgeByID(e);
+        }
+        if (!e) {
+            return;
+        }
+
+        if (this._activeEdge != e) {
+            this.unhoverEdge(this._activeEdge);
+            this._activeEdge = e;
+        }
+
+        if (config.enableAnimation) {
+            e.entity.animateTextPadding(this._zr, 300, 12);
+            e.entity.startActiveAnimation(this._zr, e.entity);
+        }
+        e.entity.highlightLabel();
     };
 
     /**
@@ -880,7 +925,6 @@ define(function (require) {
         if (typeof(node) === 'string') {
             node = this._graphLayout.getNodeById(node);
         }
-
         this._lastClickNode = null;
         this._activeNode = node;
 
@@ -939,6 +983,7 @@ define(function (require) {
         if (!e) {
             return;
         }
+
         this._lastClickNode = null;
         this._activeNode = null;
 
@@ -1018,7 +1063,8 @@ define(function (require) {
                 });
             }
             if (showSidebar) {
-                sideBar.show(n.id + ',' + n.data.layerCounter);
+                var layerCounter = n.data ? n.data.layerCounter : n.layerCounter;
+                sideBar.show(n.id + ',' + layerCounter);
             }
         }
     };
@@ -1070,6 +1116,53 @@ define(function (require) {
                         ].join(',');
             sideBar.show(logParam);
         }
+    };
+
+    GraphMain.prototype.showNodeEndTip = function (n) {
+        if (typeof(n) === 'string') {
+            n = graph.getNodeById(n);
+        }
+
+        var tip = this._kgraph.getComponentByType('TIP');
+        tip.setData(config.tip.nodeEnd, n);
+    };
+
+    GraphMain.prototype.showNodeHoverTip = function (n) {
+        if (typeof(n) === 'string') {
+            n = graph.getNodeById(n);
+        }
+
+        var isClicked = cookies.get('BKGraph_node_click_0') || 0;
+
+        if (!isClicked) {
+            var tip = this._kgraph.getComponentByType('TIP');
+            tip.setData(config.tip.node, n);
+        }
+    };
+
+    GraphMain.prototype.showEdgeClickTip = function (e, isOther) {
+        if (typeof(e) === 'string') {
+            e = this._getEdgeByID(e);
+        }
+        if (!e) {
+            return;
+        }
+
+        var isClicked = cookies.get('BKGraph_edge_click_0') || 0;
+        if (!isClicked) {
+            this._activeEdge = e;
+            this.highlightEdge(e);
+            this.hoverEdge(e);
+
+            var tip = this._kgraph.getComponentByType('TIP');
+            var tipData = isOther ? config.tip.edgeOther : config.tip.edge;
+            tip.setData(tipData, e, true);
+        }
+    };
+
+    GraphMain.prototype.hideTip = function () {
+        var tip = this._kgraph.getComponentByType('TIP');
+        tip && tip.hide();
     };
 
     /**
@@ -1342,10 +1435,9 @@ define(function (require) {
         this._syncHeaderBarExplorePercent();
         zr.refreshNextFrame();
 
-        if (logTitle.length) {
-            return true;
-        }
-        return false;
+        // if (node.outEdges || node.outEdges.length == 0) {
+        //     this.showNodeEndTip(node);
+        // }
     }
 
     GraphMain.prototype.toJSON = function () {
@@ -1687,6 +1779,10 @@ define(function (require) {
 
     GraphMain.prototype._createNodeEntity = function (node, style) {
         var zr = this._zr;
+        if (node == this.getMainNode()) {
+            style ? '' : (style = {});
+            zrUtil.merge(style, config.nodeStyle.mainNode, true);
+        }
         var nodeEntity = new NodeEntity({
             radius: node.layout.size,
             label: node.data.name,
@@ -1707,6 +1803,8 @@ define(function (require) {
                 self.dispatch('mouseover:entity', node.data);
 
                 self.expandNode(node);
+
+                self.showNodeHoverTip(node);
 
                 self.hoverNode(node);
 
@@ -1732,6 +1830,15 @@ define(function (require) {
             self.dispatch('click:entity', node);
 
             self.showEntityDetail(node, true);
+
+            self.hideTip();
+            var isClicked = cookies.get('BKGraph_node_click_0') || 0;
+            if (!isClicked) {
+                cookies.set('BKGraph_node_click_0', node.id, {
+                    // 10 years
+                    expires: 360 * 24 * 3600 * 10
+                });
+            }
 
             if (self._lastClickNode !== node) {
                 self._lastClickNode = node;
@@ -1779,22 +1886,29 @@ define(function (require) {
         var zr = this._zr;
         if (e.node1.entity && e.node2.entity) {
             if (e.isExtra) {
-                edgeEntity = new ExtraEdgeEntity({
-                    sourceEntity: e.node1.entity,
-                    targetEntity: e.node2.entity,
-                    label: e.data.relationName,
-                    style: style
-                });
+                style ? '' : (style = {});
+                zrUtil.merge(style, config.edgeStyle.extra, true);
+            }
+            edgeEntity = new CurveEdgeEntity({
+                sourceEntity: e.node1.entity,
+                targetEntity: e.node2.entity,
+                label: e.data.relationName,
+                style: style,
+                layerCounter: Math.max(e.node1.data.layerCounter, e.node2.data.layerCounter),
+                isExtra: e.isExtra
+            });
+            if (e.isExtra) {
                 if (config.enableAnimation) {
                     this._extraEdgeBundle.addEdge(e);
                 }
-            } else {
-                edgeEntity = new EdgeEntity({
-                    sourceEntity: e.node1.entity,
-                    targetEntity: e.node2.entity,
-                    label: e.data.relationName
-                });
             }
+            // } else {
+            //     edgeEntity = new EdgeEntity({
+            //         sourceEntity: e.node1.entity,
+            //         targetEntity: e.node2.entity,
+            //         label: e.data.relationName
+            //     });
+            // }
             edgeEntity.initialize(this._zr);
 
             edgeEntity.bind('click', function () {
@@ -1802,6 +1916,16 @@ define(function (require) {
 
                 this.showRelationDetail(e);
                 this.highlightEdge(e);
+
+                var isClicked = cookies.get('BKGraph_edge_click_0') || 0;
+                if (!isClicked) {
+                    self.hideTip();
+                    cookies.set('BKGraph_edge_click_0', e.data.id, {
+                        // 10 years
+                        expires: 360 * 24 * 3600 * 10
+                    });
+                }
+
                 bkgLog({
                     type: 'zhishitupuclick',
                     target: [
@@ -1824,21 +1948,15 @@ define(function (require) {
                 if (self._lastHoverEdge !== e) {
                     self.dispatch('mouseover:relation', e.data);
 
-                    if (config.enableAnimation) {
-                        edgeEntity.animateTextPadding(zr, 300, 12);
-                        edgeEntity.startActiveAnimation(zr);
-                    }
-                    edgeEntity.highlightLabel();
+                    self.hoverEdge(e);
                 }
 
                 self._lastHoverEdge = e;
             });
             edgeEntity.bind('mouseout', function () {
-                if (config.enableAnimation) {
-                    edgeEntity.animateTextPadding(zr, 300, 5);
-                    edgeEntity.stopActiveAnimation(zr);
-                }
-                edgeEntity.lowlightLabel();
+
+                self.unhoverEdge(e);
+
                 self._lastHoverEdge = null;
             });
 
@@ -1880,10 +1998,10 @@ define(function (require) {
     };
 
     GraphMain.prototype._syncHeaderBarExplorePercent = function () {
-        var headerBarComponent = this._kgraph.getComponentByType('HEADERBAR');
-        if (headerBarComponent) {
-            headerBarComponent.setExplorePercent(this.getExplorePercent());
-        }
+        // var headerBarComponent = this._kgraph.getComponentByType('HEADERBAR');
+        // if (headerBarComponent) {
+        //     headerBarComponent.setExplorePercent(this.getExplorePercent());
+        // }
 
         if (!config.isPlat) {
             this._saveStorage();
@@ -1959,7 +2077,7 @@ define(function (require) {
         for (var i = 0; i < graph.edges.length; i++) {
             var e = graph.edges[i];
             if (e.entity) {
-                e.entity.el.ignore = e.entity.hidden || !e.entity.isInsideRect(rect);
+                e.entity.el.ignore = e.entity._labelLineShape.style.hidden || !e.entity.isInsideRect(rect);
             }
         }
 

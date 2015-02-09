@@ -49,7 +49,7 @@ define(function (require) {
         ctx.lineTo(style.xEnd, style.yEnd);
         ctx.stroke();
 
-        // 画Label水滴
+        // 画Label
         ctx.globalAlpha = 1;
         var cx = style.cx;
         var cy = style.cy;
@@ -59,8 +59,8 @@ define(function (require) {
             cy = (style.yStart + style.yEnd) / 2;
         }
         ctx.beginPath();
-        // ctx.arc(cx, cy, r, 0, Math.PI * 2);
-        this.buildDropletPath(ctx, style);
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        // this.buildDropletPath(ctx, style);
         ctx.fill();
 
         // 画Label标签

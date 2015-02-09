@@ -1,6 +1,5 @@
 <!-- target: sidebarModuleTitle -->
 <div class="bkg-module-title">
-    <div class="bkg-circle"></div>
     <h4>${sidebarModuleName}</h4>
 </div>
 
@@ -8,14 +7,12 @@
 <div class="bkg-news bkg-sidebar-module">
     <!-- block: newsModuleTitle -->
     <div class="bkg-module-title">
-        <div class="bkg-circle"></div>
         <h4 class="bkg-title"><a href="http://www.baidu.com/s?wd=${name|url}%20最新动态" title="最新动态" data-area="entity-news" target="_blank">最新动态</a></h4>
     </div>
     <!-- /block -->
     <ul>
         <!-- for: ${news} as ${item}, ${index} -->
         <li class="bkg-item">
-            <div class="bkg-circle"></div>
             <a href="${item.url}" target="_blank" class="bkg-title" title="${item.title}" data-area="${_datatype}-news">
             ${item.title|truncate(20)}
             </a>
@@ -31,7 +28,6 @@
 <!-- target: sidebarRelationNews(master=sidebarNews) -->
 <!-- block: newsModuleTitle -->
 <div class="bkg-module-title">
-    <div class="bkg-circle"></div>
     <h4 class="bkg-title"><a href="http://www.baidu.com/s?wd=${fromEntity.name|url}%20${toEntity.name|url}%20最新动态" title="${fromEntity.name} 和 ${toEntity.name} 的最新动态" data-area="relation-news" target="_blank">${fromEntity.name} 和 ${toEntity.name} 的最新动态</a></h4>
 </div>
 <!-- /block -->
@@ -39,7 +35,6 @@
 <!-- target: sidebarWeibo -->
 <div class="bkg-weibo bkg-sidebar-module">
     <div class="bkg-module-title">
-        <div class="bkg-circle"></div>
         <h4><a href="${weibo.latestWeiboUrl}" title="新浪微博" data-area="entity-weibo" target="_blank">新浪微博</a></h4>
     </div>
     <div class="bkg-weibo-info">
@@ -68,33 +63,44 @@
 <!-- target: sidebarWorks -->
 <div class="bkg-works bkg-sidebar-module">
     <div class="bkg-module-title">
-        <div class="bkg-circle"></div>
-        <h4><a href="http://www.baidu.com/s?wd=${name|url}%20热门作品" title="热门作品" data-area="entity-representativeWork" target="_blank">热门作品</a></h4>
+        <h4>热门作品</h4>
+        <a href="http://www.baidu.com/s?wd=${name|url}%20热门作品" title="更多" data-area="entity-representativeWork" target="_blank">更多 ></a>
     </div>
     <ul>
     <!-- for: ${representativeWork} as ${work}, ${idx} -->
+        <!-- if: ${idx} < 4 -->
         <li>
-            <a href="${work.movieRedir}" target="_blank" title="${work.movieName}" data-area="entity-representativeWork">
-                <img src="${work.movieImage}" class="bkg-hoverable" alt="" />
-                <span class="bkg-work-title">${work.movieName}</span>
+            <a href="${work.movieRedir}" class="bkg-hoverable" target="_blank" title="${work.movieName}" data-area="entity-representativeWork">
+                <img src="${work.movieImage}" alt="" />
+                <span class="bkg-work-type">${work.movieType|truncate(4)}</span>
+                <span class="bkg-work-title">${work.movieName|truncate(4)}</span>
             </a>
         </li>
+        <!-- /if -->
     <!-- /for -->
     </ul>
 </div>
 
 <!-- target: sidebarMailuo -->
 <div class="bkg-mailuo bkg-sidebar-module">
-    <p class="bkg-mailuo-title">${fromEntity.name}${toEntity.name}${relationName|truncate(6)} 发展脉络</p>
+    <!-- <p class="bkg-mailuo-title">${fromEntity.name}${toEntity.name}${relationName|truncate(6)} 发展脉络</p> -->
+    <div class="bkg-module-title">
+        <h4><!-- ${fromEntity.name}${toEntity.name}${relationName|truncate(6)} --> 关系发展脉络</h4>
+    </div>
     <ul>
         <!-- for: ${eventMaiLuo} as ${item}, ${index} -->
-        <li class="bkg-item">
-            <div class="bkg-circle"></div>
-            <span class="bkg-publish-time">${item.publishTime}</span>
-            <a href="${item.url}" target="_blank" class="bkg-title" title="${item.title}" data-area="relation-mailuo">
-            ${item.title|truncate(15)}
-            </a>
-        </li>
+            <!-- if: ${item.year} -->
+            <li class="bkg-item">
+                <span class="bkg-publish-year">${item.year}</span>
+            </li>
+            <!-- /if -->
+            <li class="bkg-item">
+                <div class="bkg-circle"></div>
+                <span class="bkg-publish-time">${item.publishTime}</span>
+                <a href="${item.url}" target="_blank" class="bkg-title" title="${item.title}" data-area="relation-mailuo">
+                ${item.title|truncate(12)}
+                </a>
+            </li>
         <!-- /for -->
     </ul>
 </div>
@@ -102,8 +108,8 @@
 <!-- target: sidebarLatestWorks -->
 <div class="bkg-works bkg-sidebar-module">
     <div class="bkg-module-title">
-        <div class="bkg-circle"></div>
-        <h4><a href="http://www.baidu.com/s?wd=${name|url}%20最新影视作品" title="更多" data-area="entity-latestwork" target="_blank">最新影视作品</a></h4>
+        <h4>最新影视作品</h4>
+        <a href="http://www.baidu.com/s?wd=${name|url}%20最新影视作品" title="更多" data-area="entity-latestwork" target="_blank">更多 ></a>
     </div>
     <ul>
     <!-- for: ${representativeWork} as ${work}, ${idx} -->
@@ -121,22 +127,36 @@
 <div class="bkg-show bkg-sidebar-module">
     <div class="bkg-module-title">
         <h4>最新综艺</h4>
-        <a href="http://www.baidu.com/s?wd=${name|url}%20最新综艺" title="更多" data-area="entity-show" target="_blank">更多>></a>
+        <a href="http://www.baidu.com/s?wd=${name|url}%20最新综艺" title="更多" data-area="entity-show" target="_blank">更多 ></a>
     </div>
     <ul>
     <!-- for: ${show} as ${item}, ${idx} -->
+        <!-- if: ${idx} < 3 -->
         <li>
-            <a href="${item.videoRedir}" target="_blank" title="${item.videoName}" data-area="entity-show">
-                <img src="${item.videoImage}" class="bkg-hoverable" alt="" />
-                <span class="bkg-show-title">${item.videoName}</span>
+            <a href="${item.videoRedir}" class="bkg-hoverable"  target="_blank" title="${item.videoName}" data-area="entity-show">
+                <img src="${item.videoImage}" alt="" />
+                <span class="bkg-show-title">${item.videoName|truncate(6)}</span>
             </a>
         </li>
+        <!-- /if -->
     <!-- /for -->
+    <!-- if: !${show} -->
+        <!-- for: ${representativeWork} as ${work}, ${idx} -->
+            <!-- if: ${idx} < 3 -->
+            <li>
+                <a href="${work.movieRedir}" class="bkg-hoverable" target="_blank" title="${work.movieName}" data-area="entity-representativeWork">
+                    <img src="${work.movieImage}" alt="" />
+                    <span class="bkg-show-title">${work.movieName|truncate(6)}</span>
+                </a>
+            </li>
+            <!-- /if -->
+        <!-- /for -->
+    <!-- /if -->
     </ul>
 </div>
 
 <!-- target: sidebarTag -->
-<div class="bkg-taglist bkg-sidebar-module">
+<div class="bkg-taglist bkg-sidebar-module bkg-intro-tag">
     <div class="bkg-module-title">
         <h4><!-- block: tagModuleTitle -->Ta的那些事儿<!-- /block --></h4>
     </div>
@@ -145,8 +165,11 @@
     <div class="bkg-tags">
         <!-- <span>TA的那些事儿:</span> -->
         <!-- for: ${singleTag} as ${tag}, ${index} -->
-        <a href="http://www.baidu.com/s?wd=${name|url}%20${tag.text|url}" title="${name} ${tag.text}_百度搜索" data-area="entity-singleTag" target="_blank">${tag.text}</a>
+            <!-- if: ${tag.linenum} < 3 -->
+                <a class="${tag.cls}" href="http://www.baidu.com/s?wd=${name|url}%20${tag.text|url}" title="${name} ${tag.text}_百度搜索" data-area="entity-singleTag" target="_blank" style="width:${tag.width};">${tag.text}
+            <!-- /if -->
         <!-- /for -->
+        </a>
     </div>
     <!-- /if -->
     <!-- /block -->
@@ -158,8 +181,11 @@
 <!-- if: ${pairTag} && ${pairTag.length} -->
 <div class="bkg-tags">
     <!-- for: ${pairTag} as ${tag}, ${index} -->
-    <a href="http://www.baidu.com/s?wd=${fromEntity.name|url}%20${toEntity.name|url}%20${tag.text|url}" title="${fromEntity.name} ${toEntity.name} ${tag.text}_百度搜索" data-area="relation-pairTag" target="_blank">${tag.text}</a>
+        <!-- if: ${tag.linenum} < 3 -->
+            <a class="${tag.cls}" href="http://www.baidu.com/s?wd=${fromEntity.name|url}%20${toEntity.name|url}%20${tag.text|url}" title="${fromEntity.name} ${toEntity.name} ${tag.text}_百度搜索" data-area="relation-pairTag" target="_blank" style="width: ${tag.width}">${tag.text}
+        <!-- /if -->
     <!-- /for -->
+    </a>
 </div>
 <!-- /if -->
 <!-- /block -->
@@ -176,15 +202,17 @@
     <div class="bkg-rec-tags">
         <ul>
             <!-- for: ${recommendation} as ${recTag}, ${index} -->
-            <li>
-                <a href="http://www.baidu.com/s?wd=${recTag.name|url}" target="_blank" data-area="entity-recommendation" title="${recTag.name}_百度搜索" class="bkg-hoverable">
-                    <img src="${recTag.image}" alt="">
-                    <h5>${recTag.name|truncate(6)}</h5>
-                </a>
-                <a href="http://www.baidu.com/s?wd=${recTag.name|url}" target="_blank" data-area="entity-recommendation" title="${recTag.name}_百度搜索">
-                    <span>${recTag.reason|truncate(10)}</span>
-                </a>
-            </li>
+                <!-- if: ${index} < 4 -->
+                <li>
+                    <a href="http://www.baidu.com/s?wd=${recTag.name|url}" target="_blank" data-area="entity-recommendation" title="${recTag.name}_百度搜索" class="bkg-hoverable">
+                        <img src="${recTag.image}" alt="">
+                        <h5>${recTag.name|truncate(6)}</h5>
+                    </a>
+                    <!-- <a href="http://www.baidu.com/s?wd=${recTag.name|url}" target="_blank" data-area="entity-recommendation" title="${recTag.name}_百度搜索">
+                        <span>${recTag.reason|truncate(10)}</span>
+                    </a> -->
+                </li>
+                <!-- /if -->
             <!-- /for -->
         </ul>
     </div>
@@ -203,10 +231,12 @@
 <div class="bkg-tags">
     <p class="bkg-tag-title"></p>
     <!-- for: ${recommendation.content} as ${rec}, ${index} -->
-    <a href="http://www.baidu.com/s?wd=${rec.fromName|url}%20${rec.toName|url}%20${rec.relationName|url}" target="_blank" data-area="relation-recommendation" title="${rec.fromName} ${rec.toName} ${rec.relationName}_百度搜索">
-        ${rec.fromName|truncate(5)}-${rec.toName|truncate(5)}
-    </a>
+        <!-- if: ${rec.linenum} < 3 -->
+            <a class="${rec.cls}" href="http://www.baidu.com/s?wd=${rec.fromName|url}%20${rec.toName|url}%20${rec.relationName|url}" target="_blank" data-area="relation-recommendation" title="${rec.fromName} ${rec.toName} ${rec.relationName}_百度搜索" style="width: ${rec.width}">
+                ${rec.fromName|truncate(5)}-${rec.toName|truncate(5)}
+        <!-- /if -->
     <!-- /for -->
+    </a>
 </div>
 <!-- /if -->
 

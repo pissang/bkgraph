@@ -1,20 +1,38 @@
 <div class="bkg-bg"></div>
 
-<h1>${name} <span style="font-weight:normal;">人物关系图谱</span></h1>
-<div class="bkg-explore-percent">
+<!-- <div class="bkg-logo"></div> -->
+<h1>${name}</h1>
+<!-- <div class="bkg-explore-percent">
     <span class="bkg-explore-percent-prefix">您已经是TA的</span>
     <span class="bkg-explore-percent-bar">
-        <span class="bkg-explore-percent-bar-inner"></span>
+        <span class="bkg-explore-percent-bar-inner"></span> -->
         <!-- for: ${levels} as ${level}, ${index} -->
-        <div class="bkg-milestone" style="left:${level.position}%;"></div>
+        <!-- <div class="bkg-milestone" style="left:${level.position}%;"></div> -->
         <!-- /for -->
-    </span>
+    <!-- </span> -->
     <!-- for: ${levels} as ${level}, ${index} -->
-    <div class="bkg-level-${index} bkg-level" style="width:${level.interval}%; left:${level.position}%">
+    <!-- <div class="bkg-level-${index} bkg-level" style="width:${level.interval}%; left:${level.position}%">
         <div class="bkg-level-icon"></div>
         <div class="bkg-level-title">${level.title}</div>
-    </div>
+    </div> -->
     <!-- /for -->
-</div>
+<!-- </div> -->
+<div class="bkg-search">
+    <div class="bkg-search-input">
+        <input type="text" placeholder="输入姓名 查看图谱">
+        <i class="bkg-search-btn"></i>
+    </div>
 
-<div class="bkg-share">分享</div>
+    <div class="bkg-search-result">
+        <!-- import: searchResult -->
+    </div>
+</div>
+<div class="bkg-share">
+    <i class="bkg-share-btn"></i>
+</div>
+<ul class="bkg-share-area bkg-hidden">
+    <li class="bkg-share-weibo" data-type="weibo"></li>
+    <!-- <li class="bkg-share-wechat" data-type="wechat"></li>
+    <li class="bkg-share-weixin" data-type="weixin"></li> -->
+</ul>
+<!-- <div class="bkg-share">分享</div> -->

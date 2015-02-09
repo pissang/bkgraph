@@ -5,6 +5,7 @@ define(function (require) {
     var zrUtil = require('zrender/tool/util');
 
     var CurveBundleShape = require('../shape/CurveBundle');
+    var config = require('../config');
 
     var intersect = require('../util/intersect');
 
@@ -17,16 +18,16 @@ define(function (require) {
 
         this.el = new CurveBundleShape({
             style: {
-                segments: [],
-                lineWidth: 1
+                segments: []
             },
             hoverable: false
         });
 
-        this.style = {
-            color: '#0e90fe',
-            opacity: 0.2
-        }
+        // 标示曲线的弧度方向
+        this.layerCounter = opts.layerCounter || 1;
+
+        this.style = zrUtil.clone(config.edgeStyle.extra);
+
         if (opts.style) {
             zrUtil.merge(this.style, opts.style);
         }
@@ -37,6 +38,7 @@ define(function (require) {
     ExtraEdgeBundleEntity.prototype.initialize = function (zr) {
         this.el.style.strokeColor = this.style.color;
         this.el.style.opacity = this.style.opacity;
+        this.el.style.lineWidth = this.style.lineWidth;
 
         this.update(zr);
     }
@@ -48,6 +50,7 @@ define(function (require) {
             var e = this.edges[i];
             var sourceEntity = e.node1.entity;
             var targetEntity = e.node2.entity;
+            var layerCounter = Math.max(e.node1.data.layerCounter, e.node2.data.layerCounter);
 
             var segs = this.el.style.segments;
             var seg = segs[i];
@@ -58,6 +61,7 @@ define(function (require) {
                 this._calCurvePoints(
                     sourceEntity,
                     targetEntity,
+                    layerCounter,
                     seg
                 );
 
@@ -73,12 +77,14 @@ define(function (require) {
     ExtraEdgeBundleEntity.prototype.addEdge = function (e) {
         var sourceEntity = e.node1.entity;
         var targetEntity = e.node2.entity;
+        var layerCounter = Math.max(e.node1.data.layerCounter, e.node2.data.layerCounter);
 
         var seg = [];
         if (sourceEntity && targetEntity) {
             this._calCurvePoints(
                 sourceEntity,
                 targetEntity,
+                layerCounter,
                 seg
             );
 
@@ -97,9 +103,9 @@ define(function (require) {
         }
     }
 
-    ExtraEdgeBundleEntity.prototype._calCurvePoints = function (sourceEntity, targetEntity, out) {
+    ExtraEdgeBundleEntity.prototype._calCurvePoints = function (sourceEntity, targetEntity, layerCounter, out) {
 
-        var inv = 1;
+        var inv = 1.3;
         var curve = this.el;
         var p1 = sourceEntity.el.position;
         var p2 = targetEntity.el.position;
@@ -108,16 +114,23 @@ define(function (require) {
         curve.style.yStart = p1[1];
         curve.style.xEnd = p2[0];
         curve.style.yEnd = p2[1];
-        curve.style.cpX1 = (p1[0] + p2[0]) / 2 - inv * (p2[1] - p1[1]) / 4;
-        curve.style.cpY1 = (p1[1] + p2[1]) / 2 - inv * (p1[0] - p2[0]) / 4;
+
+        if (layerCounter % 2 == 0) {
+            curve.style.cpX1 = (p1[0] + p2[0]) / 2 - inv * (p1[1] - p2[1]) / 4;
+            curve.style.cpY1 = (p1[1] + p2[1]) / 2 - inv * (p2[0] - p1[0]) / 4;
+        }
+        else {
+            curve.style.cpX1 = (p1[0] + p2[0]) / 2 - inv * (p2[1] - p1[1]) / 4;
+            curve.style.cpY1 = (p1[1] + p2[1]) / 2 - inv * (p1[0] - p2[0]) / 4;
+        }
 
         p1 = intersect.curveCircle(curve.style, p1, sourceEntity.radius);
         p2 = intersect.curveCircle(curve.style, p2, targetEntity.radius);
 
         out[0] = p1[0];
         out[1] = p1[1];
-        out[2] = (p1[0] + p2[0]) / 2 - (p2[1] - p1[1]) / 4;
-        out[3] = (p1[1] + p2[1]) / 2 - (p1[0] - p2[0]) / 4;
+        out[2] = (p1[0] + p2[0]) / 2 - inv * (p2[1] - p1[1]) / 4;
+        out[3] = (p1[1] + p2[1]) / 2 - inv * (p1[0] - p2[0]) / 4;
         out[4] = p2[0];
         out[5] = p2[1];
     }

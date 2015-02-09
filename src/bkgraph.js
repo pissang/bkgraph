@@ -17,6 +17,7 @@ define(function (require) {
     var KeyboardControl = require('./component/KeyboardControl');
     var Loading = require('./component/Loading');
     var Intro = require('./component/Intro');
+    var Tip = require('./component/Tip');
     var etpl = require('etpl');
     var jsonp = require('./util/jsonp');
     var util = require('./util/util');
@@ -54,6 +55,9 @@ define(function (require) {
 
         this.resize();
 
+        var headerBar = new HeaderBar();
+        this.addComponent(headerBar);
+
         // 加载界面
         var loading = new Loading();
         this.addComponent(loading);
@@ -62,8 +66,14 @@ define(function (require) {
 
         // if (typeof(url) === 'string' && url.indexOf('http') == 0) {
 
+            bkgLog({
+                type: 'zhishitupuapistart'
+            });
             jsonp(url, 'callback', function (data) {
 
+                bkgLog({
+                    type: 'zhishitupuapiend'
+                });
                 if (!data) {
                     self.removeComponent(loading);
                     return;
@@ -156,6 +166,9 @@ define(function (require) {
         var graphMain = new GraphMain();
         this.addComponent(graphMain);
 
+        var tip = new Tip();
+        this.addComponent(tip);
+
         var params = util.getURLSearch();
 
         if (data) {
@@ -165,40 +178,52 @@ define(function (require) {
             graphMain.setData(data);
         }
 
+        // 关系边权重排序
+        var mainRelations = [];
+        var mainEntity = data.mainEntity;
+        for (var i = 0, len = data.relations.length; i < len; i++) {
+            if (data.relations[i].fromID == mainEntity.id) {
+                mainRelations.push(data.relations[i]);
+            }
+        }
+        mainRelations.sort(function (a, b) {
+            return b.relationWeight - a.relationWeight;
+        });
+
         if (params['relation']) {
             setTimeout(function () {
                 graphMain.highlightEdge(params['relation']);
-                graphMain.moveToRelation(params['relation']);
-                graphMain.showRelationDetail(params['relation']);
+                graphMain.moveToRelation(params['relation'], function () {
+                    // 关系点击引导
+                    var edgeid = mainRelations[0].id;
+                    var isOther = false;
+                    if (params['relation'] == edgeid) {
+                        edgeid = mainRelations[1].id;
+                        isOther = true;
+                    }
+                    graphMain.showEdgeClickTip(edgeid, isOther);
+                });
+                graphMain.showRelationDetail(params['relation'], true);
             });
         }
         else if (params['entity']) {
             setTimeout(function () {
                 graphMain.highlightNode(params['entity']);
-                graphMain.moveToEntity(params['entity']);
+                graphMain.moveToEntity(params['entity'], function () {
+                    // 关系点击引导
+                    graphMain.showEdgeClickTip(mainRelations[0].id);
+                });
                 graphMain.showEntityDetail(params['entity'], true);
             });
         }
         else {
-        //     // 默认高亮中心节点权重最高的边
-        //     var mainRelations = [];
-        //     var mainEntity = data.mainEntity;
-        //     for (var i = 0, len = data.relations.length; i < len; i++) {
-        //         if (data.relations[i].fromID == mainEntity.id) {
-        //             mainRelations.push(data.relations[i]);
-        //         }
-        //     }
-        //     mainRelations.sort(function (a, b) {
-        //         return b.relationWeight - a.relationWeight;
-        //     });
-        //     setTimeout(function () {
-        //         graphMain.highlightEdge(mainRelations[0].id);
-        //         graphMain.showRelationDetail(mainRelations[0].id);
-        //     });
-                // 默认显示主要实体
-                setTimeout(function () {
-                    graphMain.showEntityDetail(data.mainEntity, false);
-                });
+            // 默认显示主要实体
+            setTimeout(function () {
+                graphMain.showEntityDetail(data.mainEntity, true);
+
+                // 关系点击引导
+                graphMain.showEdgeClickTip(mainRelations[0].id);
+            });
         }
 
         // Intro Component is defaultly included (except location has releation param)

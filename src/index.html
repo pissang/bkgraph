@@ -4,13 +4,11 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <link rel="stylesheet" type="text/css" href="./css/index.css" />
-        <link rel="stylesheet" type="text/css" href="./css/bkgraph.css" />
-        <!-- <link rel="stylesheet/less" type="text/css" href="./css/bkgraph.less" /> -->
+        <!-- <link rel="stylesheet" type="text/css" href="./css/bkgraph.css" /> -->
+        <link rel="stylesheet/less" type="text/css" href="./css/bkgraph.less" />
         <script src="../dep/esl.js"></script>
-        <!--
+
         <script src="../dep/less.min.js"></script>
-    -->
-    
 
     </head>
     <body>
@@ -44,21 +42,27 @@
                 'bkgraph'
             ], function (bkg, data) {
                 var name = window.location.hash.slice(1);
-                name = name || '谢霆锋';
-                document.title = name + '人物关系图谱';
+                name = name || '周杰伦';
+                document.title = name + ' 人物关系图谱';
 
-                var url = 'http://nj02-wd-knowledge45-ssd1l.nj02.baidu.com:8066/tupu/api/graph/v1?id=277';
-                // url = '../mock/tupu.php?id=gaoyuanyuan';
+                var url = 'http://nj02-wd-knowledge45-ssd1l.nj02.baidu.com:8066/tupu/api/graph/v2?id=129156';
+                url = 'http://cq01-rdqa-dev095.cq01.baidu.com:8766/api/tupu?id=477'
+                url = 'http://tupu.baidu.com/tupu/api/graph/v2?id=11029'
+                // url = '../mock/xietingfeng.json';
 
                 var g = bkg.init('viewport', url, function (g) {
                     var graphMain = g.getComponentByType('GRAPH');
                     g.addComponent(new bkg.SideBar());
-                    g.addComponent(new bkg.HeaderBar());
-                    g.addComponent(new bkg.SearchBar());
+                    // g.addComponent(new bkg.HeaderBar());
+                    // g.addComponent(new bkg.SearchBar());
                     g.addComponent(new bkg.KeyboardControl());
 
                     // var intro = new bkg.Intro();
                     // g.addComponent(intro);
+
+                    // if (confirm("ddd")) {
+                    //     graphMain.startForceLayout();
+                    // }
                 });
 
                 window.onresize = function () {

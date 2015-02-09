@@ -37,18 +37,18 @@ define(function (require) {
         ctx.quadraticCurveTo(style.cpX1, style.cpY1, style.xEnd, style.yEnd);
         ctx.stroke();
 
-        // 画Label水滴
+        // 画Label
         ctx.globalAlpha = 1;
         var cx = style.cx;
         var cy = style.cy;
-        var r = style.r || 10;
+        var r = style.r || 8;
         if (cx == null) {
             cx = curveTool.quadraticAt(style.xStart, style.cpX1, style.xEnd, 0.5);
             cy = curveTool.quadraticAt(style.yStart, style.cpY1, style.yEnd, 0.5);
         }
         ctx.beginPath();
-        // ctx.arc(cx, cy, r, 0, Math.PI * 2);
-        this.buildDropletPath(ctx, style);
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        // this.buildDropletPath(ctx, style);
         ctx.fill();
 
         // 画Label标签

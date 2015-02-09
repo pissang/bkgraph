@@ -39,6 +39,60 @@ define({
         }
     ],
 
+    nodeStyle: {
+        'default': {
+            color: '#000',
+            borderColor: '#e4e9f2',
+            lineWidth: 1,
+            labelColor: '#fff',
+            alpha: 0.6
+        },
+        mainNode: {
+            color: '#3385ff',
+            borderColor: '#3385ff',
+            lineWidth: 2,
+            labelColor: '#fff',
+            alpha: 0.9
+        },
+        highlight: {
+            color: '#ff860d',
+            borderColor: '#ff860d',
+            lineWidth: 2,
+            labelColor: '#fff',
+            alpha: 0.9
+        }
+    },
+    edgeStyle: {
+        'default': {
+            color: '#3385ff',
+            labelColor: '#3385ff',
+            opacity: 0.2,
+            lineWidth: 1,
+            hidden: false
+        },
+        extra: {
+            color: '#3385ff',
+            labelColor: '#3385ff',
+            opacity: 0.2,
+            lineWidth: 1,
+            hidden: true
+        },
+        highlight: {
+            color: '#ff860d',
+            labelColor: '#ff860d',
+            opacity: 1,
+            lineWidth: 1,
+            hidden: false
+        }
+    },
+
+    tip: {
+        edge: '大家都很关注这里哟，点击一探究竟吧~',
+        edgeOther: '大家也很关注这里哟，点击一探究竟吧~',
+        node: '点击头像，查看TA的详细资料吧~',
+        nodeEnd: '显示已经到头了哦~'
+    },
+
     enableAnimation: !!document.createElement('canvas').getContext,
     // enableAnimation: true,
     

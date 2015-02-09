@@ -4,9 +4,11 @@ define(function (require) {
     var Group = require('zrender/Group');
     var zrUtil = require('zrender/tool/util');
     var LabelLineShape = require('../shape/LabelLine');
+    var CircleShape = require('zrender/shape/Circle');
 
     var util = require('../util/util');
     var intersect = require('../util/intersect');
+    var config = require('../config');
 
     var vec2 = require('zrender/tool/vector');
     var v = vec2.create();
@@ -15,9 +17,13 @@ define(function (require) {
     var min = vec2.create();
     var max = vec2.create();
 
+    var baseRadius = 8;
+
     var EdgeEntity = function (opts) {
         
         Entity.call(this);
+
+        this.el = new Group();
 
         // Configs
         opts = opts || {};
@@ -28,18 +34,9 @@ define(function (require) {
 
         this.label = opts.label || '';
 
-        this._animatingSkiping = false;
+        this.style = zrUtil.clone(config.edgeStyle['default']);
+        this.highlightStyle = zrUtil.clone(config.edgeStyle.highlight);
 
-        this.style = {
-            color: '#00a2ff',
-            labelColor: '#0e90fe',
-            lineWidth: 0.7
-        };
-        this.highlightStyle = {
-            color: '#fffc00',
-            labelColor: '#f9dd05',
-            lineWidth: 1.5
-        };
         if (opts.style) {
             zrUtil.merge(this.style, opts.style);
         }
@@ -47,8 +44,12 @@ define(function (require) {
             zrUtil.merge(this.highlightStyle, opts.highlightStyle);
         }
 
+        this._animatingCircles = [];
+    };
+
+    EdgeEntity.prototype.initialize = function (zr) {
         var self = this;
-        this.el = new LabelLineShape({
+        var labelLineShape = new LabelLineShape({
             style: {
                 lineWidth: this.style.lineWidth,
                 opacity: 1,
@@ -72,14 +73,15 @@ define(function (require) {
                 self.dispatch('mouseout');
             }
         });
-    };
 
-    EdgeEntity.prototype.initialize = function (zr) {
+        this.el.addChild(labelLineShape);
+        this._labelLineShape = labelLineShape;
+
         this.update(zr);
     };
 
     EdgeEntity.prototype.setZLevel = function (zlevel) {
-        this.el.zlevel = zlevel;
+        this._labelLineShape.zlevel = zlevel;
         this.el.modSelf();
     };
 
@@ -95,11 +97,11 @@ define(function (require) {
         this.style[name] = value;
         switch (name) {
             case 'color':
-                this.el.style.strokeColor = value;
-                this.el.style.color = value;
+                this._labelLineShape.style.strokeColor = value;
+                this._labelLineShape.style.color = value;
                 break;
             case 'lineWidth':
-                this.el.style.lineWidth = value;
+                this._labelLineShape.style.lineWidth = value;
                 break;
         }
 
@@ -107,20 +109,21 @@ define(function (require) {
     }
 
     EdgeEntity.prototype.highlight = function () {
-        this.el.style.color = this.highlightStyle.color;
-        this.el.style.strokeColor = this.highlightStyle.color;
-        this.el.style.lineWidth = this.highlightStyle.lineWidth;
-        this.el.zlevel = 3;
+        this._labelLineShape.style.color = this.highlightStyle.color;
+        this._labelLineShape.style.strokeColor = this.highlightStyle.color;
+        this._labelLineShape.style.lineWidth = this.highlightStyle.lineWidth;
+        this._labelLineShape.zlevel = 3;
         this.el.modSelf();
 
         this._isHighlight = true;
     };
 
     EdgeEntity.prototype.lowlight = function () {
-        this.el.style.color = this.style.color;
-        this.el.style.strokeColor = this.style.color;
-        this.el.style.lineWidth = this.style.lineWidth;
-        this.el.zlevel = 0;
+        this._labelLineShape.style.color = this.style.color;
+        this._labelLineShape.style.strokeColor = this.style.color;
+        this._labelLineShape.style.lineWidth = this.style.lineWidth;
+        this._labelLineShape.style.hidden = this.style.hidden;
+        this._labelLineShape.zlevel = 0;
 
         this.el.modSelf();
 
@@ -130,8 +133,8 @@ define(function (require) {
     EdgeEntity.prototype.animateLength = function (zr, time, delay, fromEntity, cb) {
         this._computeLinePoints(v1, v2);
         var self = this;
-        this.el.style.xStart = this.el.style.xEnd = v1[0];
-        this.el.style.yStart = this.el.style.yEnd = v1[1];
+        this._labelLineShape.style.xStart = this._labelLineShape.style.xEnd = v1[0];
+        this._labelLineShape.style.yStart = this._labelLineShape.style.yEnd = v1[1];
         this.el.modSelf();
         zr.refreshNextFrame();
         this.addAnimation('length', zr.animation.animate(this.el.style))
@@ -152,31 +155,33 @@ define(function (require) {
 
     EdgeEntity.prototype.highlightLabel = function () {
         if (!this._isHighlight) {
-            this.el.style.color = this.highlightStyle.color;
-            this.el.style.strokeColor = this.highlightStyle.color;
-            this.el.style.lineWidth = this.highlightStyle.lineWidth;
+            this._labelLineShape.style.color = this.highlightStyle.color;
+            this._labelLineShape.style.strokeColor = this.highlightStyle.color;
+            this._labelLineShape.style.lineWidth = this.highlightStyle.lineWidth;
+            this._labelLineShape.style.opacity = this.highlightStyle.opacity;
         }
         // 显示全文
-        this.el.style.text = this.label;
-        this.el.zlevel = 3;
+        this._labelLineShape.style.text = this.label;
+        this._labelLineShape.zlevel = 3;
         this.el.modSelf();
     };
     EdgeEntity.prototype.lowlightLabel = function () {
         if (!this._isHighlight) {
-            this.el.style.color = this.style.color;
-            this.el.style.strokeColor = this.style.color;
-            this.el.style.lineWidth = this.style.lineWidth;
+            this._labelLineShape.style.color = this.style.color;
+            this._labelLineShape.style.strokeColor = this.style.color;
+            this._labelLineShape.style.lineWidth = this.style.lineWidth;
+            this._labelLineShape.style.opacity = this.style.opacity;
         }
         // 隐藏多余文字
-        this.el.style.text = util.truncate(this.label, 6);
-        this.el.zlevel = 0;
+        this._labelLineShape.style.text = util.truncate(this.label, 6);
+        this._labelLineShape.zlevel = 0;
         this.el.modSelf();
     };
 
     EdgeEntity.prototype.animateTextPadding = function (zr, time, textPadding, cb) {
         var self = this;
         this.stopAnimation('textPadding');
-        this.addAnimation('textPadding', zr.animation.animate(this.el.style))
+        this.addAnimation('textPadding', zr.animation.animate(this._labelLineShape.style))
             .when(time, {
                 textPadding: textPadding
             })
@@ -188,67 +193,56 @@ define(function (require) {
             .start('ElasticOut');
     };
 
-    EdgeEntity.prototype.startActiveAnimation = function (zr) {
+    EdgeEntity.prototype.startActiveAnimation = function (zr, e) {
 
-        if (this._animatingSkiping) {
+        if (this._animatingCircles.length) {
             return;
         }
 
-        var self = this;
-        var dropletPadding = this.el.style.dropletPadding;
+        for (var i = 3; i > 0; i--) {
+            var circle = new CircleShape({
+                style: {
+                    x: e._labelLineShape.style.cx,
+                    y: e._labelLineShape.style.cy,
+                    r: baseRadius,
+                    color: this.highlightStyle.color,
+                    opacity: this.highlightStyle.opacity * 0.8
+                },
+                hoverable: false,
+                zlevel: 2
+            });
 
-        this.addAnimation('dropletskip', zr.animation.animate(this.el.style, {loop: true})
-            .when(100, {
-                dropletPadding: dropletPadding + 6
-            })
-            .when(400, {
-                dropletPadding: dropletPadding
-            })
-            .when(800, {
-                dropletPadding: dropletPadding + 4
-            })
-            .when(1150, {
-                dropletPadding: dropletPadding
-            })
-            .when(1450, {
-                dropletPadding: dropletPadding + 3
-            })
-            .when(1750, {
-                dropletPadding: dropletPadding
-            })
-            .when(2100, {
-                dropletPadding: dropletPadding + 2
-            })
-            .when(2450, {
-                dropletPadding: dropletPadding
-            })
-            .when(2700, {
-                dropletPadding: dropletPadding + 1
-            })
-            .when(2950, {
-                dropletPadding: dropletPadding
-            })
-            .when(3200, {
-                dropletPadding: dropletPadding
-            })
-            .during(function () {
-                self.el.modSelf();
-                zr.refreshNextFrame();
-            })
-            .start('SinusoidalInOut')
-        );
+            this.addAnimation('ripplecircle', zr.animation.animate(circle.style, {loop: true})
+                .when(1500, {
+                    r: baseRadius + 6,
+                    opacity: 0
+                })
+                .during(function () {
+                    // mod一个就行了
+                    circle.modSelf();
+                    zr.refreshNextFrame();
+                })
+                .delay(-500 * i)
+                .start('CubicInOut')
+            );
 
-        this._animatingSkiping = true;
+            this.el.addChild(circle);
+            this._animatingCircles.push(circle);
+        }
     };
 
     EdgeEntity.prototype.stopActiveAnimation = function (zr) {
-        this._animatingSkiping = false;
+        if (this._animatingCircles.length) {
+            for (var i = 0; i < this._animatingCircles.length; i++) {
+                var circle = this._animatingCircles[i];
+                this.el.removeChild(circle);
+            }
+            this._animatingCircles.length = 0;
 
-        this.stopAnimation('dropletskip');
+            this.stopAnimation('ripplecircle');
 
-        this.el.style.dropletPadding = 0;
-
-        zr.refreshNextFrame();
+            zr.refreshNextFrame();
+        }
     };
 
     EdgeEntity.prototype._computeLinePoints = function (v1, v2) {
@@ -271,7 +265,7 @@ define(function (require) {
     }
 
     EdgeEntity.prototype._setLinePoints = function (v1, v2) {
-        var line = this.el;
+        var line = this._labelLineShape;
         line.style.xStart = v1[0];
         line.style.yStart = v1[1];
         line.style.xEnd = v2[0];

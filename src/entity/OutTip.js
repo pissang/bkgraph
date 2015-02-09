@@ -13,19 +13,19 @@ define(function (require) {
 
         this.label = opts.label || '';
 
-        this.color = opts.color || '#00a2ff';
+        this.color = opts.color || '#85b6ff';
 
         this.el = new RectShape({
             style: {
                 x: -25,
                 y: 0,
-                width: 50,
+                width: 55,
                 height: 25,
                 radius: 5,
                 textPosition: 'inside',
                 textColor: 'white',
                 textFont: '12px 微软雅黑',
-                opacity: 0.7
+                opacity: 0.9
             },
             highlightStyle: {
                 opacity: 0
