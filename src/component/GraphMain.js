@@ -110,6 +110,7 @@ define(function (require) {
         var self = this;
         util.addEventListener(el, 'mousedown', function () {
             self._mouseDown = true;
+            self.hideTip();
         });
         util.addEventListener(el, 'mouseup', function () {
             self._mouseDown = false;
@@ -1239,6 +1240,7 @@ define(function (require) {
             cb && cb();
         }
 
+        this.hideTip();
     };
 
     GraphMain.prototype.moveLeft = function (cb) {
@@ -1324,6 +1326,7 @@ define(function (require) {
             })
             .start('CubicInOut');
 
+        this.hideTip();
     }
 
     GraphMain.prototype.uncollapse = function () {
