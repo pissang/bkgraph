@@ -23,9 +23,6 @@ define(function (require) {
             hoverable: false
         });
 
-        // 标示曲线的弧度方向
-        this.layerCounter = opts.layerCounter || 1;
-
         this.style = zrUtil.clone(config.edgeStyle.extra);
 
         if (opts.style) {
@@ -110,27 +107,24 @@ define(function (require) {
         var p1 = sourceEntity.el.position;
         var p2 = targetEntity.el.position;
 
-        curve.style.xStart = p1[0];
-        curve.style.yStart = p1[1];
-        curve.style.xEnd = p2[0];
-        curve.style.yEnd = p2[1];
+        var curveStyle = {
+            xStart: p1[0],
+            yStart: p1[1],
+            xEnd: p2[0],
+            yEnd: p2[1]
+        };
 
-        if (layerCounter % 2 == 0) {
-            curve.style.cpX1 = (p1[0] + p2[0]) / 2 - inv * (p1[1] - p2[1]) / 4;
-            curve.style.cpY1 = (p1[1] + p2[1]) / 2 - inv * (p2[0] - p1[0]) / 4;
-        }
-        else {
-            curve.style.cpX1 = (p1[0] + p2[0]) / 2 - inv * (p2[1] - p1[1]) / 4;
-            curve.style.cpY1 = (p1[1] + p2[1]) / 2 - inv * (p1[0] - p2[0]) / 4;
-        }
+        inv *= (layerCounter % 2 == 0) ? 1 : -1;
+        curveStyle.cpX1 = (p1[0] + p2[0]) / 2 - inv * (p1[1] - p2[1]) / 4;
+        curveStyle.cpY1 = (p1[1] + p2[1]) / 2 - inv * (p2[0] - p1[0]) / 4;
 
-        p1 = intersect.curveCircle(curve.style, p1, sourceEntity.radius);
-        p2 = intersect.curveCircle(curve.style, p2, targetEntity.radius);
+        p1 = intersect.curveCircle(curveStyle, p1, sourceEntity.originalRadius);
+        p2 = intersect.curveCircle(curveStyle, p2, targetEntity.originalRadius);
 
         out[0] = p1[0];
         out[1] = p1[1];
-        out[2] = (p1[0] + p2[0]) / 2 - inv * (p2[1] - p1[1]) / 4;
-        out[3] = (p1[1] + p2[1]) / 2 - inv * (p1[0] - p2[0]) / 4;
+        out[2] = (p1[0] + p2[0]) / 2 - inv * (p1[1] - p2[1]) / 4;
+        out[3] = (p1[1] + p2[1]) / 2 - inv * (p2[0] - p1[0]) / 4;
         out[4] = p2[0];
         out[5] = p2[1];
     }

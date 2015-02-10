@@ -269,14 +269,10 @@ define(function (require) {
         if (this.isExtra) {
             inv = 1.3;
         }
-        if (this.layerCounter % 2 == 0) {
-            curve.style.cpX1 = (p1[0] + p2[0]) / 2 - inv * (p1[1] - p2[1]) / 4;
-            curve.style.cpY1 = (p1[1] + p2[1]) / 2 - inv * (p2[0] - p1[0]) / 4;
-        }
-        else {
-            curve.style.cpX1 = (p1[0] + p2[0]) / 2 - inv * (p2[1] - p1[1]) / 4;
-            curve.style.cpY1 = (p1[1] + p2[1]) / 2 - inv * (p1[0] - p2[0]) / 4;
-        }
+
+        inv *= (this.layerCounter % 2 == 0) ? 1 : -1;
+        curve.style.cpX1 = (p1[0] + p2[0]) / 2 - inv * (p1[1] - p2[1]) / 4;
+        curve.style.cpY1 = (p1[1] + p2[1]) / 2 - inv * (p2[0] - p1[0]) / 4;
     };
 
     CurveEdgeEntity.prototype.intersectRect = function (rect) {
