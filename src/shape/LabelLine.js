@@ -78,24 +78,24 @@ define(function (require) {
         var height = area.getTextWidth('国', style.textFont);
         ctx.textBaseline = 'top';
         if (angle < 0.2 || angle > 2.94) {
-            y -= style.b + textPadding + height;
+            y -= r + textPadding + height;
             x -= width / 2;
             // 顺便保存rect
             this.__rect = {
-                x: Math.min(x, cx - style.a),
-                y: y,
-                width: Math.max(width, style.a * 2),
-                height: height + textPadding + style.b * 2
+                x: Math.min(x, cx - r * 2),
+                y: y - height,
+                width: Math.max(width, r * 2),
+                height: height + textPadding + r * 2
             };
         } else {
-            x += style.a + textPadding;
+            x += r + textPadding;
             y -= height / 2;
             // 顺便保存rect
             this.__rect = {
-                x: cx - style.a,
-                y: cy - Math.max(style.b, height / 2),
-                width: width + style.a * 2 + textPadding,
-                height: Math.max(height, style.b * 2)
+                x: cx - r * 2,
+                y: cy - Math.max(r * 2, height / 2),
+                width: width + r * 4 + textPadding,
+                height: Math.max(height, r * 4)
             };
         }
         ctx.fillText(text, x, y);

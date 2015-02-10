@@ -60,15 +60,15 @@ define(function (require) {
         var width = area.getTextWidth(text, style.textFont);
         var height = area.getTextWidth('国', style.textFont);
         ctx.textBaseline = 'top';
-        var x = cx + style.a + textPadding;
+        var x = cx + r + textPadding;
         var y = cy - height / 2;
         ctx.fillText(text, x, y);
         // 顺便保存rect
         this.__rect = {
-            x: cx - style.a,
-            y: cy - Math.max(style.b, height / 2),
-            width: width + style.a * 2 + textPadding,
-            height: Math.max(height, style.b * 2)
+            x: cx - r * 2,
+            y: cy - Math.max(r * 2, height / 2),
+            width: width + r * 2 + textPadding,
+            height: Math.max(height, r * 2)
         };
 
         ctx.restore();

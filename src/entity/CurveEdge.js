@@ -255,8 +255,8 @@ define(function (require) {
         curve.style.cy = curveTool.quadraticAt(
             curve.style.yStart, curve.style.cpY1, curve.style.yEnd, 0.5
         );
-        curve.style.a = 8;
-        curve.style.b = 14;
+        // curve.style.a = 8;
+        // curve.style.b = 14;
     };
 
     CurveEdgeEntity.prototype._setCurvePoints = function (curve, p1, p2) {

@@ -66,15 +66,15 @@ define({
         'default': {
             color: '#3385ff',
             labelColor: '#3385ff',
-            opacity: 0.2,
+            opacity: 0.3,
             lineWidth: 1,
             hidden: false
         },
         extra: {
             color: '#3385ff',
             labelColor: '#3385ff',
-            opacity: 0.2,
-            lineWidth: 1,
+            opacity: 0.3,
+            lineWidth: 0.4,
             hidden: true
         },
         highlight: {

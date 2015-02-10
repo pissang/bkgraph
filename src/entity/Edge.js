@@ -213,8 +213,8 @@ define(function (require) {
             });
 
             this.addAnimation('ripplecircle', zr.animation.animate(circle.style, {loop: true})
-                .when(1500, {
-                    r: baseRadius + 6,
+                .when(2000, {
+                    r: baseRadius + 7,
                     opacity: 0
                 })
                 .during(function () {
@@ -275,8 +275,8 @@ define(function (require) {
         // line.style.r = (
         //     this.sourceEntity.radius + this.targetEntity.radius
         // ) / 20 + 3;
-        line.style.a = 8;
-        line.style.b = 14;
+        // line.style.a = 8;
+        // line.style.b = 14;
     }
 
     EdgeEntity.prototype.intersectRect = function (rect) {

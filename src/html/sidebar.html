@@ -5,7 +5,7 @@
                 <div class="bkg-relation-entity">
                     <div class="bkg-relation-entity-from">
                         <a href="http://www.baidu.com/s?wd=${fromEntity.name|url}" target="_blank" data-area="relation-info-entity" title="${fromEntity.name}_百度搜索">
-                            <img src="${fromEntity.imageIcon}" alt="">
+                            <img src="${fromEntity.image }" alt="">
                             <h5>${fromEntity.name}</h5>
                         </a>
                     </div>
@@ -14,7 +14,7 @@
                     </div>
                     <div class="bkg-relation-entity-to">
                         <a href="http://www.baidu.com/s?wd=${toEntity.name|url}" target="_blank" data-area="relation-info-entity" title="${toEntity.name}_百度搜索">
-                            <img src="${toEntity.imageIcon}" alt="">
+                            <img src="${toEntity.image }" alt="">
                             <h5>${toEntity.name}</h5>
                         </a>
                     </div>
@@ -32,7 +32,7 @@
         </div>
     <!-- else -->
         <div class="bkg-person-info">
-            <a class="bkg-person-pic" href="http://www.baidu.com/s?wd=${name|url}" data-area="entity-baike" target="_blank" title="${name}_百度搜索"><img src="${imageIcon}" /></a>
+            <a class="bkg-person-pic" href="http://www.baidu.com/s?wd=${name|url}" data-area="entity-baike" target="_blank" title="${name}_百度搜索"><img src="${image}" /></a>
             <div class="bkg-person-description">
                 <p>
                     <span class="bkg-person-name">${name}</span>

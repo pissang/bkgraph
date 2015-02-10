@@ -64,7 +64,9 @@
 <div class="bkg-works bkg-sidebar-module">
     <div class="bkg-module-title">
         <h4>热门作品</h4>
-        <a href="http://www.baidu.com/s?wd=${name|url}%20热门作品" title="更多" data-area="entity-representativeWork" target="_blank">更多 ></a>
+        <div class="bkg-more">
+            <a href="http://www.baidu.com/s?wd=${name|url}%20热门作品" title="更多" data-area="entity-representativeWork" target="_blank">更多 ></a>
+        </div>
     </div>
     <ul>
     <!-- for: ${representativeWork} as ${work}, ${idx} -->
@@ -109,7 +111,9 @@
 <div class="bkg-works bkg-sidebar-module">
     <div class="bkg-module-title">
         <h4>最新影视作品</h4>
-        <a href="http://www.baidu.com/s?wd=${name|url}%20最新影视作品" title="更多" data-area="entity-latestwork" target="_blank">更多 ></a>
+        <div class="bkg-more">
+            <a href="http://www.baidu.com/s?wd=${name|url}%20最新影视作品" title="更多" data-area="entity-latestwork" target="_blank">更多 ></a>
+        </div>
     </div>
     <ul>
     <!-- for: ${representativeWork} as ${work}, ${idx} -->
@@ -127,7 +131,9 @@
 <div class="bkg-show bkg-sidebar-module">
     <div class="bkg-module-title">
         <h4>最新综艺</h4>
-        <a href="http://www.baidu.com/s?wd=${name|url}%20最新综艺" title="更多" data-area="entity-show" target="_blank">更多 ></a>
+        <div class="bkg-more">
+            <a href="http://www.baidu.com/s?wd=${name|url}%20最新综艺" title="更多" data-area="entity-show" target="_blank">更多 ></a>
+        </div>
     </div>
     <ul>
     <!-- for: ${show} as ${item}, ${idx} -->
@@ -191,7 +197,7 @@
 <!-- /block -->
 
 <!-- target: sidebarRecommendation -->
-<div class="bkg-taglist bkg-sidebar-module">
+<div class="bkg-taglist bkg-rec-taglist bkg-sidebar-module">
     <!-- block: tagModuleTitle -->
     <div class="bkg-module-title">
         <h4>您可能感兴趣的那些人儿</h4>

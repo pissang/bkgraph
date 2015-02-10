@@ -5,6 +5,8 @@
     display: none;
 }
 .bkg-hoverable {
+
+    border: 1px solid transparent;
     -webkit-transition: -webkit-transform 0.1s linear;
        -moz-transition: -moz-transform 0.1s linear;
         -ms-transition: -ms-transform 0.1s linear;
@@ -18,7 +20,8 @@
              -o-transform: scale(1.15);
                 transform: scale(1.15);
 
-        box-shadow: 0px 0px 5px black;
+        //box-shadow: 0px 0px 5px #3385ff;
+        border: 1px solid #3385ff;
     }
 }
 [placeholder] {
@@ -346,13 +349,12 @@
     // min-height: 260px;
     overflow: hidden;
     box-sizing: border-box;
-    opacity: 1;
 
-    -webkit-transition: opacity 200ms cubic-bezier(0.52,0,0.48,1);
-    -moz-transition: opacity 200ms cubic-bezier(0.52,0,0.48,1);
-    -ms-transition: opacity 200ms cubic-bezier(0.52,0,0.48,1);
-    -o-transition: opacity 200ms cubic-bezier(0.52,0,0.48,1);
-    transition: opacity 200ms cubic-bezier(0.52,0,0.48,1);
+    -webkit-transition: height 200ms cubic-bezier(0.52,0,0.48,1);
+       -moz-transition: height 200ms cubic-bezier(0.52,0,0.48,1);
+        -ms-transition: height 200ms cubic-bezier(0.52,0,0.48,1);
+         -o-transition: height 200ms cubic-bezier(0.52,0,0.48,1);
+            transition: height 200ms cubic-bezier(0.52,0,0.48,1);
 
     a {
         color: #3385ff;
@@ -363,7 +365,7 @@
         &:hover {
             background-color: #3385ff;
             color: #fff;
-            border-radius: 3px;
+            // border-radius: 3px;
         }
     }
 
@@ -373,7 +375,7 @@
     }
 
     &.hidden {
-        opacity: 0;
+        height: 0;
         display: none;
     }
 
@@ -435,19 +437,21 @@
                 margin: 0;
                 font-weight: normal;
             }
-            a {
-                float: right;
-                color: #3385ff;
-                line-height: 50px;
-                text-decoration: none;
 
-                &:hover {
-                    background: transparent;
-                    color: #02c0fe;
+            .bkg-more {
+                display: inline-block;
+                float: right;
+                line-height: 50px;
+
+                a {
+                    color: #3385ff;
+
+                    &:hover {
+                        color: #fff;
+                    }
                 }
             }
         }
-
     }
 
     .bkg-sidebar-intro {
@@ -634,13 +638,16 @@
             margin-top: 0;
             margin-bottom: 0;
             padding: 0;
-            border-bottom: none;
+
+            &.bkg-rec-taglist {
+                border-bottom: none;
+            }
 
             .bkg-module-title {
 
                 padding: 0 20px;
                 h4 {
-                    line-height: 44px;
+                    line-height: 50px;
                 }
             }
 
@@ -648,9 +655,7 @@
 
                 display: table;
                 width: 100%;
-                border: 1px solid #f3f3f3;
-                // -moz-box-sizing: border-box;
-                //     box-sizing: border-box;
+                border-top: 1px solid #f3f3f3;
 
                 a {
                     display: inline-block;
@@ -671,6 +676,10 @@
 
                     &.no-left-border {
                         border-left: none;
+                    }
+
+                    &.no-bottom-border {
+                        border-bottom: none;
                     }
 
                     &:hover {
@@ -738,6 +747,7 @@
                             font-size: 11px;
                             white-space: nowrap;
                             line-height: 18px;
+                            background: #000;
                             background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0), #000);
                             background: -moz-linear-gradient(top, rgba(255, 255, 255, 0), #000);
                             background: -ms-linear-gradient(top, rgba(255, 255, 255, 0), #000);
@@ -932,10 +942,12 @@
                 bottom: 0;
                 left: 0;
                 right: 0;
+                background: #000;
                 background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0), #000);
                 background: -moz-linear-gradient(top, rgba(255, 255, 255, 0), #000);
                 background: -ms-linear-gradient(top, rgba(255, 255, 255, 0), #000);
                 background: -o-linear-gradient(top, rgba(255, 255, 255, 0), #000);
+                line-height: 18px;
 
                 white-space: nowrap;
             }
@@ -989,10 +1001,12 @@
                 bottom: 0;
                 left: 0;
                 right: 0;
+                background: #000;
                 background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0), #000);
                 background: -moz-linear-gradient(top, rgba(255, 255, 255, 0), #000);
                 background: -ms-linear-gradient(top, rgba(255, 255, 255, 0), #000);
                 background: -o-linear-gradient(top, rgba(255, 255, 255, 0), #000);
+                line-height: 18px;
 
                 white-space: nowrap;
             }
@@ -1017,12 +1031,12 @@
             margin-top: -6px;
             margin-left: -11px;
             background-image: url(../img/bkg.png);
-            background-position: -183px -18px;
+            background-position: -183px -6px;
         }
 
         &.bkg-toggle-fold {
             .bkg-toggle-btn {
-                background-position: -229px -18px;
+                background-position: -229px -6px;
             }
         }
     }
@@ -1034,7 +1048,7 @@
         width: 20px;
         height: 20px;
         background-image: url(../img/bkg.png);
-        background-position: -138px -14px;
+        background-position: -138px -3px;
         cursor: pointer;
     }
 }
@@ -1047,9 +1061,9 @@
     top: 0px;
     left: 0px;
     right: 0px;
-    z-index: 11;
+    z-index: 1;
     height: @headerbar-height;
-    box-shadow: 0 5px 30px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: 0 12px 20px 0 rgba(0, 0, 0, 0.1);
     color: white;
 
     .bkg-bg {
@@ -1059,7 +1073,6 @@
         right: 0px;
         height: @headerbar-height;
         border-bottom: 1px solid #f6f6f5;
-        box-shadow: 0 1px 1px 1px #FCFCFC;
         // background-image: url(../img/bkg-img.png);
         background-color: #fff;
         background-position: 0 0;
@@ -1112,12 +1125,13 @@
             .bkg-search-btn {
                 position: absolute;
                 right: 10px;
+                top: 5px;
                 display: inline-block;
                 width: 25px;
                 height: 30px;
 
                 background-image: url(../img/bkg.png);
-                background-position: 0 -7px;
+                background-position: 0 0;
                 cursor: pointer;
             }
         }
@@ -1184,6 +1198,7 @@
                             white-space: nowrap;
                             line-height: 18px;
 
+                            background: #000;
                             background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.1) 0%, rgba(0, 0, 0, 0.5) 40%, rgba(0, 0, 0, 0.6) 98%, #000 100%);
                             background: -moz-linear-gradient(top, rgba(255, 255, 255, 0.1) 0%, rgba(0, 0, 0, 0.5) 40%, rgba(0, 0, 0, 0.6) 98%, #000 100%);
                             background: -ms-linear-gradient(top, rgba(255, 255, 255, 0.1) 0%, rgba(0, 0, 0, 0.5) 40%, rgba(0, 0, 0, 0.6) 98%, #000 100%);
@@ -1278,7 +1293,7 @@
         cursor: pointer;
 
         background-image: url(../img/bkg.png);
-        background-position: -34px -6px;
+        background-position: -34px 5px;
         border-radius: 50%;
 
         &:hover {
@@ -1293,7 +1308,7 @@
 
         &.bkg-share-btn-active {
             background-color: #8f9bb3;
-            background-position: -83px -5px;
+            background-position: -83px 5px;
 
             -webkit-transform: rotate(90deg);
                -moz-transform: rotate(90deg);
@@ -1330,7 +1345,7 @@
 
             background-color: #fff;
             background-image: url(../img/bkg.png);
-            background-position: 11px -45px;
+            background-position: 11px -35px;
             cursor: pointer;
 
             &.bkg-share-wechat {
@@ -1344,7 +1359,7 @@
             &:hover {
                 background-color: #f86c6a;
                 border: 1px solid #f86c6a;
-                background-position: -49px -45px;
+                background-position: -49px -35px;
 
                 &.bkg-share-wechat {
                     background-color: #71d241;

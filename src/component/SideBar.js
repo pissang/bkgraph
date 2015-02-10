@@ -135,8 +135,12 @@ define(function (require) {
                     tagData.width = Math.floor(tagData.text.length * 298 / (tagWordLenDic[tagData.linenum])) + 'px';
                 }
                 if (tagData.linenum != lastLineNum) {
-                    tagData.cls = 'no-left-border';
+                    tagData.cls = ' no-left-border ';
                 }
+                if (tagData.linenum == 2 || linenum == tagData.linenum) {
+                    tagData.cls = (tagData.cls || '') + ' no-bottom-border';
+                }
+
                 lastLineNum = tagData.linenum;
             }
         }
@@ -167,7 +171,10 @@ define(function (require) {
                     tagData.width = Math.floor((tagData.fromName.length + tagData.toName.length + 1) * 298 / (tagWordLenDic[tagData.linenum])) + 'px';
                 }
                 if (tagData.linenum != lastLineNum) {
-                    tagData.cls = 'no-left-border';
+                    tagData.cls = ' no-left-border ';
+                }
+                if (tagData.linenum == 2 || linenum == tagData.linenum) {
+                    tagData.cls = (tagData.cls || '') + ' no-bottom-border';
                 }
                 lastLineNum = tagData.linenum;
             }

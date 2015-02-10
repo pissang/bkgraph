@@ -104,7 +104,7 @@ define(function (require) {
         if (this.label) {
             var labelShape = new CrescentShape({
                 style: {
-                    height: 25,
+                    height: 27,
                     x: 0,
                     y: 0,
                     r: baseRadius,
@@ -115,7 +115,7 @@ define(function (require) {
                     textAlign: 'center',
                     brushType: 'both',
                     textColor: this.style.labelColor,
-                    textFont: '14px 微软雅黑'
+                    textFont: '15px 微软雅黑'
                 },
                 z: 10,
                 hoverable: false,
