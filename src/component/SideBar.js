@@ -153,11 +153,13 @@ define(function (require) {
             for (var i = 0, len = tags.length; i < len; i++) {
                 tagData = tags[i];
                 if (tagWordLen < 12) {
-                    tagWordLen += tagData.fromName.length + tagData.toName.length + 1;
+                    tagWordLen += (tagData.fromName.length > 6 ? 6 : tagData.fromName.length)
+                                + (tagData.toName.length > 6 ? 6 : tagData.toName.length) + 1;
                 }
                 else {
                     linenum ++;
-                    tagWordLen = tagData.fromName.length + tagData.toName.length + 1;
+                    tagWordLen = (tagData.fromName.length > 6 ? 6 : tagData.fromName.length)
+                                + (tagData.toName.length > 6 ? 6 : tagData.toName.length) + 1;
                 }
                 tagData.linenum = linenum;
                 tagWordLenDic[linenum] = tagWordLen;
@@ -168,7 +170,9 @@ define(function (require) {
             for (var i = 0, len = tags.length; i < len; i++) {
                 tagData = tags[i];
                 if (tagData.linenum < 3) {
-                    tagData.width = Math.floor((tagData.fromName.length + tagData.toName.length + 1) * 298 / (tagWordLenDic[tagData.linenum])) + 'px';
+                    tagData.width = Math.floor(((tagData.fromName.length > 6 ? 6 : tagData.fromName.length)
+                        + (tagData.toName.length > 6 ? 6 : tagData.toName.length) + 1)
+                        * 298 / (tagWordLenDic[tagData.linenum])) + 'px';
                 }
                 if (tagData.linenum != lastLineNum) {
                     tagData.cls = ' no-left-border ';
@@ -238,13 +242,14 @@ define(function (require) {
             if (searchBar) {
                 searchBar.hide(logParam);
             }
-        }
 
-        bkgLog({
-            type: 'zhishitupushow',
-            target: logParam,
-            area: 'sidebar'
-        });
+            bkgLog({
+                type: 'zhishitupushow',
+                target: logParam,
+                area: 'sidebar'
+            });
+
+        }
     };
 
     /**
@@ -290,6 +295,12 @@ define(function (require) {
             util.addClass(this._$fold, 'bkg-hidden');
 
             this._forScroll(true);
+
+            bkgLog({
+                type: 'zhishitupufold',
+                target: logParam,
+                area: 'sidebar'
+            });
         }
     };
 
@@ -302,6 +313,12 @@ define(function (require) {
             util.removeClass(this._$fold, 'bkg-hidden');
 
             this._forScroll();
+
+            bkgLog({
+                type: 'zhishitupuunfold',
+                target: logParam,
+                area: 'sidebar'
+            });
         }
     };
 
@@ -311,6 +328,7 @@ define(function (require) {
             if (this._$viewport.style.height) {
                 this._$viewport.style.height = this._$content.clientHeight + 'px';
                 this._scrollbar.destory();
+                this._scrollbar = null;
             }
         }
         else {

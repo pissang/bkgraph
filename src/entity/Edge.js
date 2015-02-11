@@ -52,6 +52,7 @@ define(function (require) {
         var labelLineShape = new LabelLineShape({
             style: {
                 lineWidth: this.style.lineWidth,
+                r: 8,
                 opacity: 1,
                 color: this.style.color,
                 strokeColor: this.style.color,
@@ -213,7 +214,7 @@ define(function (require) {
             });
 
             this.addAnimation('ripplecircle', zr.animation.animate(circle.style, {loop: true})
-                .when(2000, {
+                .when(2500, {
                     r: baseRadius + 7,
                     opacity: 0
                 })
@@ -222,7 +223,7 @@ define(function (require) {
                     circle.modSelf();
                     zr.refreshNextFrame();
                 })
-                .delay(-500 * i)
+                .delay(-800 * i)
                 .start('CubicInOut')
             );
 

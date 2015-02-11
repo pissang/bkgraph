@@ -76,6 +76,7 @@ define(function (require) {
                 yEnd: 0,
                 cpX1: 0,
                 cpY1: 0,
+                r: 8,
                 opacity: this.style.opacity,
                 lineWidth: this.style.lineWidth,
                 hidden: this.style.hidden,

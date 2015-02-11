@@ -1051,8 +1051,11 @@ define(function (require) {
         var sideBar = this._kgraph.getComponentByType('SIDEBAR');
         if (sideBar) {
             var detailData = this._loadDetailFromStorage(n.id);
+            var layerCounter = n.data ? n.data.layerCounter : n.layerCounter;
             if (detailData) {
                 sideBar.setData(detailData);
+
+                showSidebar && sideBar.show(n.id + ',' + layerCounter);
             }
             else {
                 jsonp(this._kgraph.getDetailAPI(), { detail_id: n.id }, 'callback', function (data) {
@@ -1060,12 +1063,10 @@ define(function (require) {
                     data.layerCounter = n.data ? n.data.layerCounter : n.layerCounter;
                     sideBar.setData(data);
 
+                    showSidebar && sideBar.show(n.id + ',' + layerCounter);
+
                     self._saveDetailToStorage(n.id, data);
                 });
-            }
-            if (showSidebar) {
-                var layerCounter = n.data ? n.data.layerCounter : n.layerCounter;
-                sideBar.show(n.id + ',' + layerCounter);
             }
         }
     };
@@ -1089,8 +1090,20 @@ define(function (require) {
             var self = this;
 
             var detailData = this._loadDetailFromStorage(e.data.id);
+            var logParam = [
+                    // from entity
+                    e.node1.id,
+                    e.node1.data.layerCounter,
+                    // to entity
+                    e.node2.id,
+                    e.node2.data.layerCounter,
+                    e.data.id,
+                    e.isExtra ? 1 : 0,
+                    e.isSpecial ? 1 : 0
+                ].join(',');
             if (detailData) {
                 sideBar.setData(detailData, true);
+                sideBar.show(logParam);
             }
             else {
                 jsonp(this._kgraph.getDetailAPI(), { detail_id: e.data.id }, 'callback', function (data) {
@@ -1100,22 +1113,11 @@ define(function (require) {
                     data._datatype = 'relation'; // for ubs log
 
                     sideBar.setData(data, true);
+                    sideBar.show(logParam);
 
                     self._saveDetailToStorage(e.data.id, data);
                 });
             }
-            var logParam = [
-                            // from entity
-                            e.node1.id,
-                            e.node1.data.layerCounter,
-                            // to entity
-                            e.node2.id,
-                            e.node2.data.layerCounter,
-                            e.data.id,
-                            e.isExtra ? 1 : 0,
-                            e.isSpecial ? 1 : 0
-                        ].join(',');
-            sideBar.show(logParam);
         }
     };
 

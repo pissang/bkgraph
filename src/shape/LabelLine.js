@@ -53,7 +53,7 @@ define(function (require) {
         ctx.globalAlpha = 1;
         var cx = style.cx;
         var cy = style.cy;
-        // var r = style.r || 10;
+        var r = style.r || 8;
         if (cx == null) {
             cx = (style.xStart + style.xEnd) / 2;
             cy = (style.yStart + style.yEnd) / 2;

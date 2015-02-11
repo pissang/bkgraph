@@ -10,7 +10,7 @@
                         </a>
                     </div>
                     <div class="bkg-relation-name">
-                        <a href="http://www.baidu.com/s?wd=${fromEntity.name|url}%20${toEntity.name|url}%20${relationName|url}" title="${fromEntity.name}${toEntity.name} ${relationName}_百度搜索" data-area="relation-info-title" target="_blank"><span>${relationName|truncate(6)}</span></a>
+                        <a href="http://www.baidu.com/s?wd=${fromEntity.name|url}%20${toEntity.name|url}%20${relationName|url}" title="${fromEntity.name}${toEntity.name} ${relationName}_百度搜索" data-area="relation-info-title" target="_blank"><span>${relationName}</span></a>
                     </div>
                     <div class="bkg-relation-entity-to">
                         <a href="http://www.baidu.com/s?wd=${toEntity.name|url}" target="_blank" data-area="relation-info-entity" title="${toEntity.name}_百度搜索">
@@ -24,7 +24,8 @@
             <!-- if: ${relationExplaination} -->
             <div class="bkg-relation-description">
                 <p>
-                    <span>关系简介</span> ${relationExplaination.text|truncate(26)}
+                    <!-- <span>关系简介</span>  -->
+                    ${relationExplaination.text|truncate(50)}
                     <a href="${relationExplaination.url}" class="bkg-more" title="更多" data-area="relation-info-desc" target="_blank">更多 ></a>
                 </p>
             </div>
@@ -37,7 +38,7 @@
                 <p>
                     <span class="bkg-person-name">${name}</span>
                     <!-- <b>简介:</b> -->
-                    ${introduction.content|truncate(30)}
+                    ${introduction.content|truncate(46)}
                     <a href="http://www.baidu.com/s?wd=${name|url}" class="bkg-more" data-area="entity-baike" title="更多" target="_blank">更多 ></a>
                 </p>
             </div>
@@ -47,8 +48,10 @@
 <!-- <div class="bkg-sidebar-scroll"> -->
     <div class="bkg-sidebar-viewport">
         <div class="bkg-sidebar-dimup bkg-hidden"></div>
-        <!--  if: (${isRelation} && (${eventMaiLuo} || ${recommendation})) || (!${isRelation} && (${representativeWork} || ${recommendation})) -->
-        <div class="bkg-sidebar-dimbottom"></div>
+        <!--  if: (${isRelation} && (${eventMaiLuo} || (${recommendation} && ${pairTag})))
+            || (!${isRelation} && (${representativeWork} || ${recommendation}))
+        -->
+            <!-- <div class="bkg-sidebar-dimbottom"></div> -->
         <!-- /if -->
         <div class="bkg-sidebar-content">
             <!-- if: ${isRelation} -->
@@ -57,19 +60,26 @@
                     <!-- import: sidebarRelationTag -->
                 <!-- /if -->
 
-                <!-- 默认隐藏 -->
-                <div class="bkg-sidebar-fold bkg-hidden">
-                    <!-- if: ${eventMaiLuo} -->
-                        <!-- import: sidebarMailuo -->
-                    <!-- /if -->
-
+                <!-- 没有tag和脉络 -->
+                <!-- if: !${pairTag} && !${eventMaiLuo} -->
                     <!-- if: ${recommendation} -->
                         <!-- import: sidebarRelationRecommendation -->
                     <!-- /if -->
-                </div>
+                <!-- else -->
+                    <!-- 默认隐藏 -->
+                    <div class="bkg-sidebar-fold bkg-hidden">
+                        <!-- if: ${eventMaiLuo} -->
+                            <!-- import: sidebarMailuo -->
+                        <!-- /if -->
 
-                <!-- if: ${eventMaiLuo} || ${recommendation} -->
-                    <div class="bkg-toggle"><i class="bkg-toggle-btn"></i></div>
+                        <!-- if: ${recommendation} -->
+                            <!-- import: sidebarRelationRecommendation -->
+                        <!-- /if -->
+                    </div>
+
+                    <!-- if: ${eventMaiLuo} || ${recommendation} -->
+                        <div class="bkg-toggle"><i class="bkg-toggle-btn"></i></div>
+                    <!-- /if -->
                 <!-- /if -->
 
             <!-- else -->

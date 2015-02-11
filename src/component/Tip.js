@@ -176,7 +176,7 @@ define(function (require) {
             case 'top':
                 leftPos -= parseInt(style.width) / 2 + parseInt(style.paddingLeft);
                 if (isRelation) {
-                    topPos += n.entity._labelLineShape.style.a;
+                    topPos += n.entity._labelLineShape.style.r;
                 }
                 else {
                     topPos += (parseInt(style.paddingBottom) + 10) * zoom ;
@@ -186,7 +186,7 @@ define(function (require) {
             case 'right':
                 topPos -= parseInt(style.height) / 2 + parseInt(style.paddingTop);
                 if (isRelation) {
-                    leftPos -= parseInt(style.width) + n.entity._labelLineShape.style.b * 1.5;
+                    leftPos -= parseInt(style.width) + n.entity._labelLineShape.style.r * 1.5;
                 }
                 else {
                     leftPos -= parseInt(style.width) + n.entity.radius + 10;
@@ -197,7 +197,7 @@ define(function (require) {
             case 'bottom':
                 leftPos -= parseInt(style.width) / 2 + parseInt(style.paddingLeft);
                 if (isRelation) {
-                    topPos -= parseInt(style.height) + n.entity._labelLineShape.style.a * 2;
+                    topPos -= parseInt(style.height) + n.entity._labelLineShape.style.r * 2;
                 }
                 else {
                     topPos -= parseInt(style.height) + n.entity.radius + 10;
@@ -208,7 +208,7 @@ define(function (require) {
             case 'left':
                 topPos -= parseInt(style.height) / 2 + parseInt(style.paddingLeft);
                 if (isRelation) {
-                    leftPos += n.entity._labelLineShape.style.b * 1.5 * zoom;
+                    leftPos += n.entity._labelLineShape.style.r * 1.5 * zoom;
                 }
                 else {
                     leftPos += n.entity.radius * zoom + 10;

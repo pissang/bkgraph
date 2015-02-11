@@ -52,7 +52,7 @@ define(function (require) {
             self.filter(self._$input.value);
         });
 
-        util.addEventListener(this._$input, 'keydown', util.debounce(function () {
+        util.addEventListener(this._$input, 'keyup', util.debounce(function () {
             self.filter(self._$input.value);
         }, 200));
 
@@ -137,13 +137,18 @@ define(function (require) {
         var renderData = {};
         if (name) {
             var url = this._kgraph.getDetailAPI();
-            url = 'http://cp01-rdqa-dev395.cp01.baidu.com:8006/tupu/api/graph/v2/?id=340391';
             jsonp(url, { act: 'tpuser', mt: 'use', 'ver': 'v1', q: name }, 'callback', function (data) {
                 renderData = {
                     entities: data.data || [],
                     name: name
                 };
                 self._$searchResult.innerHTML = renderSearchResult(renderData);
+            });
+
+            bkgLog({
+                type: 'zhishitupusearch',
+                target: name,
+                area: 'headerbar'
             });
         }
         else {
