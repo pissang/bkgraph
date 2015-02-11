@@ -350,10 +350,10 @@
     overflow: hidden;
     box-sizing: border-box;
 
-    -webkit-user-select: text;
-       -moz-user-select: text;
-         -o-user-select: text;
-            user-select: text;
+    -webkit-user-select: none;
+       -moz-user-select: none;
+         -o-user-select: none;
+            user-select: none;
 
 
     -webkit-transition: height 200ms cubic-bezier(0.52,0,0.48,1);
@@ -1128,6 +1128,9 @@
                 border-color: transparent;
                 outline: none;
                 font-size:14px;
+            }
+            input::-ms-clear {
+                display: none;
             }
 
             .bkg-search-btn {

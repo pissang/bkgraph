@@ -18,6 +18,8 @@ define(function (require) {
 
         Component.call(this);
 
+        this._scrollbar = null;
+
         var self = this;
         util.addEventListener(this.el, 'click', function (e) {
             self._dispatchClick(e);
@@ -83,6 +85,7 @@ define(function (require) {
     };
 
     SideBar.prototype.setData = function (data, isRelation) {
+        this._scrollbar && (this._scrollbar = null);
         this._fixData(data, isRelation);
         this.render(data, isRelation);
     };
