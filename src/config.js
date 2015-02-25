@@ -38,51 +38,153 @@ define({
             interval: 0
         }
     ],
-
-    nodeStyle: {
-        'default': {
-            color: '#000',
-            borderColor: '#e4e9f2',
-            lineWidth: 1,
-            labelColor: '#fff',
-            alpha: 0.6
+    // 样式配置
+    // 普通节点不同状态的样式
+    nodeStates: {
+        normal: {
+            shapeStyle: {
+                label: {
+                    color: '#000',
+                    textColor: '#fff'
+                },
+                outline: {
+                    lineWidth: 1,
+                    strokeColor: '#e4e9f2'
+                }
+            }
         },
-        mainNode: {
-            color: '#3385ff',
-            borderColor: '#3385ff',
-            lineWidth: 2,
-            labelColor: '#fff',
-            alpha: 0.9
+        hover: {
+            shapeStyle: {
+                label: {
+                    color: '#ff860d'
+                },
+                outline: {
+                    lineWidth: 2,
+                    strokeColor: '#ff860d'
+                }
+            }
         },
-        highlight: {
-            color: '#ff860d',
-            borderColor: '#ff860d',
-            lineWidth: 2,
-            labelColor: '#fff',
-            alpha: 0.9
+        active: {
+            shapeStyle: {
+                label: {
+                    color: '#ff860d'
+                },
+                outline: {
+                    lineWidth: 2,
+                    strokeColor: '#ff860d'
+                }
+            }
         }
     },
-    edgeStyle: {
-        'default': {
-            color: '#3385ff',
-            labelColor: '#3385ff',
-            opacity: 0.3,
-            lineWidth: 1,
-            hidden: false
+
+    // 主节点不同状态的样式
+    mainNodeStates: {
+        normal: {
+            shapeStyle: {
+                label: {
+                    color: '#3385ff',
+                    textColor: '#fff'
+                },
+                outline: {
+                    lineWidth: 2,
+                    strokeColor: '#3385ff'
+                }
+            },
+            labelAlpha: 0.9
         },
-        extra: {
-            color: '#3385ff',
-            labelColor: '#3385ff',
-            opacity: 0.3,
-            lineWidth: 0.4,
-            hidden: true
+        hover: {
+            shapeStyle: {
+                label: {
+                    color: '#ff860d'
+                },
+                outline: {
+                    strokeColor: '#ff860d'
+                }
+            }
         },
-        highlight: {
-            color: '#ff860d',
-            labelColor: '#ff860d',
-            opacity: 1,
-            lineWidth: 1,
-            hidden: false
+        active: {
+            shapeStyle: {
+                label: {
+                    color: '#ff860d'
+                },
+                outline: {
+                    strokeColor: '#ff860d'
+                }
+            }
+        }
+    },
+
+    // 普通边不同状态的样式
+    edgeStates: {
+        normal: {
+            shapeStyle: {
+                labelLine: {
+                    color: '#3385ff',
+                    strokeColor: '#3385ff',
+                    textColor: '#3385ff',
+                    opacity: 0.3,
+                    lineWidth: 1
+                }
+            }
+        },
+        hover: {
+            shapeStyle: {
+                labelLine: {
+                    color: '#ff860d',
+                    strokeColor: '#ff860d',
+                    textColor: '#ff860d',
+                    opacity: 1,
+                    lineWidth: 1
+                }
+            }
+        },
+        active: {
+            shapeStyle: {
+                labelLine: {
+                    color: '#ff860d',
+                    strokeColor: '#ff860d',
+                    textColor: '#ff860d',
+                    opacity: 1,
+                    lineWidth: 1
+                }
+            }
+        }
+    },
+
+    // 补边不同状态的样式
+    extraEdgeStates: {
+        normal: {
+            shapeStyle: {
+                labelLine: {
+                    color: '#3385ff',
+                    strokeColor: '#3385ff',
+                    textColor: '#3385ff',
+                    opacity: 0.3,
+                    lineWidth: 0.4
+                }
+            }
+        },
+        hover: {
+            shapeStyle: {
+                labelLine: {
+                    color: '#ff860d',
+                    strokeColor: '#ff860d',
+                    textColor: '#ff860d',
+                    opacity: 1,
+                    lineWidth: 0.4
+                }
+            }
+        },
+        active: {
+            shapeStyle: {
+                labelLine: {
+                    color: '#ff860d',
+                    strokeColor: '#ff860d',
+                    textColor: '#ff860d',
+                    opacity: 1,
+                    lineWidth: 0.4
+                }
+            }
         }
     },
 
@@ -95,8 +197,6 @@ define({
 
     enableAnimation: !!document.createElement('canvas').getContext,
     // enableAnimation: true,
-    
-    circleKeywords: '男友,女友,妻子,老婆,丈夫,老公,绯闻,暧昧,对象,干爹,真爱,夫妻,情侣,不和,私生子,艳照门,前夫,前妻,密友,中戏校友,情人',
 
     voteAPI: 'http://api.open.baidu.com/pae/component/api/vote',
     voteProjectHuoying: 'ks_huoying',

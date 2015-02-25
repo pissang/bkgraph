@@ -20,8 +20,6 @@ define(function (require) {
     var NodeEntity = function (opts) {
 
         Entity.call(this);
-        
-        this.el = new Group();
 
         // Configs
         opts = opts || {};
@@ -37,15 +35,55 @@ define(function (require) {
 
         this.draggable = opts.draggable || false;
 
-        this.style = zrUtil.clone(config.nodeStyle['default']);
-        this.highlightStyle = zrUtil.clone(config.nodeStyle.highlight);
+        this.states = {
+            normal: {
+                name: 'normal',
+                zlevel: 1,
+                z: 1,
+                // 自定义属性
+                labelAlpha: 0.6
+            },
+            hover: {
+                name: 'hover',
+                zlevel: 3,
+                onenter: function () {
+                    this.animateRadius(this.originalRadius * 1.2, 500);
+                    this.startActiveAnimation();
+                },
+                onleave: function (state, nextState) {
+                    if (nextState.name !== 'active') {
+                        this.animateRadius(this.originalRadius, 500);
+                        this.stopActiveAnimation();
+                    }
+                },
+                labelAlpha: 0.9
+            },
+            active: {
+                name: 'active',
+                zlevel: 3,
+                onenter: function (state, previousState) {
+                    if (previousState.name !== 'hover') {
+                        this.animateRadius(this.originalRadius * 1.2, 500);
+                        this.startActiveAnimation();
+                    }
+                },
+                onleave: function (state, nextState) {
+                    this.animateRadius(this.originalRadius, 500);
+                    this.stopActiveAnimation();
+                },
+                labelAlpha: 0.9
+            }
+        };
 
-        if (opts.style) {
-            zrUtil.merge(this.style, opts.style, true)
-        }
-        if (opts.highlightStyle) {
-            zrUtil.merge(this.highlightStyle, opts.highlightStyle)
-        }
+        zrUtil.merge(this.states, opts.states || {}, true);
+
+        this.defaultState = opts.defaultState != null ? opts.defaultState : 'normal';
+
+        this.statesTransition = {
+            normal: ['hover', 'active'],
+            hover: ['normal', 'active'],
+            active: ['normal']
+        };
 
         this._animatingCircles = [];
     }
@@ -53,18 +91,19 @@ define(function (require) {
     var events = ['mouseover', 'mouseout', 'click', 'dragstart', 'dragend', 'dragenter', 'dragover'];
 
     NodeEntity.prototype.initialize = function (zr) {
+
+        Entity.prototype.initialize.call(this, zr);
+
         var self = this;
         var r = this.radius;
 
         var dragging = false;
         var outlineShape = new CircleShape({
             style: {
-                strokeColor: this.style.borderColor,
                 brushType: 'stroke',
                 r: baseRadius,
                 x: 0,
-                y: 0,
-                lineWidth: this.style.lineWidth
+                y: 0
             },
             highlightStyle: {
                 opacity: 0
@@ -108,13 +147,11 @@ define(function (require) {
                     x: 0,
                     y: 0,
                     r: baseRadius,
-                    color: zrColor.alpha(this.style.color, this.style.alpha),
                     brushType: 'fill',
                     text: this.label,
                     textPosition: 'inside',
                     textAlign: 'center',
                     brushType: 'both',
-                    textColor: this.style.labelColor,
                     textFont: '15px 微软雅黑'
                 },
                 z: 10,
@@ -123,22 +160,26 @@ define(function (require) {
             });
         }
 
-        this.el.addChild(imageShape);
-
+        this.addShape('image', imageShape);
         if (labelShape) {
-            this.el.addChild(labelShape);
+            this.addShape('label', labelShape);
         }
-
-        this.el.addChild(outlineShape);
-
-        this._imageShape = imageShape;
-        this._labelShape = labelShape;
-        this._outlineShape = outlineShape;
+        this.addShape('outline', outlineShape);
 
         this.el.scale[0] = this.el.scale[1] = this.radius / baseRadius;
 
-        // 加载头像图片
-        // this.loadImage(zr);
+        // 设置标签透明度
+        this.bind('state:enter', function (state) {
+            if (labelShape) {
+                labelShape.style.color = zrColor.alpha(
+                    state.shapeStyle.label.color, state.labelAlpha
+                );
+            }
+        });
+
+        if (this.defaultState) {
+            this.setState(this.defaultState);
+        }
     }
 
     NodeEntity.prototype.loadImage = function (zr, success, error) {
@@ -173,22 +214,6 @@ define(function (require) {
         this.el.modSelf();
     };
 
-    // TODO STYLE BINDING
-    NodeEntity.prototype.setStyle = function (name, value) {
-        this.style[name] = value;
-        switch (name) {
-            case 'color':
-                this._outlineShape.style.strokeColor = value;
-                this._labelShape.style.color = zrColor.alpha(this.style.color, this.style.alpha);
-                break;
-            case 'lineWidth':
-                this._outlineShape.style.lineWidth = value;
-                break;
-        }
-
-        this.el.modSelf();
-    };
-
     NodeEntity.prototype.setZLevel = function (zlevel) {
         this._outlineShape.zlevel = zlevel;
         this._imageShape.zlevel = zlevel;
@@ -196,29 +221,10 @@ define(function (require) {
         this.el.modSelf();
     };
 
-    NodeEntity.prototype.highlight = function () {
-        this._outlineShape.style.strokeColor = this.highlightStyle.borderColor;
-        this._outlineShape.style.lineWidth = this.highlightStyle.lineWidth;
-        this._labelShape.style.color = zrColor.alpha(this.highlightStyle.color, this.highlightStyle.alpha);
-        this._labelShape.style.textColor = this.highlightStyle.labelColor;
+    NodeEntity.prototype.animateRadius = function (r, time, cb) {
 
-        this.setZLevel(3);
+        var zr = this.zr;
 
-        this.el.modSelf();
-    };
-
-    NodeEntity.prototype.lowlight = function () {
-        this._outlineShape.style.strokeColor = this.style.borderColor;
-        this._outlineShape.style.lineWidth = this.style.lineWidth;
-        this._labelShape.style.color = zrColor.alpha(this.style.color, this.style.alpha);
-        this._labelShape.style.textColor = this.style.labelColor;
-
-        this.setZLevel(1);
-
-        this.el.modSelf();
-    };
-
-    NodeEntity.prototype.animateRadius = function (zr, r, time, cb) {
         this.stopAnimation('radius');
 
         var self = this;
@@ -237,8 +243,8 @@ define(function (require) {
         .start('ElasticOut')
     };
 
-    NodeEntity.prototype.startActiveAnimation = function (zr) {
-
+    NodeEntity.prototype.startActiveAnimation = function () {
+        var zr = this.zr;
         if (this._animatingCircles.length) {
             return;
         }
@@ -254,7 +260,7 @@ define(function (require) {
                     x: 0,
                     y: 0,
                     r: baseRadius + 5,
-                    color: this.highlightStyle.color,
+                    color: this.states.hover.shapeStyle.outline.strokeColor,
                     opacity: 0.5
                 },
                 hoverable: false,
@@ -288,7 +294,8 @@ define(function (require) {
         }
     }
 
-    NodeEntity.prototype.stopActiveAnimation = function (zr) {
+    NodeEntity.prototype.stopActiveAnimation = function () {
+        var zr = this.zr;
         if (this._animatingCircles.length) {
             for (var i = 0; i < this._animatingCircles.length; i++) {
                 var circle = this._animatingCircles[i];
@@ -298,14 +305,14 @@ define(function (require) {
 
             this.stopAnimation('glowcircle');
 
-            zr.refreshNextFrame();
+            this.zr.refreshNextFrame();
         }
     }
 
     var min = [0, 0];
     var max = [0, 0];
     NodeEntity.prototype.isInsideRect = function (rect) {
-        var r = this.radius + this.style.lineWidth;
+        var r = this.radius;
 
         min[0] = this.el.position[0] - r;
         min[1] = this.el.position[1] - r;

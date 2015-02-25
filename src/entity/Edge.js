@@ -19,9 +19,9 @@ define(function (require) {
 
     var baseRadius = 8;
 
-    var EdgeEntity = function (opts) {
+    var EdgeEntity = function (opts, zr) {
         
-        Entity.call(this);
+        Entity.call(this, zr);
 
         this.el = new Group();
 
@@ -34,16 +34,6 @@ define(function (require) {
 
         this.label = opts.label || '';
 
-        this.style = zrUtil.clone(config.edgeStyle['default']);
-        this.highlightStyle = zrUtil.clone(config.edgeStyle.highlight);
-
-        if (opts.style) {
-            zrUtil.merge(this.style, opts.style);
-        }
-        if (opts.highlightStyle) {
-            zrUtil.merge(this.highlightStyle, opts.highlightStyle);
-        }
-
         this._animatingCircles = [];
     };
 
@@ -54,8 +44,6 @@ define(function (require) {
                 lineWidth: this.style.lineWidth,
                 r: 8,
                 opacity: 1,
-                color: this.style.color,
-                strokeColor: this.style.color,
                 text: util.truncate(this.label, 6),
                 textFont: '13px 微软雅黑',
                 textPadding: 5,
@@ -75,15 +63,9 @@ define(function (require) {
             }
         });
 
-        this.el.addChild(labelLineShape);
-        this._labelLineShape = labelLineShape;
+        this.addShape('labelLine', labelLineShape);
 
         this.update(zr);
-    };
-
-    EdgeEntity.prototype.setZLevel = function (zlevel) {
-        this._labelLineShape.zlevel = zlevel;
-        this.el.modSelf();
     };
 
     EdgeEntity.prototype.update = function () {
@@ -92,43 +74,6 @@ define(function (require) {
             this._setLinePoints(v1, v2);
         }
         this.el.modSelf();
-    };
-
-    EdgeEntity.prototype.setStyle = function (name, value) {
-        this.style[name] = value;
-        switch (name) {
-            case 'color':
-                this._labelLineShape.style.strokeColor = value;
-                this._labelLineShape.style.color = value;
-                break;
-            case 'lineWidth':
-                this._labelLineShape.style.lineWidth = value;
-                break;
-        }
-
-        this.el.modSelf();
-    }
-
-    EdgeEntity.prototype.highlight = function () {
-        this._labelLineShape.style.color = this.highlightStyle.color;
-        this._labelLineShape.style.strokeColor = this.highlightStyle.color;
-        this._labelLineShape.style.lineWidth = this.highlightStyle.lineWidth;
-        this._labelLineShape.zlevel = 3;
-        this.el.modSelf();
-
-        this._isHighlight = true;
-    };
-
-    EdgeEntity.prototype.lowlight = function () {
-        this._labelLineShape.style.color = this.style.color;
-        this._labelLineShape.style.strokeColor = this.style.color;
-        this._labelLineShape.style.lineWidth = this.style.lineWidth;
-        this._labelLineShape.style.hidden = this.style.hidden;
-        this._labelLineShape.zlevel = 0;
-
-        this.el.modSelf();
-
-        this._isHighlight = false;
     };
 
     EdgeEntity.prototype.animateLength = function (zr, time, delay, fromEntity, cb) {
@@ -154,35 +99,11 @@ define(function (require) {
             .start();
     };
 
-    EdgeEntity.prototype.highlightLabel = function () {
-        if (!this._isHighlight) {
-            this._labelLineShape.style.color = this.highlightStyle.color;
-            this._labelLineShape.style.strokeColor = this.highlightStyle.color;
-            this._labelLineShape.style.lineWidth = this.highlightStyle.lineWidth;
-            this._labelLineShape.style.opacity = this.highlightStyle.opacity;
-        }
-        // 显示全文
-        this._labelLineShape.style.text = this.label;
-        this._labelLineShape.zlevel = 3;
-        this.el.modSelf();
-    };
-    EdgeEntity.prototype.lowlightLabel = function () {
-        if (!this._isHighlight) {
-            this._labelLineShape.style.color = this.style.color;
-            this._labelLineShape.style.strokeColor = this.style.color;
-            this._labelLineShape.style.lineWidth = this.style.lineWidth;
-            this._labelLineShape.style.opacity = this.style.opacity;
-        }
-        // 隐藏多余文字
-        this._labelLineShape.style.text = util.truncate(this.label, 6);
-        this._labelLineShape.zlevel = 0;
-        this.el.modSelf();
-    };
-
-    EdgeEntity.prototype.animateTextPadding = function (zr, time, textPadding, cb) {
+    EdgeEntity.prototype.animateTextPadding = function (textPadding, time, cb) {
         var self = this;
+        var zr = this.zr;
         this.stopAnimation('textPadding');
-        this.addAnimation('textPadding', zr.animation.animate(this._labelLineShape.style))
+        this.addAnimation('textPadding', zr.animation.animate(this.getShape('labelLine').style))
             .when(time, {
                 textPadding: textPadding
             })
@@ -194,20 +115,22 @@ define(function (require) {
             .start('ElasticOut');
     };
 
-    EdgeEntity.prototype.startActiveAnimation = function (zr, e) {
+    EdgeEntity.prototype.startActiveAnimation = function (e) {
 
         if (this._animatingCircles.length) {
             return;
         }
 
+        var zr = this.zr;
+        var labelLineShape = this.getShape('labelLine');
         for (var i = 3; i > 0; i--) {
             var circle = new CircleShape({
                 style: {
-                    x: e._labelLineShape.style.cx,
-                    y: e._labelLineShape.style.cy,
+                    x: labelLineShape.style.cx,
+                    y: labelLineShape.style.cy,
                     r: baseRadius,
-                    color: this.highlightStyle.color,
-                    opacity: this.highlightStyle.opacity * 0.8
+                    color: this.states.hover.shapeStyle.labelLine.strokeColor,
+                    opacity: this.states.hover.shapeStyle.labelLine.opacity * 0.8
                 },
                 hoverable: false,
                 zlevel: 2

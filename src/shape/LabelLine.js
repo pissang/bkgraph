@@ -11,38 +11,9 @@ define(function (require) {
 
     LabelLine.prototype.type = 'labelline';
 
-    LabelLine.prototype.buildDropletPath = function(ctx, style) {
-
-        var angle = style.angle || 0;
-        var dropletPadding = style.dropletPadding || 0;
-        var cx = style.cx;
-        var cy = style.cy - dropletPadding;
-
-        ctx.arc(cx, cy, style.a, 0, 2 * Math.PI);
-        ctx.moveTo(cx + style.a * Math.cos((30 + angle) * Math.PI / 180), cy + style.a * Math.sin((30 + angle) * Math.PI / 180));
-        ctx.lineTo(cx - style.b * Math.sin(Math.PI / 180 * angle), cy + style.b * Math.cos(Math.PI / 180 * angle));
-        ctx.lineTo(cx - style.a * Math.sin(Math.PI / 180 * (60 + angle)), cy + style.a * Math.cos(Math.PI / 180 * (60 + angle)));
-    };
-
     LabelLine.prototype.brush = function (ctx, isHighlight) {
-        var style = this.style;
 
-        if (isHighlight) {
-            // 根据style扩展默认高亮样式
-            style = this.getHighlightStyle(
-                style,
-                this.highlightStyle || {},
-                this.brushTypeOnly
-            );
-        }
-
-        ctx.save();
-        
-        this.doClip(ctx);
-
-        this.setContext(ctx, style);
-        // 设置transform
-        this.setTransform(ctx);
+        var style = this.beforeBrush(ctx, isHighlight);
 
         ctx.beginPath();
         ctx.moveTo(style.xStart, style.yStart);
@@ -60,10 +31,9 @@ define(function (require) {
         }
         ctx.beginPath();
         ctx.arc(cx, cy, r, 0, Math.PI * 2);
-        // this.buildDropletPath(ctx, style);
         ctx.fill();
 
-        // 画Label标签
+        // 画Label文本
         var text = style.text;
         var textPadding = style.textPadding;
         if (textPadding == null) { textPadding = 5; }
@@ -100,7 +70,7 @@ define(function (require) {
         }
         ctx.fillText(text, x, y);
 
-        ctx.restore();
+        this.afterBrush();
     }
 
     LabelLine.prototype.getRect = function (style) {
@@ -108,7 +78,7 @@ define(function (require) {
     }
 
     LabelLine.prototype.isCover = function (x, y) {
-        var originPos = this.getTansform(x, y);
+        var originPos = this.transformCoordToLocal(x, y);
         x = originPos[0];
         y = originPos[1];
         

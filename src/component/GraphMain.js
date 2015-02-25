@@ -12,7 +12,6 @@ define(function (require) {
 
     var ForceLayout = require('../layout/ForceLayout');
     var NodeEntity = require('../entity/Node');
-    var EdgeEntity = require('../entity/Edge');
     var CurveEdgeEntity = require('../entity/CurveEdge');
     var OutTipEntity = require('../entity/OutTip');
     var ExtraEdgeBundleEntity = require('../entity/ExtraEdgeBundle');
@@ -68,16 +67,9 @@ define(function (require) {
         // 中心节点
         this._mainNode = null;
 
-        this._lastClickNode = null;
-
         this._lastHoverNode = null;
 
         this._lastHoverEdge = null;
-
-        // 当前关注的节点, 可能是点击，也可能是搜索定位
-        this._activeNode = null;
-
-        this._activeEdge = null;
 
         // 图中所有的节点数
         this._nodeEntityCount = 0;
@@ -434,8 +426,6 @@ define(function (require) {
             this._root.addChild(this._extraEdgeBundle.el);
         }
 
-        // 所有实体都在 zlevel-1 层
-        // 所有边都在 zlevel-0 层
         graph.eachEdge(function (e) {
             if (
                 e.node1.data.layerCounter <= this._defaultLayerCount &&
@@ -646,33 +636,15 @@ define(function (require) {
     };
 
     /**
-     * 除了当前激活(点击或者在搜索栏里选择)外的节点，所有节点移除hover特效
-     */
-    GraphMain.prototype.unhoverAll = function () {
-        var zr = this._zr;
-        var graph = this._graph;
-        for (var i = 0; i < graph.nodes.length; i++) {
-            var n = graph.nodes[i];
-            if (n.entity && n !== this._activeNode) {
-                this.unhoverNode(n);
-                if (n._isHighlight) {
-                    n.entity.highlight(zr);
-                }
-            }
-        }
-    };
-
-    /**
      * 低亮所有节点
      */
-    GraphMain.prototype.lowlightAll = function () {
+    GraphMain.prototype.unactiveAll = function () {
         var zr = this._zr;
         var graph = this._graph;
         for (var i = 0; i < graph.nodes.length; i++) {
             var n = graph.nodes[i];
             if (n.entity) {
-                this.unhoverNode(n);
-                this.lowlightNode(n);
+                n.entity.setState('normal');
             }
             // 移除屏外提示
             if (n._outTipEntity) {
@@ -680,10 +652,14 @@ define(function (require) {
                 n._outTipEntity = null;
             }
         }
+
         for (var i = 0; i < graph.edges.length; i++) {
             var e = graph.edges[i];
             if (e.entity) {
-                e.entity.lowlight();
+                e.entity.setState('normal');
+                if (e.isExtra) {
+                    e.entity.hidden = true;
+                }
             }
         }
 
@@ -693,20 +669,13 @@ define(function (require) {
     /**
      * 节点移除hover特效
      */
-    GraphMain.prototype.unhoverNode = function (node) {
-        if (node._isHover) {
-            // if (config.enableAnimation) {
-                node.entity.stopActiveAnimation(this._zr);
-                node.entity.animateRadius(
-                    this._zr, node.layout.size, 500
-                );
-            // } else {
-            //     node.entity.setRadius(node.layout.size);
-            // }
-
-            node.entity.lowlight();
-
-            node._isHover = false;
+    GraphMain.prototype.unhoverNode = function () {
+        var node = this._lastHoverNode;
+        if (node && node.entity) {
+            if (node.entity.getState() !== 'active') {
+                node.entity.setState('normal');
+            }
+            this._lastHoverNode = null;
         }
     };
 
@@ -714,107 +683,89 @@ define(function (require) {
      * 鼠标 hover 到节点上的特效
      */
     GraphMain.prototype.hoverNode = function (node) {
-        this.unhoverEdge(this._activeEdge);
-        if (node._isHover) {
-            return;
-        }
+        this.unhoverEdge();
 
-        node._isHover = true;
+        this.unhoverNode();
 
-        // Hover 实体放大
-        // if (config.enableAnimation) {
-            node.entity.animateRadius(
-                this._zr, node.layout.size * 1.2, 500
-            );
-            node.entity.startActiveAnimation(this._zr);
-        // }
-        // else {
-        //     node.entity.setRadius(node.layout.size * 1.2);
-        // }
+        if (node.entity) {
+            node.entity.setState('hover');
 
-        node.entity.highlight();
-    };
-
-    /**
-     * 低亮指定节点
-     */
-    GraphMain.prototype.lowlightNode = function (node) {
-        if (node.entity && node._isHighlight) {
-            node.entity.lowlight();
-            node._isHighlight = false;
-        }
-    };
-
-    /**
-     * 高亮指定节点
-     */
-    GraphMain.prototype.highlightNode = function (node) {
-        if (typeof(node) === 'string') {
-            node = this._graph.getNodeById(node);
-        }
-        this.lowlightAll();
-
-        this.hoverNode(node);
-        if (node.entity && !node._isHighlight) {
-            node.entity.highlight();
-            node._isHighlight = true;
+            this._lastHoverNode = node;
         }
     };
 
     /**
      * 边移除hover特效
      */
-    GraphMain.prototype.unhoverEdge = function (e) {
-        if (typeof(e) === 'string') {
-            e = this._getEdgeByID(e);
+    GraphMain.prototype.unhoverEdge = function () {
+        var edge = this._lastHoverEdge;
+        if (edge && edge.entity) {
+            if (edge.entity.getState() !== 'active') {
+                edge.entity.setState('normal');
+            }
+            this._lastHoverEdge = null;
         }
-        if (!e) {
-            return;
-        }
-
-        if (config.enableAnimation) {
-            e.entity.animateTextPadding(this._zr, 300, 5);
-            e.entity.stopActiveAnimation(this._zr, e.entity);
-        }
-        e.entity.lowlightLabel();
     };
 
     /**
      * 鼠标 hover 到边上的特效
      */
-    GraphMain.prototype.hoverEdge = function (e) {
-        if (typeof(e) === 'string') {
-            e = this._getEdgeByID(e);
-        }
-        if (!e) {
-            return;
-        }
+    GraphMain.prototype.hoverEdge = function (edge) {
+        this.unhoverNode();
 
-        if (this._activeEdge != e) {
-            this.unhoverEdge(this._activeEdge);
-            this._activeEdge = e;
-        }
+        this.unhoverEdge();
 
-        if (config.enableAnimation) {
-            e.entity.animateTextPadding(this._zr, 300, 12);
-            e.entity.startActiveAnimation(this._zr, e.entity);
+        if (edge.entity) {
+            edge.entity.setState('hover');
+
+            this._lastHoverEdge = edge;
         }
-        e.entity.highlightLabel();
     };
 
-    /**
-     * 高亮节点+显示邻接节点, 点击触发
-     */
-    GraphMain.prototype.highlightNodeAndShowAdjacency = function (node) {
+    GraphMain.prototype.activeEdge = function (edge) {
+        if (typeof(edge) === 'string') {
+            edge = this._getEdgeByID(edge);
+        }
+
+        if (edge && edge.entity) {
+            this.unactiveAll();
+            edge.entity.setState('active');
+
+            if (edge.isExtra) {
+                edge.entity.hidden = false;
+            }
+        }
+    };
+
+    GraphMain.prototype.activeNode = function (node) {
         if (typeof(node) === 'string') {
             node = this._graph.getNodeById(node);
         }
         var zr = this._zr;
 
-        this.lowlightAll();
+        if (node && node.entity) {
+            this.unactiveAll();
 
-        this.hoverNode(node);
-        node._isHighlight = true;
+            node.entity.setState('active');
+        }
+    };
+
+    /**
+     * 高亮节点+显示邻接节点, 点击触发
+     */
+    GraphMain.prototype.activeNodeAndShowAdjacency = function (node) {
+        if (typeof(node) === 'string') {
+            node = this._graph.getNodeById(node);
+        }
+        var zr = this._zr;
+
+        if (! node || ! node.entity) {
+            return;
+        }
+
+        this.unactiveAll();
+
+        node.entity.setState('active');
 
         for (var i = 0; i < node.edges.length; i++) {
             var e = node.edges[i];
@@ -832,7 +783,6 @@ define(function (require) {
                 this._createNodeEntity(other);
                 newNodeEntity = true;
             }
-            // other.entity.highlight();
 
             if (!e.entity) {
                 // 动态添加
@@ -841,7 +791,7 @@ define(function (require) {
             }
 
             if (e.isExtra) {
-                e.entity.show();
+                e.entity.hidden = false;
             }
 
             if (config.enableAnimation) {
@@ -853,189 +803,11 @@ define(function (require) {
                 }
             }
 
-            // other._isHighlight = true;
-
             this._syncOutTipEntities();
         }
 
         this._syncHeaderBarExplorePercent();
         zr.refreshNextFrame();
-    };
-
-    /**
-     * 高亮节点与邻接节点, 点击触发
-     */
-    GraphMain.prototype.highlightNodeAndAdjacency = function (node) {
-        if (typeof(node) === 'string') {
-            node = this._graph.getNodeById(node);
-        }
-        var zr = this._zr;
-
-        this.lowlightAll();
-
-        this.hoverNode(node);
-        node._isHighlight = true;
-
-        for (var i = 0; i < node.edges.length; i++) {
-            var e = node.edges[i];
-            var other = e.node1 === node ? e.node2 : e.node1;
-
-            //中心节点不出补边
-            if (node.data.layerCounter === 0 && e.isExtra) {
-                continue;
-            }
-
-            var newNodeEntity = false;
-            var newEdgeEntity = false;
-            if (!other.entity) {
-                // 动态添加
-                this._createNodeEntity(other);
-                newNodeEntity = true;
-            }
-            other.entity.highlight();
-
-            if (!e.entity) {
-                // 动态添加
-                this._createEdgeEntity(e);
-                newEdgeEntity = true;
-            }
-
-            e.entity.highlight();
-            if (config.enableAnimation) {
-                if (newNodeEntity) {
-                    this._growNodeAnimation(other, node, Math.random() * 500);
-                }
-                else if (newEdgeEntity) {
-                    e.entity.animateLength(zr, 300, 0, node.entity);
-                }
-            }
-
-            other._isHighlight = true;
-
-            this._syncOutTipEntities();
-        }
-
-        this._syncHeaderBarExplorePercent();
-        zr.refreshNextFrame();
-    };
-
-    /**
-     * 高亮节点与主节点的关系路径, 在搜索栏里选择触发
-     */
-    GraphMain.prototype.highlightNodeToMain = function (node) {
-        if (typeof(node) === 'string') {
-            node = this._graphLayout.getNodeById(node);
-        }
-        this._lastClickNode = null;
-        this._activeNode = node;
-
-        var graphLayout = this._graphLayout;
-        var graph = this._graph;
-        var zr = this._zr;
-        node = graphLayout.getNodeById(node.id);
-
-        this.lowlightAll();
-
-        // 这里把图当做树来遍历了
-        var current = node;
-        var nodes = [current];
-        while (current) {
-            var n = graph.getNodeById(current.id);
-            if (!n.entity) {
-                this._createNodeEntity(n);
-            }
-            if (node === current) {
-                this.hoverNode(n);
-                n._isHighlight = true;
-            } else {
-                n.entity.highlight();
-                n._isHighlight = true;
-            }
-
-            var inEdge = current.inEdges[0];
-            if (!inEdge) {
-                break;
-            }
-            current = inEdge.node1;
-
-            nodes.push(current);
-        }
-
-        for (var i = 0; i < nodes.length - 1; i++) {
-            var n2 = nodes[i];
-            var n1 = nodes[i + 1];
-            var e = graph.getEdge(n1.id, n2.id);
-
-            if (!e.entity) {
-                this._createEdgeEntity(e);
-            }
-            e.entity.highlight();
-        }
-
-        this._syncHeaderBarExplorePercent();
-
-        zr.refreshNextFrame();
-    };
-
-    GraphMain.prototype.highlightEdge = function (e) {
-        if (typeof(e) === 'string') {
-            e = this._getEdgeByID(e);
-        }
-        if (!e) {
-            return;
-        }
-
-        this._lastClickNode = null;
-        this._activeNode = null;
-
-        this.lowlightAll();
-
-        if (!e.node1.entity) {
-            e.node1.entity = this._createNodeEntity(e.node1);
-        }
-        if (!e.node2.entity) {
-            e.node2.entity = this._createNodeEntity(e.node2);
-        }
-        e.node1.entity.highlight();
-        e.node1._isHighlight = true;
-        e.node2.entity.highlight();
-        e.node2._isHighlight = true;
-
-        if (!e.entity) {
-            this._createEdgeEntity(e);
-        }
-        e.entity.highlight();
-    };
-
-    /**
-     * 默认显示所有圈子
-     */
-    GraphMain.prototype._highlightCircle = function (cycle) {
-        var len = cycle.nodes.length;
-        for (var i = 0; i < len; i++) {
-            var n1 = cycle.nodes[i];
-            var n2 = cycle.nodes[(i + 1) % len];
-
-            var e = this._graph.getEdge(n1, n2) || this._graph.getEdge(n2, n1);
-            if (!n1.entity) {
-                this._baseEntityCount++;
-                this._createNodeEntity(n1);
-            }
-            if (!n2.entity) {
-                this._baseEntityCount++;
-                this._createNodeEntity(n2);
-            }
-            if (!e.entity) {
-                this._createEdgeEntity(e);
-            }
-            n1.entity.setStyle('color', '#58bb00');
-            n2.entity.setStyle('color', '#58bb00');
-            e.entity.setStyle('color', '#58bb00');
-            e.entity.setStyle('lineWidth', 2.5);
-            e.entity.setStyle('hidden', false);
-        }
-        this._zr.refreshNextFrame();
-        this._syncHeaderBarExplorePercent();
     };
 
     /**
@@ -1153,9 +925,7 @@ define(function (require) {
 
         var isClicked = cookies.get('BKGraph_edge_click_0') || 0;
         if (!isClicked) {
-            this._activeEdge = e;
-            this.highlightEdge(e);
-            this.hoverEdge(e);
+            this.activeEdge(e);
 
             var tip = this._kgraph.getComponentByType('TIP');
             var tipData = isOther ? config.tip.edgeOther : config.tip.edge;
@@ -1667,7 +1437,6 @@ define(function (require) {
                 self._root.clipShape = null;
                 cb && cb();
             })
-            // .delay(200)
             .start();
     }
 
@@ -1699,7 +1468,7 @@ define(function (require) {
             y: (-layer0.position[1] + top)/ layer0.scale[1],
             width: (zr.getWidth() - 2 * left) / layer0.scale[0],
             height: (zr.getHeight() - top - bottom) / layer0.scale[1]
-        }
+        };
 
         for (var i = 0; i < node.edges.length; i++) {
             var e = node.edges[i];
@@ -1772,7 +1541,7 @@ define(function (require) {
         this._animating = true;
         zr.refreshNextFrame();
         e.entity.animateLength(zr, 300, 0, fromNode.entity, function () {
-            toNode.entity.animateRadius(zr, radius, 500, function () {
+            toNode.entity.animateRadius(radius, 500, function () {
                 self._animating = false;
                 // 方便计算边的顶点
                 fromNode.entity.radius = fromNode.layout.size;
@@ -1782,18 +1551,14 @@ define(function (require) {
         });
     };
 
-    GraphMain.prototype._createNodeEntity = function (node, style) {
+    GraphMain.prototype._createNodeEntity = function (node) {
         var zr = this._zr;
-        if (node == this.getMainNode()) {
-            style ? '' : (style = {});
-            zrUtil.merge(style, config.nodeStyle.mainNode, true);
-        }
         var nodeEntity = new NodeEntity({
             radius: node.layout.size,
             label: node.data.name,
             image: node.data.image,
-            style: style,
-            draggable: this.draggable
+            draggable: this.draggable,
+            states: node === this.getMainNode() ? config.mainNodeStates : config.nodeStates
         });
         nodeEntity.initialize(this._zr);
 
@@ -1819,17 +1584,9 @@ define(function (require) {
                     area: 'entity'
                 });
             }
-            self._lastHoverNode = node;
         });
         nodeEntity.bind('mouseout', function () {
-            if (node !== self._activeNode) {
-                self.unhoverNode(node);
-                //  回复到高亮状态
-                if (node._isHighlight) {
-                    node.entity.highlight();
-                }
-            }
-            self._lastHoverNode = null;
+            self.unhoverNode();
         });
         nodeEntity.bind('click', function () {
             self.dispatch('click:entity', node);
@@ -1838,6 +1595,7 @@ define(function (require) {
 
             self.hideTip();
             var isClicked = cookies.get('BKGraph_node_click_0') || 0;
+
             if (!isClicked) {
                 cookies.set('BKGraph_node_click_0', node.id, {
                     // 10 years
@@ -1845,18 +1603,15 @@ define(function (require) {
                 });
             }
 
-            if (self._lastClickNode !== node) {
-                self._lastClickNode = node;
+            if (nodeEntity.getState() !== 'active') {
                 self._syncOutTipEntities();
-                self.highlightNodeAndShowAdjacency(node);
+                self.activeNodeAndShowAdjacency(node);
 
                 bkgLog({
                     type: 'zhishitupuclick',
                     target: node.id + ',' + node.data.layerCounter,
                     area: 'entity'
                 });
-                
-                self._activeNode = node;
             }
         });
         nodeEntity.bind('dragstart', function () {
@@ -1885,50 +1640,43 @@ define(function (require) {
         return nodeEntity;
     };
 
-    GraphMain.prototype._createEdgeEntity = function (e, style) {
-        var edgeEntity;
+    GraphMain.prototype._createEdgeEntity = function (e) {
         var self = this;
         var zr = this._zr;
         if (e.node1.entity && e.node2.entity) {
-            if (e.isExtra) {
-                style ? '' : (style = {});
-                zrUtil.merge(style, config.edgeStyle.extra, true);
-            }
-            edgeEntity = new CurveEdgeEntity({
+            var edgeEntity = new CurveEdgeEntity({
                 sourceEntity: e.node1.entity,
                 targetEntity: e.node2.entity,
                 label: e.data.relationName,
-                style: style,
                 layerCounter: Math.max(e.node1.data.layerCounter, e.node2.data.layerCounter),
-                isExtra: e.isExtra
+                isExtra: e.isExtra,
+                states: e.isExtra ? config.extraEdgeStates : config.edgeStates
             });
             if (e.isExtra) {
                 if (config.enableAnimation) {
                     this._extraEdgeBundle.addEdge(e);
                 }
+                edgeEntity.hidden = true;
             }
-            // } else {
-            //     edgeEntity = new EdgeEntity({
-            //         sourceEntity: e.node1.entity,
-            //         targetEntity: e.node2.entity,
-            //         label: e.data.relationName
-            //     });
-            // }
+
             edgeEntity.initialize(this._zr);
 
             edgeEntity.bind('click', function () {
                 self.dispatch('click:relation', e);
 
-                this.showRelationDetail(e);
-                this.highlightEdge(e);
+                if (edgeEntity.getState() != 'active') {
+                    this.showRelationDetail(e);
 
-                var isClicked = cookies.get('BKGraph_edge_click_0') || 0;
-                if (!isClicked) {
-                    self.hideTip();
-                    cookies.set('BKGraph_edge_click_0', e.data.id, {
-                        // 10 years
-                        expires: 360 * 24 * 3600 * 10
-                    });
+                    this.activeEdge(e);
+
+                    var isClicked = cookies.get('BKGraph_edge_click_0') || 0;
+                    if (!isClicked) {
+                        self.hideTip();
+                        cookies.set('BKGraph_edge_click_0', e.data.id, {
+                            // 10 years
+                            expires: 360 * 24 * 3600 * 10
+                        });
+                    }
                 }
 
                 bkgLog({
@@ -1956,13 +1704,9 @@ define(function (require) {
                     self.hoverEdge(e);
                 }
 
-                self._lastHoverEdge = e;
             });
             edgeEntity.bind('mouseout', function () {
-
-                self.unhoverEdge(e);
-
-                self._lastHoverEdge = null;
+                self.unhoverEdge();
             });
 
             e.entity = edgeEntity;
@@ -2003,11 +1747,6 @@ define(function (require) {
     };
 
     GraphMain.prototype._syncHeaderBarExplorePercent = function () {
-        // var headerBarComponent = this._kgraph.getComponentByType('HEADERBAR');
-        // if (headerBarComponent) {
-        //     headerBarComponent.setExplorePercent(this.getExplorePercent());
-        // }
-
         if (!config.isPlat) {
             this._saveStorage();
         }
@@ -2040,7 +1779,7 @@ define(function (require) {
         for (var i = 0; i < graph.nodes.length; i++) {
             var n = graph.nodes[i];
             if (n.entity) {
-                n.entity.el.ignore = !n.entity.isInsideRect(rect);
+                n.entity.el.ignore = n.entity.hidden || !n.entity.isInsideRect(rect);
                 if (! n.entity.el.ignore) {
                     // 需要统计第一帧中所有图片加载完成的时间
                     if (this._isFirstFrame) {
@@ -2082,7 +1821,7 @@ define(function (require) {
         for (var i = 0; i < graph.edges.length; i++) {
             var e = graph.edges[i];
             if (e.entity) {
-                e.entity.el.ignore = e.entity._labelLineShape.style.hidden || !e.entity.isInsideRect(rect);
+                e.entity.el.ignore = e.entity.hidden || !e.entity.isInsideRect(rect);
             }
         }
 

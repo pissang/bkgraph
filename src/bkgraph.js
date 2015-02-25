@@ -192,7 +192,7 @@ define(function (require) {
 
         if (params['relation']) {
             setTimeout(function () {
-                graphMain.highlightEdge(params['relation']);
+                graphMain.activeEdge(params['relation']);
                 graphMain.moveToRelation(params['relation'], function () {
                     // 关系点击引导
                     var edgeid = mainRelations[0].id;
@@ -208,7 +208,7 @@ define(function (require) {
         }
         else if (params['entity']) {
             setTimeout(function () {
-                graphMain.highlightNode(params['entity']);
+                graphMain.activeNode(params['entity']);
                 graphMain.moveToEntity(params['entity'], function () {
                     // 关系点击引导
                     graphMain.showEdgeClickTip(mainRelations[0].id);

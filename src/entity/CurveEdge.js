@@ -6,7 +6,7 @@ define(function (require) {
     var zrUtil = require('zrender/tool/util');
     var curveTool = require('zrender/tool/curve');
     var LabelCurveShape = require('../shape/LabelCurve');
-    var EdgeEntity = require('./Edge');
+    var CircleShape = require('zrender/shape/Circle');
 
     var util = require('../util/util');
     var intersect = require('../util/intersect');
@@ -19,6 +19,8 @@ define(function (require) {
     var min = vec2.create();
     var max = vec2.create();
 
+    var baseRadius = 8;
+
     function lerp(x0, x1, t) {
         return x0 * (1 - t) + x1 * t;
     }
@@ -26,8 +28,6 @@ define(function (require) {
     var CurveEdgeEntity = function (opts) {
         
         Entity.call(this);
-
-        this.el = new Group();
 
         // Configs
         opts = opts || {};
@@ -43,52 +43,70 @@ define(function (require) {
 
         this.isExtra = opts.isExtra;
 
-        if (this.isExtra) {
-            this.style = zrUtil.clone(config.edgeStyle.extra);
-        }
-        else {
-            this.style = zrUtil.clone(config.edgeStyle['default']);
+        this.states = {
+            normal: {
+                name: 'normal',
+                zlevel: 1,
+                z: 0,
+            },
+            hover: {
+                name: 'hover',
+                zlevel: 3,
+                onenter: function (state, previousState) {
+                    this.animateTextPadding(12, 300);
+                    this.startActiveAnimation();
+                },
+                onleave: function (state, nextState) {
+                    if (nextState.name !== 'active') {
+                        this.animateTextPadding(5, 300);
+                        this.stopActiveAnimation();
+                    }
+                }
+            },
+            active: {
+                name: 'active',
+                zlevel: 3,
+                onenter: function (state, previousState) {
+                    if (previousState.name !== 'hover') {
+                        this.animateTextPadding(12, 300);
+                        this.startActiveAnimation();
+                    }
+                },
+                onleave: function (state, nextState) {
+                    this.animateTextPadding(5, 300);
+                    this.stopActiveAnimation();
+                }
+            }
         }
 
-        // this.style = zrUtil.clone(config.edgeStyle['default']);
-        this.showStyle = zrUtil.clone(config.edgeStyle['default']);
-        this.highlightStyle = zrUtil.clone(config.edgeStyle.highlight);
+        zrUtil.merge(this.states, opts.states || {});
 
-        if (opts.style) {
-            zrUtil.merge(this.style, opts.style, true);
-        }
-        if (opts.highlightStyle) {
-            zrUtil.merge(this.highlightStyle, opts.highlightStyle)
-        }
+        this.defaultState = opts.defaultState == null
+            ? (this.isExtra ? 'hidden' : 'normal')
+            : opts.defaultState;
+
+        this.statesTransition = {
+            normal: ['hover', 'active'],
+            hover: ['normal', 'active'],
+            active: ['normal']
+        };
 
         this._animatingCircles = [];
     };
 
-    CurveEdgeEntity.prototype.hidden = false;
-
     CurveEdgeEntity.prototype.initialize = function (zr) {
+
+        Entity.prototype.initialize.call(this, zr);
+
         var self = this;
         var labelLineShape = new LabelCurveShape({
             style: {
-                xStart: 0,
-                yStart: 0,
-                xEnd: 0,
-                yEnd: 0,
-                cpX1: 0,
-                cpY1: 0,
                 r: 8,
-                opacity: this.style.opacity,
-                lineWidth: this.style.lineWidth,
-                hidden: this.style.hidden,
-                color: this.style.color,
-                strokeColor: this.style.color,
                 text: util.truncate(this.label, 10),
                 textFont: '13px 微软雅黑',
                 textPadding: 5,
                 dropletPadding: 0
             },
-            z: 0,
-            zlevel: 0,
             clickable: true,
             onclick: function () {
                 self.dispatch('click')
@@ -101,14 +119,13 @@ define(function (require) {
             }
         });
 
-        this.el.addChild(labelLineShape);
-        this._labelLineShape = labelLineShape;
-        this.update();
-    };
+        this.addShape('labelLine', labelLineShape);
 
-    CurveEdgeEntity.prototype.setZLevel = function (zlevel) {
-        this._labelLineShape.zlevel = zlevel;
-        this.el.modSelf();
+        this.update();
+
+        if (this.defaultState) {
+            this.setState(this.defaultState);
+        }
     };
 
     CurveEdgeEntity.prototype.update = function () {
@@ -123,74 +140,23 @@ define(function (require) {
         this.el.modSelf();
     };
 
-    CurveEdgeEntity.prototype.setStyle = function (name, value) {
-        this.style[name] = value;
-        switch (name) {
-            case 'color':
-                this._labelLineShape.style.strokeColor = value;
-                this._labelLineShape.style.color = value;
-                break;
-            case 'lineWidth':
-                this._labelLineShape.style.lineWidth = value;
-                break;
-            case 'hidden':
-                this.hidden = value;
-        }
-    }
-
-    CurveEdgeEntity.prototype.show = function () {
-        this.hidden = this.showStyle.hidden;
-        this._labelLineShape.zlevel = 1;
-        this._labelLineShape.style.color = this.showStyle.color;
-        this._labelLineShape.style.strokeColor = this.showStyle.color;
-        this._labelLineShape.style.opacity = this.showStyle.opacity;
-        this._labelLineShape.style.lineWidth = this.showStyle.lineWidth;
-        this._labelLineShape.style.hidden = this.showStyle.hidden;
-        this.el.modSelf();
-    };
-
-    CurveEdgeEntity.prototype.highlight = function () {
-        this.hidden = this.highlightStyle.hidden;
-        this._labelLineShape.zlevel = 3;
-        this._labelLineShape.style.color = this.highlightStyle.color;
-        this._labelLineShape.style.strokeColor = this.highlightStyle.color;
-        this._labelLineShape.style.opacity = this.highlightStyle.opacity;
-        this._labelLineShape.style.lineWidth = this.highlightStyle.lineWidth;
-        this._labelLineShape.style.hidden = this.highlightStyle.hidden;
-        this.el.modSelf();
-
-        this._isHighlight = true;
-    };
-
-    CurveEdgeEntity.prototype.lowlight = function () {
-        this.hidden = this.style.hidden;
-        this._labelLineShape.zlevel = 0;
-        this._labelLineShape.style.color = this.style.color;
-        this._labelLineShape.style.strokeColor = this.style.color;
-        this._labelLineShape.style.opacity = this.style.opacity;
-        this._labelLineShape.style.lineWidth = this.style.lineWidth;
-        this._labelLineShape.style.hidden = this.style.hidden;
-        this.el.modSelf();
-
-        this._isHighlight = false;
-    };
-
     CurveEdgeEntity.prototype.animateLength = function (zr, time, delay, fromEntity, cb) {
-        var curve = this._labelLineShape;
+        var curve = this.getShape('labelLine');
+        var curveStyle = curve.style;
         var x0, y0, x2, y2;
-        var x1 = curve.style.cpX1;
-        var y1 = curve.style.cpY1;
+        var x1 = curveStyle.cpX1;
+        var y1 = curveStyle.cpY1;
         var animateFromSource = fromEntity === this.sourceEntity;
         if (animateFromSource) {
-            var x0 = curve.style.xStart;
-            var x2 = curve.style.xEnd;
-            var y0 = curve.style.yStart;
-            var y2 = curve.style.yEnd;
+            var x0 = curveStyle.xStart;
+            var x2 = curveStyle.xEnd;
+            var y0 = curveStyle.yStart;
+            var y2 = curveStyle.yEnd;
         } else {
-            var x0 = curve.style.xEnd;
-            var x2 = curve.style.xStart;
-            var y0 = curve.style.yEnd;
-            var y2 = curve.style.yStart;
+            var x0 = curveStyle.xEnd;
+            var x2 = curveStyle.xStart;
+            var y0 = curveStyle.yEnd;
+            var y2 = curveStyle.yStart;
         }
         var self = this;
         var obj = {t: 0};
@@ -207,14 +173,14 @@ define(function (require) {
                 var y01 = lerp(y0, y1, t);
                 var y12 = lerp(y1, y2, t);
                 var y012 = lerp(y01, y12, t);
-                curve.style.cpX1 = x01;
-                curve.style.cpY1 = y01;
+                curveStyle.cpX1 = x01;
+                curveStyle.cpY1 = y01;
                 if (animateFromSource) {
-                    curve.style.xEnd = x012;
-                    curve.style.yEnd = y012;   
+                    curveStyle.xEnd = x012;
+                    curveStyle.yEnd = y012;   
                 } else {
-                    curve.style.xStart = x012;
-                    curve.style.yStart = y012;
+                    curveStyle.xStart = x012;
+                    curveStyle.yStart = y012;
                 }
 
                 self.el.modSelf();
@@ -228,21 +194,81 @@ define(function (require) {
         );
     }
 
-    CurveEdgeEntity.prototype.highlightLabel = EdgeEntity.prototype.highlightLabel;
-    
-    CurveEdgeEntity.prototype.lowlightLabel = EdgeEntity.prototype.lowlightLabel;
+    CurveEdgeEntity.prototype.animateTextPadding = function (textPadding, time, cb) {
+        var self = this;
+        var zr = this.zr;
+        this.stopAnimation('textPadding');
+        this.addAnimation('textPadding', zr.animation.animate(this.getShape('labelLine').style))
+            .when(time, {
+                textPadding: textPadding
+            })
+            .during(function () {
+                self.el.modSelf();
+                zr.refreshNextFrame();
+            })
+            .done(cb)
+            .start('ElasticOut');
+    };;
 
-    CurveEdgeEntity.prototype.animateTextPadding = EdgeEntity.prototype.animateTextPadding;
+    CurveEdgeEntity.prototype.startActiveAnimation = function (e) {
 
-    CurveEdgeEntity.prototype.startActiveAnimation = EdgeEntity.prototype.startActiveAnimation;
+        if (this._animatingCircles.length) {
+            return;
+        }
 
-    CurveEdgeEntity.prototype.stopActiveAnimation = EdgeEntity.prototype.stopActiveAnimation;
+        var zr = this.zr;
+        var labelLineShape = this.getShape('labelLine');
+        for (var i = 3; i > 0; i--) {
+            var circle = new CircleShape({
+                style: {
+                    x: labelLineShape.style.cx,
+                    y: labelLineShape.style.cy,
+                    r: baseRadius,
+                    color: this.states.hover.shapeStyle.labelLine.strokeColor,
+                    opacity: this.states.hover.shapeStyle.labelLine.opacity * 0.8
+                },
+                hoverable: false,
+                zlevel: 2
+            });
+
+            this.addAnimation('ripplecircle', zr.animation.animate(circle.style, {loop: true})
+                .when(2500, {
+                    r: baseRadius + 7,
+                    opacity: 0
+                })
+                .during(function () {
+                    // mod一个就行了
+                    circle.modSelf();
+                    zr.refreshNextFrame();
+                })
+                .delay(-800 * i)
+                .start('CubicInOut')
+            );
+
+            this.el.addChild(circle);
+            this._animatingCircles.push(circle);
+        }
+    };
+
+    CurveEdgeEntity.prototype.stopActiveAnimation = function (zr) {
+        if (this._animatingCircles.length) {
+            for (var i = 0; i < this._animatingCircles.length; i++) {
+                var circle = this._animatingCircles[i];
+                this.el.removeChild(circle);
+            }
+            this._animatingCircles.length = 0;
+
+            this.stopAnimation('ripplecircle');
+
+            this.zr.refreshNextFrame();
+        }
+    };
 
     CurveEdgeEntity.prototype._computeCurvePoints = function (p1, p2) {
         var sourceEntity = this.sourceEntity;
         var targetEntity = this.targetEntity;
 
-        var curve = this._labelLineShape;
+        var curve = this.getShape('labelLine');
         this._setCurvePoints(curve, p1, p2);
 
         p1 = intersect.curveCircle(curve.style, p1, sourceEntity.originalRadius);
@@ -277,11 +303,11 @@ define(function (require) {
     };
 
     CurveEdgeEntity.prototype.intersectRect = function (rect) {
-        return intersect.curveRect(this._labelLineShape.style, rect);
+        return intersect.curveRect(this.getShape('labelLine').style, rect);
     }
 
     CurveEdgeEntity.prototype.isInsideRect = function (rect) {
-        var style = this._labelLineShape.style;
+        var style = this.getShape('labelLine').style;
         vec2.set(v2, style.cpX1, style.cpY1);
         vec2.set(v3, style.xEnd, style.yEnd);
         vec2.set(min, style.xStart, style.yStart);

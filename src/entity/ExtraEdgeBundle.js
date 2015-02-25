@@ -23,19 +23,14 @@ define(function (require) {
             hoverable: false
         });
 
-        this.style = zrUtil.clone(config.edgeStyle.extra);
-
-        if (opts.style) {
-            zrUtil.merge(this.style, opts.style);
-        }
-
         this.edges = [];
     }
 
     ExtraEdgeBundleEntity.prototype.initialize = function (zr) {
-        this.el.style.strokeColor = this.style.color;
-        this.el.style.opacity = this.style.opacity;
-        this.el.style.lineWidth = this.style.lineWidth;
+        var shapeStyleConfig = config.extraEdgeStates.normal.shapeStyle.labelLine;
+        this.el.style.strokeColor = shapeStyleConfig.strokeColor;
+        this.el.style.opacity = shapeStyleConfig.opacity;
+        this.el.style.lineWidth = shapeStyleConfig.lineWidth;
 
         this.update(zr);
     }

@@ -15,26 +15,19 @@ define(function (require) {
     LabelCurve.prototype.type = 'labelcurve';
 
     LabelCurve.prototype.brush = function (ctx, isHighlight) {
-        var style = this.style;
 
-        if (isHighlight) {
-            // 根据style扩展默认高亮样式
-            style = this.getHighlightStyle(
-                style,
-                this.highlightStyle || {},
-                this.brushTypeOnly
-            );
-        }
+        var style = this.beforeBrush(ctx, isHighlight);
 
-        ctx.save();
-        this.doClip(ctx);
-        this.setContext(ctx, style);
-        // 设置transform
-        this.setTransform(ctx);
+        var x0 = style.xStart || 0;
+        var y0 = style.yStart || 0;
+        var x1 = style.cpX1 || 0;
+        var y1 = style.cpY1 || 0;
+        var x2 = style.xEnd || 0;
+        var y2 = style.yEnd || 0;
 
         ctx.beginPath();
-        ctx.moveTo(style.xStart, style.yStart);
-        ctx.quadraticCurveTo(style.cpX1, style.cpY1, style.xEnd, style.yEnd);
+        ctx.moveTo(x0, y0);
+        ctx.quadraticCurveTo(x1, y1, x2, y2);
         ctx.stroke();
 
         // 画Label
@@ -43,15 +36,14 @@ define(function (require) {
         var cy = style.cy;
         var r = style.r || 8;
         if (cx == null) {
-            cx = curveTool.quadraticAt(style.xStart, style.cpX1, style.xEnd, 0.5);
-            cy = curveTool.quadraticAt(style.yStart, style.cpY1, style.yEnd, 0.5);
+            cx = curveTool.quadraticAt(x0, x1, x2, 0.5);
+            cy = curveTool.quadraticAt(y0, y1, y2, 0.5);
         }
         ctx.beginPath();
         ctx.arc(cx, cy, r, 0, Math.PI * 2);
-        // this.buildDropletPath(ctx, style);
         ctx.fill();
 
-        // 画Label标签
+        // 画Label文本
         var text = style.text;
         var textPadding = style.textPadding;
         if (textPadding == null) { textPadding = 5; }
@@ -71,10 +63,8 @@ define(function (require) {
             height: Math.max(height, r * 2)
         };
 
-        ctx.restore();
+        this.afterBrush(ctx);
     }
-
-    LabelCurve.prototype.buildDropletPath = LabelLineShape.prototype.buildDropletPath;
 
     LabelCurve.prototype.getRect = LabelLineShape.prototype.getRect;
 
