@@ -71,6 +71,8 @@ define(function (require) {
 
         this._lastHoverEdge = null;
 
+        this._currentActiveNode = null;
+
         // 图中所有的节点数
         this._nodeEntityCount = 0;
         // 第一次展现的节点数，用于计算用户探索的百分比
@@ -663,6 +665,8 @@ define(function (require) {
             }
         }
 
+        this._currentActiveNode = null;
+
         zr.refreshNextFrame();
     };
 
@@ -747,6 +751,8 @@ define(function (require) {
             this.unactiveAll();
 
             node.entity.setState('active');
+
+            this._currentActiveNode = node;
         }
     };
 
@@ -766,6 +772,8 @@ define(function (require) {
         this.unactiveAll();
 
         node.entity.setState('active');
+
+        this._currentActiveNode = node;
 
         for (var i = 0; i < node.edges.length; i++) {
             var e = node.edges[i];
@@ -1445,7 +1453,7 @@ define(function (require) {
      */
     GraphMain.prototype._syncOutTipEntities = function () {
         var zr = this._zr;
-        var node = this._lastClickNode;
+        var node = this._currentActiveNode;
         if (!node) {
             return;
         }

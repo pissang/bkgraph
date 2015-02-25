@@ -191,8 +191,9 @@ define(function (require) {
         var self = this;
         var image = new Image();
         image.onload = function () {
-            self._imageShape.style.image = image;
-            self._imageShape.modSelf();
+            var imageShape = self.getShape('image');
+            imageShape.style.image = image;
+            imageShape.modSelf();
             zr.refreshNextFrame();
 
             success && success();
