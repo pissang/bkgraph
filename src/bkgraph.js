@@ -193,33 +193,21 @@ define(function (require) {
         if (params['relation']) {
             setTimeout(function () {
                 graphMain.activeEdge(params['relation']);
-                graphMain.moveToRelation(params['relation'], function () {
-                    // 关系点击引导
-                    var edgeid = mainRelations[0].id;
-                    var isOther = false;
-                    if (params['relation'] == edgeid) {
-                        edgeid = mainRelations[1].id;
-                        isOther = true;
-                    }
-                    graphMain.showEdgeClickTip(edgeid, isOther);
-                });
+                graphMain.moveToRelation(params['relation']);
                 graphMain.showRelationDetail(params['relation'], true);
             });
         }
         else if (params['entity']) {
             setTimeout(function () {
                 graphMain.activeNode(params['entity']);
-                graphMain.moveToEntity(params['entity'], function () {
-                    // 关系点击引导
-                    graphMain.showEdgeClickTip(mainRelations[0].id);
-                });
+                graphMain.moveToEntity(params['entity']);
                 graphMain.showEntityDetail(params['entity'], true);
             });
         }
         else {
             // 默认显示主要实体
             setTimeout(function () {
-                graphMain.showEntityDetail(data.mainEntity, true);
+                graphMain.showEntityDetail(data.mainEntity, false);
 
                 // 关系点击引导
                 graphMain.showEdgeClickTip(mainRelations[0].id);

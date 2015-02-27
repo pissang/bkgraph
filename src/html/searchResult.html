@@ -6,7 +6,7 @@
         <!-- for: ${interests} as ${entity}, ${index} -->
             <!-- if: ${index} < 4 -->
             <li>
-                <a href="http://tupu.baidu.com/tupu/${entity.id}.html" target="_blank" data-area="headerbar-interest" title="${entity.name}_人物关系图谱">
+                <a href="/tupu/${entity.id}.html" target="_blank" data-area="headerbar-interest" title="${entity.name}_人物关系图谱">
                     <img src="${entity.image}" alt="">
                     <h5>${entity.name}</h5>
                 </a>
@@ -24,13 +24,13 @@
                     <p>您已经在${entity.n}的图谱中了,看看他们吧！</p>
                 </li>
             <!-- elif: ${index} < 10 && !${entity.isme} -->
-                <li title="${entity.n}_人物关系图谱"><a href="http://tupu.baidu.com/tupu/${entity.id}.html" target="_blank">${entity.n}</a></li>
+                <li title="${entity.n}_人物关系图谱"><a href="/tupu/${entity.id}.html" target="_blank">${entity.n}</a></li>
             <!-- /if -->
         <!-- /for -->
     <!-- else -->
         <li class="bkg-search-nodata">
             <p>暂时没有Ta的关系图谱</p>
-            <a href="http://www.baidu.com/s?wd=${name|url}" target="_blank">百度一下 "<span>${name|truncate(14)}</span>"</a>
+            <a href="http://www.baidu.com/s?wd=${name|url}" target="_blank" data-area="nodata">百度一下 "<span>${name|truncate(14)}</span>"</a>
         </li>
     <!-- /if -->
 </ul>

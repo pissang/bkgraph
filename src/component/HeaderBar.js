@@ -19,6 +19,11 @@ define(function (require) {
         Component.call(this);
 
         this._graphCollapsed = true;
+
+        var self = this;
+        util.addEventListener(this.el, 'click', function (e) {
+            self._dispatchClick(e);
+        });
     };
 
     HeaderBar.prototype.type = 'HEADERBAR';
@@ -195,7 +200,30 @@ define(function (require) {
             type: 'zhishitupuweibo',
             target: idx.toString()
         });
-    }
+    };
+
+    HeaderBar.prototype._dispatchClick = function (e) {
+        var target = e.target || e.srcElement;
+
+        var current = target;
+        while (current && current.nodeName.toLowerCase() !== 'a') {
+            current = current.parentNode;
+        }
+
+        var fromid = this._kgraph.getRawData() && this._kgraph.getRawData().mainEntity.id;
+        if (current) {
+            var linkArea = current.getAttribute('data-area');
+            bkgLog({
+                type: 'zhishitupulink',
+                target: [
+                            fromid,
+                            current.getAttribute('title'),
+                            current.getAttribute('href')
+                        ].join(','),
+                area: 'headerbar-' + linkArea
+            });
+        }
+    };
 
     zrUtil.inherits(HeaderBar, Component);
 

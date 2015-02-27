@@ -98,7 +98,7 @@ define(function (require) {
             && x <= (rect.x + rect.width)
             && y >= rect.y
             && y <= (rect.y + rect.height)
-            || isInsideLine;
+            && isInsideLine;
     }
 
     zrUtil.inherits(LabelLine, ShapeBase);

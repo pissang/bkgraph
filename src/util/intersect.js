@@ -139,7 +139,7 @@ define(function (require) {
 
         var d = Infinity;
         var t, start = 0, end = 1;
-        for (var i = 0; i < 2; i++) {
+        for (var i = 0; i < 3; i++) {
             for (var _t = start; _t < end; _t += interval) {
                 v1[0] = curveTool.quadraticAt(x0, x1, x2, _t);
                 v1[1] = curveTool.quadraticAt(y0, y1, y2, _t);

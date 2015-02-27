@@ -52,6 +52,7 @@
             || (!${isRelation} && ${singleTag} && (${representativeWork} || ${recommendation}))
             || (!${isRelation} && !(!${singleTag} && !${representativeWork} && !${show} && ${recommendation})
                 && !(!${singleTag} && !${representativeWork} && !${show} && !${recommendation})
+                && !(${singleTag} && !${representativeWork} && !${show} && !${recommendation})
             )
         -->
             <div class="bkg-sidebar-dimbottom"></div>
@@ -117,6 +118,7 @@
                 <!-- if: (${singleTag} && (${representativeWork} || ${show} || ${recommendation}))
                     || (!(!${singleTag} && !${representativeWork} && !${show} && ${recommendation})
                         && !(!${singleTag} && !${representativeWork} && !${show} && !${recommendation})
+                        && !(${singleTag} && !${representativeWork} && !${show} && !${recommendation})
                         )
                 -->
                     <div class="bkg-toggle"><i class="bkg-toggle-btn"></i></div>
