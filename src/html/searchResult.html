@@ -24,7 +24,13 @@
                     <p>您已经在${entity.n}的图谱中了,看看他们吧！</p>
                 </li>
             <!-- elif: ${index} < 10 && !${entity.isme} -->
-                <li title="${entity.n}_人物关系图谱"><a href="/tupu/${entity.id}.html" target="_blank">${entity.n}</a></li>
+                <!-- if: ${index} == 0 -->
+                    <li title="${entity.n}_人物关系图谱" class="bkg-active">
+                <!-- else -->
+                    <li title="${entity.n}_人物关系图谱">
+                <!-- /if -->
+                        <a href="/tupu/${entity.id}.html" target="_blank">${entity.n}</a>
+                    </li>
             <!-- /if -->
         <!-- /for -->
     <!-- else -->

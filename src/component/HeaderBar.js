@@ -57,8 +57,44 @@ define(function (require) {
             self.filter(self._$input.value);
         });
 
-        util.addEventListener(this._$input, 'keyup', util.debounce(function () {
-            self.filter(self._$input.value);
+        util.addEventListener(this._$input, 'keyup', util.debounce(function (e) {
+            var _$list = Sizzle('.bkg-search-list', this.el)[0];
+            var _$items = Sizzle('.bkg-search-list li', this.el);
+
+            var _$active = Sizzle('.bkg-search-list .bkg-active', this.el)[0];
+            var index = 0;
+            for (var i = 0, len = _$items.length; i < len; i++) {
+                if (util.hasClass(_$items[i], 'bkg-active')) {
+                    index = i;
+                    break;
+                }
+            }
+            switch(e.keyCode) {
+                case 13: // enter
+                    var _$activeLink = Sizzle('.bkg-search-list .bkg-active a', this.el)[0];
+                    if (_$activeLink) {
+                        window.open(_$activeLink.getAttribute('href'));
+                    }
+                    break;
+                case 38: //up arrow
+                    util.removeClass(_$active, 'bkg-active');
+                    index--;
+                    if (index < 0) {
+                        index = len - 1;
+                    }
+                    util.addClass(_$items[index], 'bkg-active');
+                    break;
+                case 40: //down arrow
+                    util.removeClass(_$active, 'bkg-active');
+                    index++;
+                    if (index > len - 1) {
+                        index = 0;
+                    }
+                    util.addClass(_$items[index], 'bkg-active');
+                    break;
+                default:
+                    self.filter(self._$input.value);
+            }
         }, 200));
 
         util.addEventListener(Sizzle('body')[0], 'click', function (e) {
@@ -66,6 +102,20 @@ define(function (require) {
             self._$searchResult.innerHTML = '';
             util.removeClass(self._$share, 'bkg-share-btn-active');
             util.addClass(self._$shareList, 'bkg-hidden');
+        });
+
+        util.addEventListener(this._$searchResult, 'mouseover', function (e) {
+            var target = e.target || e.srcElement;
+            var current = target;
+            while (current && current.nodeName.toLowerCase() !== 'li') {
+                current = current.parentNode;
+            }
+
+            var _$active = Sizzle('.bkg-search-list .bkg-active', this.el)[0];
+            if (_$active && current !== _$active) {
+                util.removeClass(_$active, 'bkg-active');
+                util.addClass(current, 'bkg-active');
+            }
         });
 
         // share
