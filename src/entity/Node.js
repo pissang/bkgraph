@@ -143,7 +143,7 @@ define(function (require) {
         if (this.label) {
             var labelShape = new CrescentShape({
                 style: {
-                    height: 27,
+                    height: 25,
                     x: 0,
                     y: 0,
                     r: baseRadius,

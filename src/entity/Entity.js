@@ -86,7 +86,7 @@ define(function (require) {
         var previousState = this.states[this._currentState];
         if (this._currentState) {
             var transitionList = this.statesTransition[this._currentState];
-            if (! transitionList || transitionList.indexOf(sName) < 0) {
+            if (!transitionList || zrUtil.indexOf(transitionList, sName) < 0) {
                 return;
             }
         }

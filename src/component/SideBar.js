@@ -20,6 +20,8 @@ define(function (require) {
 
         this._scrollbar = null;
 
+        this._isFold = true;
+
         var self = this;
         util.addEventListener(this.el, 'click', function (e) {
             self._dispatchClick(e);
@@ -63,24 +65,26 @@ define(function (require) {
 
     SideBar.prototype.resize = function (w, h) {
 
-        var maxheight = h - this._$intro.clientHeight - 100;
+        var maxheight = h - this._$intro.clientHeight - 100; // 滚动区域最大高度
+        var viewportHeight = this._$viewport.clientHeight; // 滚动区域可视高度
+        var contentHeight = this._$content.clientHeight; // 滚动区域内容实际高度
 
-        if (this._$viewport.clientHeight > maxheight) {
-            if (this._scrollbar) {
-                this._$viewport.style.height = maxheight + 'px';
+        if (this._scrollbar) {
+            if (contentHeight < maxheight) {
+                this._$viewport.style.height = contentHeight + 'px';
+                this.el.style.height = this._$intro.clientHeight + contentHeight + 'px';
             }
             else {
-
+                this._$viewport.style.height = maxheight + 'px';
+                this.el.style.height = h - 100 + 'px';
             }
         }
         else {
-            if (this._scrollbar) {
-                this._$viewport.style.height = maxheight + 'px';
-            }
-            else {
-
+            if (viewportHeight > maxheight) {
+                this._forScroll();
             }
         }
+
         this._scrollbar && this._scrollbar.resize();
     };
 
@@ -94,6 +98,10 @@ define(function (require) {
         if (data._isfixed) {
             return;
         }
+
+        data.show && (data.showName = '最新综艺');
+        data.representativeWork && (data.representativeWorkName = '热门作品');
+
         // add year data for mailuo
         if (isRelation && data.eventMaiLuo) {
             var year = 0;
@@ -223,6 +231,9 @@ define(function (require) {
         if ($relationName) {
             $relationName.style.top = - $relationName.clientHeight - 10 + 'px';
         }
+
+        var height = this._$intro.clientHeight + this._$content.clientHeight;
+        this.el.style.height = height + 'px';
     };
 
     /**
@@ -231,6 +242,9 @@ define(function (require) {
     SideBar.prototype.show = function (logParam) {
         if (util.hasClass(this.el, 'hidden')) {
             util.removeClass(this.el, 'hidden');
+
+            var height = this._$intro.clientHeight + this._$content.clientHeight;
+            this.el.style.height = height + 'px';
 
             // 图谱部分左移
             // var graphMain = this._kgraph.getComponentByType('GRAPH');
@@ -241,10 +255,10 @@ define(function (require) {
             // this._$toggleBtn.innerHTML = '隐<br />藏<br />>';
 
             // 搜索栏自动隐藏
-            var searchBar = this._kgraph.getComponentByType('SEARCHBAR');
-            if (searchBar) {
-                searchBar.hide(logParam);
-            }
+            // var searchBar = this._kgraph.getComponentByType('SEARCHBAR');
+            // if (searchBar) {
+            //     searchBar.hide(logParam);
+            // }
 
             bkgLog({
                 type: 'zhishitupushow',
@@ -258,9 +272,16 @@ define(function (require) {
     /**
      * 隐藏边栏
      */
-    SideBar.prototype.hide = function (logParam) {
+    SideBar.prototype.hide = function (logParam, cb) {
         if (!util.hasClass(this.el, 'hidden')) {
-            util.addClass(this.el, 'hidden');
+            this.el.style.height = 0;
+
+            var self = this;
+            setTimeout(function () {
+                util.addClass(self.el, 'hidden');
+
+                cb && cb();
+            }, 150);
 
             // var graphMain = this._kgraph.getComponentByType('GRAPH');
             // if (graphMain) {
@@ -297,7 +318,8 @@ define(function (require) {
             util.removeClass(this._$toggle, 'bkg-toggle-fold');
             util.addClass(this._$fold, 'bkg-hidden');
 
-            this._forScroll(true);
+            this._isFold = true;
+            this._forScroll();
 
             bkgLog({
                 type: 'zhishitupufold',
@@ -315,6 +337,7 @@ define(function (require) {
             util.addClass(this._$toggle, 'bkg-toggle-fold');
             util.removeClass(this._$fold, 'bkg-hidden');
 
+            this._isFold = false;
             this._forScroll();
 
             bkgLog({
@@ -325,27 +348,40 @@ define(function (require) {
         }
     };
 
-    SideBar.prototype._forScroll = function (isFold) {
-        if (isFold && this._scrollbar) {
-            this._scrollbar.scrollTo(0);
-            if (this._$viewport.style.height) {
-                this._$viewport.style.height = this._$content.clientHeight + 'px';
-                this._scrollbar.destory();
-                this._scrollbar = null;
+    SideBar.prototype._forScroll = function () {
+
+        var maxheight = document.body.clientHeight - this._$intro.clientHeight - 100; // 滚动区域最大高度
+        var viewportHeight = this._$viewport.clientHeight; // 滚动区域可视高度
+        var contentHeight = this._$content.clientHeight; // 滚动区域内容实际高度
+
+        if (this._isFold) {
+            // 展开状态
+            if (this._scrollbar) {
+                this._scrollbar.scrollTo(0);
+                if (this._$viewport.style.height) {
+                    this._$viewport.style.height = this._$content.clientHeight + 'px';
+                    this._scrollbar.destory();
+                    this._scrollbar = null;
+                }
             }
+            this.el.style.height = this._$intro.clientHeight + this._$content.clientHeight + 'px';
         }
         else {
-            var maxheight = document.body.clientHeight - this._$intro.clientHeight - 100;
-
+            // 收起状态
             if (this._$content.clientHeight > maxheight) {
                 this._$viewport.style.height = maxheight + 'px';
 
                 this._scrollbar = new ScrollBar(this._$content);
                 this._scrollbar.scrollTo(0);
                 this._scrollbar.resize();
+
+                this.el.style.height = document.body.clientHeight - 100 + 'px';
+            }
+            else {
+                this._$viewport.style.height = this._$content.clientHeight + 'px';
+                this.el.style.height = this._$intro.clientHeight + this._$content.clientHeight + 'px';
             }
         }
-
     };
 
     /**

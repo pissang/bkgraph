@@ -77,7 +77,7 @@ define(function (require) {
                     }
                     break;
                 case 38: //up arrow
-                    util.removeClass(_$active, 'bkg-active');
+                    _$active && util.removeClass(_$active, 'bkg-active');
                     index--;
                     if (index < 0) {
                         index = len - 1;
@@ -85,7 +85,7 @@ define(function (require) {
                     util.addClass(_$items[index], 'bkg-active');
                     break;
                 case 40: //down arrow
-                    util.removeClass(_$active, 'bkg-active');
+                    _$active && util.removeClass(_$active, 'bkg-active');
                     index++;
                     if (index > len - 1) {
                         index = 0;
@@ -98,10 +98,20 @@ define(function (require) {
         }, 200));
 
         util.addEventListener(Sizzle('body')[0], 'click', function (e) {
-            self._$input.value = '';
-            self._$searchResult.innerHTML = '';
-            util.removeClass(self._$share, 'bkg-share-btn-active');
-            util.addClass(self._$shareList, 'bkg-hidden');
+            var target = e.target || e.srcElement;
+            var current = target;
+            while (current && current.nodeName.toLowerCase() !== 'a') {
+                current = current.parentNode;
+            }
+            if (!current) {
+                self._$input.value = '';
+                self._$searchResult.innerHTML = '';
+                util.removeClass(self._$share, 'bkg-share-btn-active');
+                util.addClass(self._$shareList, 'hidden');
+                setTimeout(function () {
+                    util.addClass(self._$shareList, 'bkg-hidden');
+                }, 300);
+            }
         });
 
         util.addEventListener(this._$searchResult, 'mouseover', function (e) {
@@ -123,12 +133,18 @@ define(function (require) {
             e.cancelBubble = true;
             e.stopPropagation && e.stopPropagation();
 
-            if (util.hasClass(self._$shareList, 'bkg-hidden')) {
+            if (util.hasClass(self._$shareList, 'hidden')) {
                 util.removeClass(self._$shareList, 'bkg-hidden');
+                setTimeout(function () {
+                    util.removeClass(self._$shareList, 'hidden');
+                }, 100);
                 util.addClass(self._$share, 'bkg-share-btn-active');
             }
             else {
-                util.addClass(self._$shareList, 'bkg-hidden');
+                util.addClass(self._$shareList, 'hidden');
+                setTimeout(function () {
+                    util.addClass(self._$shareList, 'bkg-hidden');
+                }, 300);
                 util.removeClass(self._$share, 'bkg-share-btn-active');
             }
         });
@@ -190,6 +206,7 @@ define(function (require) {
     HeaderBar.prototype.filter = function (name) {
         var self = this;
         var renderData = {};
+        var nodata = '';
         if (name) {
             var url = this._kgraph.getDetailAPI();
             jsonp(url, { act: 'tpuser', mt: 'use', 'ver': 'v1', q: name }, 'callback', function (data) {
@@ -198,12 +215,17 @@ define(function (require) {
                     name: name
                 };
                 self._$searchResult.innerHTML = renderSearchResult(renderData);
-            });
 
-            bkgLog({
-                type: 'zhishitupusearch',
-                target: name,
-                area: 'headerbar'
+                if (!data.data) {
+                    nodata = 'nodata';
+                }
+
+                bkgLog({
+                    type: 'zhishitupusearch',
+                    target: name,
+                    area: 'headerbar',
+                    extend: nodata
+                });
             });
         }
         else {

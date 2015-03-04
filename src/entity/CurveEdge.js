@@ -82,7 +82,7 @@ define(function (require) {
         zrUtil.merge(this.states, opts.states || {});
 
         this.defaultState = opts.defaultState == null
-            ? (this.isExtra ? 'hidden' : 'normal')
+            ? 'normal'//(this.isExtra ? 'hidden' : 'normal')
             : opts.defaultState;
 
         this.statesTransition = {
@@ -218,7 +218,7 @@ define(function (require) {
 
         var zr = this.zr;
         var labelLineShape = this.getShape('labelLine');
-        for (var i = 3; i > 0; i--) {
+        for (var i = 4; i > 0; i--) {
             var circle = new CircleShape({
                 style: {
                     x: labelLineShape.style.cx,
@@ -232,8 +232,8 @@ define(function (require) {
             });
 
             this.addAnimation('ripplecircle', zr.animation.animate(circle.style, {loop: true})
-                .when(2500, {
-                    r: baseRadius + 7,
+                .when(2000, {
+                    r: baseRadius + 12,
                     opacity: 0
                 })
                 .during(function () {

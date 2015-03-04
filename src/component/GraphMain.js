@@ -72,6 +72,7 @@ define(function (require) {
         this._lastHoverEdge = null;
 
         this._currentActiveNode = null;
+        this._currentActiveEdge = null;
 
         // 图中所有的节点数
         this._nodeEntityCount = 0;
@@ -453,7 +454,7 @@ define(function (require) {
             panable: true,
             zoomable: true,
             maxZoom: 1.5,
-            minZoom: 0.5
+            minZoom: 0.6
         });
     };
 
@@ -738,6 +739,8 @@ define(function (require) {
             if (edge.isExtra) {
                 edge.entity.hidden = false;
             }
+
+            this._currentActiveEdge = edge;
         }
     };
 
@@ -830,24 +833,28 @@ define(function (require) {
 
         var sideBar = this._kgraph.getComponentByType('SIDEBAR');
         if (sideBar) {
-            var detailData = this._loadDetailFromStorage(n.id);
-            var layerCounter = n.data ? n.data.layerCounter : n.layerCounter;
-            if (detailData) {
-                sideBar.setData(detailData);
+            sideBar.hide();
 
-                showSidebar && sideBar.show(n.id + ',' + layerCounter);
-            }
-            else {
-                jsonp(this._kgraph.getDetailAPI(), { detail_id: n.id }, 'callback', function (data) {
-                    data._datatype = 'entity'; // for ubs log
-                    data.layerCounter = n.data ? n.data.layerCounter : n.layerCounter;
-                    sideBar.setData(data);
+            setTimeout(function () {
+                var detailData = self._loadDetailFromStorage(n.id);
+                var layerCounter = n.data ? n.data.layerCounter : n.layerCounter;
+                if (detailData) {
+                    sideBar.setData(detailData);
 
                     showSidebar && sideBar.show(n.id + ',' + layerCounter);
+                }
+                else {
+                    jsonp(self._kgraph.getDetailAPI(), { detail_id: n.id }, 'callback', function (data) {
+                        data._datatype = 'entity'; // for ubs log
+                        data.layerCounter = n.data ? n.data.layerCounter : n.layerCounter;
+                        sideBar.setData(data);
 
-                    self._saveDetailToStorage(n.id, data);
-                });
-            }
+                        showSidebar && sideBar.show(n.id + ',' + layerCounter);
+
+                        self._saveDetailToStorage(n.id, data);
+                    });
+                }
+            }, 300);
         }
     };
 
@@ -863,41 +870,51 @@ define(function (require) {
         }
         var sideBar = this._kgraph.getComponentByType('SIDEBAR');
         if (sideBar) {
+            sideBar.hide();
             // var data = {};
             // for (var name in e.data) {
             //     data[name] = e.data[name];
             // }
             var self = this;
 
-            var detailData = this._loadDetailFromStorage(e.data.id);
-            var logParam = [
-                    // from entity
-                    e.node1.id,
-                    e.node1.data.layerCounter,
-                    // to entity
-                    e.node2.id,
-                    e.node2.data.layerCounter,
-                    e.data.id,
-                    e.isExtra ? 1 : 0,
-                    e.isSpecial ? 1 : 0
-                ].join(',');
-            if (detailData) {
-                sideBar.setData(detailData, true);
-                sideBar.show(logParam);
-            }
-            else {
-                jsonp(this._kgraph.getDetailAPI(), { detail_id: e.data.id }, 'callback', function (data) {
-
-                    data.fromEntity = self._graph.getNodeById(data.fromID).data;
-                    data.toEntity = self._graph.getNodeById(data.toID).data;
-                    data._datatype = 'relation'; // for ubs log
-
-                    sideBar.setData(data, true);
+            setTimeout(function () {
+                var detailData = self._loadDetailFromStorage(e.data.id);
+                var logParam = [
+                        // from entity
+                        e.node1.id,
+                        e.node1.data.layerCounter,
+                        // to entity
+                        e.node2.id,
+                        e.node2.data.layerCounter,
+                        e.data.id,
+                        e.isExtra ? 1 : 0,
+                        e.isSpecial ? 1 : 0
+                    ].join(',');
+                if (detailData) {
+                    sideBar.setData(detailData, true);
                     sideBar.show(logParam);
+                }
+                else {
+                    jsonp(self._kgraph.getDetailAPI(), { detail_id: e.data.id }, 'callback', function (data) {
 
-                    self._saveDetailToStorage(e.data.id, data);
-                });
-            }
+                        data.fromEntity = self._graph.getNodeById(data.fromID).data;
+                        data.toEntity = self._graph.getNodeById(data.toID).data;
+                        data._datatype = 'relation'; // for ubs log
+
+                        sideBar.setData(data, true);
+                        sideBar.show(logParam);
+
+                        self._saveDetailToStorage(e.data.id, data);
+                    });
+                }
+            }, 300);
+        }
+    };
+
+    GraphMain.prototype.hideSidebar = function () {
+        var sideBar = this._kgraph.getComponentByType('SIDEBAR');
+        if (sideBar) {
+            sideBar.hide();
         }
     };
 
@@ -1599,6 +1616,13 @@ define(function (require) {
         nodeEntity.bind('click', function () {
             self.dispatch('click:entity', node);
 
+            if (self._currentActiveNode == node) {
+                self._currentActiveNode = null;
+                self.unactiveAll();
+                self.hideSidebar();
+                return;
+            }
+
             self.showEntityDetail(node, true);
 
             self.hideTip();
@@ -1672,9 +1696,16 @@ define(function (require) {
             edgeEntity.bind('click', function () {
                 self.dispatch('click:relation', e);
 
-                if (edgeEntity.getState() != 'active') {
-                    this.showRelationDetail(e);
+                if (self._currentActiveEdge == e) {
+                    self._currentActiveEdge = null;
+                    self.unactiveAll();
+                    self.hideSidebar();
+                    return;
+                }
 
+                this.showRelationDetail(e);
+
+                if (edgeEntity.getState() != 'active') {
                     this.activeEdge(e);
 
                     var isClicked = cookies.get('BKGraph_edge_click_0') || 0;

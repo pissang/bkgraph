@@ -1,6 +1,7 @@
 define(function (require) {
     
     var supportCanvas = document.createElement('canvas').getContext;
+    var zrUtil = require('zrender/tool/util');
     
     var util = {
         indexOf: function (array, value) {
@@ -144,12 +145,21 @@ define(function (require) {
 
             return function () {
                 var context = this, args = arguments;
-                var later = function () {
-                    timeout = null;
+
+                var agent = navigator.userAgent.toLowerCase() ;
+                var regStr_ie = /msie [\d.]+;/gi;
+                if (agent.indexOf("msie") > 0
+                    && (agent.match(regStr_ie) + '').replace(/[^0-9.]/ig, '') <= 8) {
                     func.apply(context, args);
                 }
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
+                else {
+                    var later = function () {
+                        timeout = null;
+                        func.apply(context, args);
+                    }
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                }
             }
         },
 

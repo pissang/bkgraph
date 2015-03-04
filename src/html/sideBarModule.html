@@ -28,7 +28,7 @@
 <!-- target: sidebarRelationNews(master=sidebarNews) -->
 <!-- block: newsModuleTitle -->
 <div class="bkg-module-title">
-    <h4 class="bkg-title"><a href="http://www.baidu.com/s?wd=${fromEntity.name|url}%20${toEntity.name|url}%20最新动态" title="${fromEntity.name} 和 ${toEntity.name} 的最新动态" data-area="relation-news" target="_blank">${fromEntity.name} 和 ${toEntity.name} 的最新动态</a></h4>
+    <h4 class="bkg-title"><a href="http://www.baidu.com/s?ie=utf-8&wd=${fromEntity.name|url}%20${toEntity.name|url}%20最新动态" title="${fromEntity.name} 和 ${toEntity.name} 的最新动态" data-area="relation-news" target="_blank">${fromEntity.name} 和 ${toEntity.name} 的最新动态</a></h4>
 </div>
 <!-- /block -->
 
@@ -65,7 +65,7 @@
     <div class="bkg-module-title">
         <h4>热门作品</h4>
         <div class="bkg-more">
-            <a href="http://www.baidu.com/s?wd=${name|url}%20热门作品" title="更多" data-area="entity-representativeWork" target="_blank">更多 ></a>
+            <a href="http://www.baidu.com/s?ie=utf-8&wd=${name|url}%20${representativeWorkName|url}" title="更多" data-area="entity-representativeWork" target="_blank">更多 ></a>
         </div>
     </div>
     <ul>
@@ -112,7 +112,7 @@
     <div class="bkg-module-title">
         <h4>最新影视作品</h4>
         <div class="bkg-more">
-            <a href="http://www.baidu.com/s?wd=${name|url}%20最新影视作品" title="更多" data-area="entity-latestwork" target="_blank">更多 ></a>
+            <a href="http://www.baidu.com/s?ie=utf-8&wd=${name|url}%20最新影视作品" title="更多" data-area="entity-latestwork" target="_blank">更多 ></a>
         </div>
     </div>
     <ul>
@@ -132,7 +132,7 @@
     <div class="bkg-module-title">
         <h4>最新综艺</h4>
         <div class="bkg-more">
-            <a href="http://www.baidu.com/s?wd=${name|url}%20最新综艺" title="更多" data-area="entity-show" target="_blank">更多 ></a>
+            <a href="http://www.baidu.com/s?ie=utf-8&wd=${name|url}%20${showName|url}" title="更多" data-area="entity-show" target="_blank">更多 ></a>
         </div>
     </div>
     <ul>
@@ -214,8 +214,8 @@
                         <img src="${recTag.image}" alt="">
                         <h5>${recTag.name|truncate(6)}</h5>
                     </a>
-                    <a href="http://www.baidu.com/s?wd=${recTag.name|url}" target="_blank" data-area="entity-recommendation" title="${recTag.name}_百度搜索" class="bkg-rec-reason">
-                        <span>${recTag.reason|truncate(12)}</span>
+                    <a href="http://www.baidu.com/s?wd=${recTag.name|url}" target="_blank" data-area="entity-recommendation" title="${recTag.reason}" class="bkg-rec-reason">
+                        <span>${recTag.reason|truncate(8)}</span>
                     </a>
                 </li>
                 <!-- /if -->
