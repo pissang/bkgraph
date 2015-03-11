@@ -206,7 +206,7 @@ define(function (require) {
 
     NodeEntity.prototype.setDraggable = function (draggable) {
         this.draggable = draggable;
-        this._outlineShape.draggable = draggable;
+        this.getShape('outline').draggable = draggable;
     };
 
     NodeEntity.prototype.setRadius = function (r) {
@@ -216,9 +216,9 @@ define(function (require) {
     };
 
     NodeEntity.prototype.setZLevel = function (zlevel) {
-        this._outlineShape.zlevel = zlevel;
-        this._imageShape.zlevel = zlevel;
-        this._labelShape.zlevel = zlevel;
+        this.getShape('outline').zlevel = zlevel;
+        this.getShape('image').zlevel = zlevel;
+        this.getShape('label').zlevel = zlevel;
         this.el.modSelf();
     };
 

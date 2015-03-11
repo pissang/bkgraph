@@ -72,7 +72,6 @@ define(function (require) {
         this._lastHoverEdge = null;
 
         this._currentActiveNode = null;
-        this._currentActiveEdge = null;
 
         // 图中所有的节点数
         this._nodeEntityCount = 0;
@@ -740,7 +739,6 @@ define(function (require) {
                 edge.entity.hidden = false;
             }
 
-            this._currentActiveEdge = edge;
         }
     };
 
@@ -1616,15 +1614,6 @@ define(function (require) {
         nodeEntity.bind('click', function () {
             self.dispatch('click:entity', node);
 
-            if (self._currentActiveNode == node) {
-                self._currentActiveNode = null;
-                self.unactiveAll();
-                self.hideSidebar();
-                return;
-            }
-
-            self.showEntityDetail(node, true);
-
             self.hideTip();
             var isClicked = cookies.get('BKGraph_node_click_0') || 0;
 
@@ -1635,16 +1624,24 @@ define(function (require) {
                 });
             }
 
+            bkgLog({
+                type: 'zhishitupuclick',
+                target: node.id + ',' + node.data.layerCounter,
+                area: 'entity'
+            });
+
             if (nodeEntity.getState() !== 'active') {
                 self._syncOutTipEntities();
                 self.activeNodeAndShowAdjacency(node);
-
-                bkgLog({
-                    type: 'zhishitupuclick',
-                    target: node.id + ',' + node.data.layerCounter,
-                    area: 'entity'
-                });
             }
+            else {
+                self._currentActiveNode = null;
+                self.unactiveAll();
+                self.hideSidebar();
+                return;
+            }
+
+            self.showEntityDetail(node, true);
         });
         nodeEntity.bind('dragstart', function () {
             node.layout.fixed = true;
@@ -1696,28 +1693,6 @@ define(function (require) {
             edgeEntity.bind('click', function () {
                 self.dispatch('click:relation', e);
 
-                if (self._currentActiveEdge == e) {
-                    self._currentActiveEdge = null;
-                    self.unactiveAll();
-                    self.hideSidebar();
-                    return;
-                }
-
-                this.showRelationDetail(e);
-
-                if (edgeEntity.getState() != 'active') {
-                    this.activeEdge(e);
-
-                    var isClicked = cookies.get('BKGraph_edge_click_0') || 0;
-                    if (!isClicked) {
-                        self.hideTip();
-                        cookies.set('BKGraph_edge_click_0', e.data.id, {
-                            // 10 years
-                            expires: 360 * 24 * 3600 * 10
-                        });
-                    }
-                }
-
                 bkgLog({
                     type: 'zhishitupuclick',
                     target: [
@@ -1733,6 +1708,26 @@ define(function (require) {
                             ].join(','),
                     area: 'relation'
                 });
+
+                if (edgeEntity.getState() != 'active') {
+                    this.activeEdge(e);
+
+                    var isClicked = cookies.get('BKGraph_edge_click_0') || 0;
+                    if (!isClicked) {
+                        self.hideTip();
+                        cookies.set('BKGraph_edge_click_0', e.data.id, {
+                            // 10 years
+                            expires: 360 * 24 * 3600 * 10
+                        });
+                    }
+                }
+                else {
+                    self.unactiveAll();
+                    self.hideSidebar();
+                    return;
+                }
+
+                this.showRelationDetail(e);
 
             }, this);
             edgeEntity.bind('mouseover', function () {

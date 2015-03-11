@@ -6,9 +6,11 @@
         <!-- for: ${interests} as ${entity}, ${index} -->
             <!-- if: ${index} < 4 -->
             <li>
-                <a href="/tupu/${entity.id}.html" target="_blank" data-area="headerbar-interest" title="${entity.name}_人物关系图谱">
+                <a href="/tupu/${entity.id}.html" target="_blank" data-area="headerbar-interest" title="${entity.name}_人物关系图谱" class="bkg-interest-img">
                     <img src="${entity.image}" alt="">
-                    <h5>${entity.name}</h5>
+                </a>
+                <a href="/tupu/${entity.id}.html" target="_blank" data-area="headerbar-interest" title="${entity.name}_人物关系图谱" class="bkg-interest-name">
+                    <span>${entity.name}</span>
                 </a>
             </li>
             <!-- /if -->

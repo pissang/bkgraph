@@ -9,6 +9,8 @@ define(function (require) {
 
         this._$content = content;
 
+        this._$dim = Sizzle('.bkg-sidebar-dimup', this._$viewport)[0];
+
         this._$scrollButton = null;
 
         this._$scrollBar = null;
@@ -83,6 +85,8 @@ define(function (require) {
 
         this._sy = e.screenY;
         this._sx = e.screenX;
+
+        this._dim(this._scroll);
     };
 
     ScrollBar.prototype._onMouseScroll = function (e) {
@@ -115,6 +119,8 @@ define(function (require) {
 
         this._thumbTop = (this._scrollBarHeight - this._scrollButtonHeight) * scroll / max;
         this._$scrollButton.style.top = (this._thumbTop || 0) + 'px';
+
+        this._dim(scroll);
     };
 
     ScrollBar.prototype.resize = function () {
@@ -131,6 +137,10 @@ define(function (require) {
 
         this._scrollBarHeight = parseInt(this._$scrollBar.clientHeight);
         var thumbHeight = this._scrollBarHeight * this._viewportHeight / this._contentHeight;
+        if (thumbHeight == this._viewportHeight) {
+            thumbHeight = 0;
+        }
+
         this._scrollButtonHeight = thumbHeight;
 
         this._$scrollButton.style.height = thumbHeight + 'px';
@@ -142,6 +152,15 @@ define(function (require) {
         util.removeEventListener(this._$viewport, 'mousewheel', this._onMouseScroll);
         util.removeEventListener(this._$viewport, 'DOMMouseScroll', this._onMouseScroll);
         util.removeEventListener(this._$viewport, 'keydown', this._onKeyDown);
+    };
+
+    ScrollBar.prototype._dim = function (scroll) {
+        if (scroll > 10) {
+            util.removeClass(this._$dim, 'bkg-hidden');
+        }
+        else {
+            util.addClass(this._$dim, 'bkg-hidden');
+        }
     };
 
     return ScrollBar;

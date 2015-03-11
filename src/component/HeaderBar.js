@@ -13,6 +13,7 @@ define(function (require) {
 
     var config = require('../config');
     var levels = config.levels;
+    var share = config.share;
 
     var HeaderBar = function () {
 
@@ -57,7 +58,12 @@ define(function (require) {
             self.filter(self._$input.value);
         });
 
-        util.addEventListener(this._$input, 'keyup', util.debounce(function (e) {
+        var keyEvent = 'keydown';
+        var ua = navigator.userAgent.toLowerCase();
+        if (ua.indexOf("firefox") > 0 || ua.indexOf("msie") > 0) {
+            keyEvent = 'keyup';
+        }
+        util.addEventListener(this._$input, keyEvent, util.debounce(function (e) {
             var _$list = Sizzle('.bkg-search-list', this.el)[0];
             var _$items = Sizzle('.bkg-search-list li', this.el);
 
@@ -246,11 +252,13 @@ define(function (require) {
         }
         if(idx < 0) return;
 
+        var randomIndex = Math.floor(Math.random() * share.length + 1) - 1;
+        var shareContent = share[randomIndex].replace('{name}', document.title.substring(0, document.title.indexOf(' ')));
         var _param = {
             url: document.URL,
             appkey: '',
             ralateUid: '', //关联用户的id，自动@
-            title: levels[idx].content,
+            title: shareContent,
             pic: '',
             language: 'zh_cn'
         }
@@ -270,7 +278,7 @@ define(function (require) {
         // Log weibo level
         bkgLog({
             type: 'zhishitupuweibo',
-            target: idx.toString()
+            target: JSON.stringify(shareContent)
         });
     };
 

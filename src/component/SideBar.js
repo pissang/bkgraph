@@ -371,7 +371,9 @@ define(function (require) {
             if (this._$content.clientHeight > maxheight) {
                 this._$viewport.style.height = maxheight + 'px';
 
-                this._scrollbar = new ScrollBar(this._$content);
+                if (!this._scrollbar) {
+                    this._scrollbar = new ScrollBar(this._$content);
+                }
                 this._scrollbar.scrollTo(0);
                 this._scrollbar.resize();
 

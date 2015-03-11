@@ -4,7 +4,7 @@
             <div class="bkg-relation-entity-wrapper">
                 <div class="bkg-relation-entity">
                     <div class="bkg-relation-entity-from">
-                        <a href="http://www.baidu.com/s?wd=${fromEntity.name|url}" target="_blank" data-area="relation-info-entity" title="${fromEntity.name}_百度搜索">
+                        <a href="http://www.baidu.com/s?wd=${fromEntity.name|url}" target="_blank" data-area="relation-info-entity" title="${fromEntity.name}_百度搜索" class="bkg-hoverable">
                             <img src="${fromEntity.image }" alt="">
                             <h5>${fromEntity.name}</h5>
                         </a>
@@ -13,13 +13,12 @@
                         <a href="http://www.baidu.com/s?wd=${fromEntity.name|url}%20${toEntity.name|url}%20${relationName|url}" title="${fromEntity.name}${toEntity.name} ${relationName}_百度搜索" data-area="relation-info-title" target="_blank"><span>${relationName|truncate(6)}</span></a>
                     </div>
                     <div class="bkg-relation-entity-to">
-                        <a href="http://www.baidu.com/s?wd=${toEntity.name|url}" target="_blank" data-area="relation-info-entity" title="${toEntity.name}_百度搜索">
+                        <a href="http://www.baidu.com/s?wd=${toEntity.name|url}" target="_blank" data-area="relation-info-entity" title="${toEntity.name}_百度搜索" class="bkg-hoverable">
                             <img src="${toEntity.image }" alt="">
                             <h5>${toEntity.name}</h5>
                         </a>
                     </div>
                 </div>
-                
             </div>
             <!-- if: ${relationExplaination} -->
             <div class="bkg-relation-description">
@@ -33,98 +32,98 @@
         </div>
     <!-- else -->
         <div class="bkg-person-info">
-            <a class="bkg-person-pic" href="http://www.baidu.com/s?wd=${name|url}" data-area="entity-baike" target="_blank" title="${name}_百度搜索"><img src="${image}" /></a>
+            <a class="bkg-person-pic bkg-hoverable" href="http://www.baidu.com/s?wd=${name|url}" data-area="entity-baike-pic" target="_blank" title="${name}_百度搜索"><img src="${image}" /></a>
             <div class="bkg-person-description">
                 <p>
-                    <span class="bkg-person-name">${name}</span>
+                    <span class="bkg-person-name">
+                        <a href="http://www.baidu.com/s?wd=${name|url}" data-area="entity-baike-name" target="_blank" title="${name}_百度搜索">${name}</a>
+                    </span>
                     <!-- <b>简介:</b> -->
                     ${introduction.content|truncate(46)}
-                    <a href="http://www.baidu.com/s?wd=${name|url}" class="bkg-more" data-area="entity-baike" title="更多" target="_blank">更多 ></a>
+                    <a href="http://www.baidu.com/s?wd=${name|url}" class="bkg-more" data-area="entity-baike-more" title="更多" target="_blank">更多 ></a>
                 </p>
             </div>
         </div>
     <!-- /if -->
 </div>
-<!-- <div class="bkg-sidebar-scroll"> -->
-    <div class="bkg-sidebar-viewport">
-        <div class="bkg-sidebar-dimup bkg-hidden"></div>
-        <!--  if: (${isRelation} && (${eventMaiLuo} || (${recommendation} && ${pairTag})))
-            || (!${isRelation} && ${singleTag} && (${representativeWork} || ${recommendation}))
-            || (!${isRelation} && !(!${singleTag} && !${representativeWork} && !${show} && ${recommendation})
-                && !(!${singleTag} && !${representativeWork} && !${show} && !${recommendation})
-                && !(${singleTag} && !${representativeWork} && !${show} && !${recommendation})
-            )
-        -->
-            <div class="bkg-sidebar-dimbottom"></div>
-        <!-- /if -->
-        <div class="bkg-sidebar-content">
-            <!-- if: ${isRelation} -->
+<div class="bkg-sidebar-viewport">
+    <div class="bkg-sidebar-dimup bkg-hidden"></div>
+    <!--  if: (${isRelation} && (${eventMaiLuo} || (${recommendation} && ${pairTag})))
+        || (!${isRelation} && ${singleTag} && (${representativeWork} || ${recommendation}))
+        || (!${isRelation} && !(!${singleTag} && !${representativeWork} && !${show} && ${recommendation})
+            && !(!${singleTag} && !${representativeWork} && !${show} && !${recommendation})
+            && !(${singleTag} && !${representativeWork} && !${show} && !${recommendation})
+        )
+    -->
+        <div class="bkg-sidebar-dimbottom"></div>
+    <!-- /if -->
+    <div class="bkg-sidebar-content">
+        <!-- if: ${isRelation} -->
 
-                <!-- if: ${pairTag} && ${pairTag.length}-->
-                    <!-- import: sidebarRelationTag -->
+            <!-- if: ${pairTag} && ${pairTag.length}-->
+                <!-- import: sidebarRelationTag -->
+            <!-- /if -->
+
+            <!-- 没有tag和脉络 -->
+            <!-- if: !${pairTag} && !${eventMaiLuo} -->
+                <!-- if: ${recommendation} -->
+                    <!-- import: sidebarRelationRecommendation -->
                 <!-- /if -->
+            <!-- else -->
+                <!-- 默认隐藏 -->
+                <div class="bkg-sidebar-fold bkg-hidden">
+                    <!-- if: ${eventMaiLuo} -->
+                        <!-- import: sidebarMailuo -->
+                    <!-- /if -->
 
-                <!-- 没有tag和脉络 -->
-                <!-- if: !${pairTag} && !${eventMaiLuo} -->
                     <!-- if: ${recommendation} -->
                         <!-- import: sidebarRelationRecommendation -->
                     <!-- /if -->
-                <!-- else -->
-                    <!-- 默认隐藏 -->
-                    <div class="bkg-sidebar-fold bkg-hidden">
-                        <!-- if: ${eventMaiLuo} -->
-                            <!-- import: sidebarMailuo -->
-                        <!-- /if -->
+                </div>
 
-                        <!-- if: ${recommendation} -->
-                            <!-- import: sidebarRelationRecommendation -->
-                        <!-- /if -->
-                    </div>
-
-                    <!-- if: ${eventMaiLuo} || ${recommendation} -->
-                        <div class="bkg-toggle"><i class="bkg-toggle-btn"></i></div>
-                    <!-- /if -->
-                <!-- /if -->
-
-            <!-- else -->
-
-                <!-- if: ${singleTag} && ${singleTag.length}-->
-                    <!-- import: sidebarTag -->
-                <!-- /if -->
-
-                <!-- 没有tag -->
-                <!-- if: !${singleTag} && !${representativeWork} && !${show} -->
-                    <!-- if: ${recommendation} && ${recommendation.length}-->
-                        <!-- import: sidebarRecommendation -->
-                    <!-- /if -->
-                <!-- else -->
-                    <!-- 默认隐藏 -->
-                    <div class="bkg-sidebar-fold bkg-hidden">
-                        <!-- if: ${representativeWork} -->
-                            <!-- import: sidebarWorks -->
-                        <!-- /if -->
-
-                        <!-- if: ${show} -->
-                            <!-- import: sidebarShow -->
-                        <!-- /if -->
-
-                        <!-- if: ${recommendation} && ${recommendation.length} -->
-                            <!-- import: sidebarRecommendation -->
-                        <!-- /if -->
-                    </div>
-                <!-- /if -->
-
-                <!-- todo: crazy -->
-                <!-- if: (${singleTag} && (${representativeWork} || ${show} || ${recommendation}))
-                    || (!(!${singleTag} && !${representativeWork} && !${show} && ${recommendation})
-                        && !(!${singleTag} && !${representativeWork} && !${show} && !${recommendation})
-                        && !(${singleTag} && !${representativeWork} && !${show} && !${recommendation})
-                        )
-                -->
+                <!-- if: ${eventMaiLuo} || ${recommendation} -->
                     <div class="bkg-toggle"><i class="bkg-toggle-btn"></i></div>
                 <!-- /if -->
-
             <!-- /if -->
-        </div>
+
+        <!-- else -->
+
+            <!-- if: ${singleTag} && ${singleTag.length}-->
+                <!-- import: sidebarTag -->
+            <!-- /if -->
+
+            <!-- 没有tag -->
+            <!-- if: !${singleTag} && !${representativeWork} && !${show} -->
+                <!-- if: ${recommendation} && ${recommendation.length}-->
+                    <!-- import: sidebarRecommendation -->
+                <!-- /if -->
+            <!-- else -->
+                <!-- 默认隐藏 -->
+                <div class="bkg-sidebar-fold bkg-hidden">
+                    <!-- if: ${representativeWork} -->
+                        <!-- import: sidebarWorks -->
+                    <!-- /if -->
+
+                    <!-- if: ${show} -->
+                        <!-- import: sidebarShow -->
+                    <!-- /if -->
+
+                    <!-- if: ${recommendation} && ${recommendation.length} -->
+                        <!-- import: sidebarRecommendation -->
+                    <!-- /if -->
+                </div>
+            <!-- /if -->
+
+            <!-- todo: crazy -->
+            <!-- if: (${singleTag} && (${representativeWork} || ${show} || ${recommendation}))
+                || (!(!${singleTag} && !${representativeWork} && !${show} && ${recommendation})
+                    && !(!${singleTag} && !${representativeWork} && !${show} && !${recommendation})
+                    && !(${singleTag} && !${representativeWork} && !${show} && !${recommendation})
+                    )
+            -->
+                <div class="bkg-toggle"><i class="bkg-toggle-btn"></i></div>
+            <!-- /if -->
+
+        <!-- /if -->
     </div>
-<!-- </div> -->
+</div>
