@@ -192,7 +192,6 @@ define(function (require) {
 
         this._$share = Sizzle('.bkg-share', this.el)[0];
         this._$shareList = Sizzle('.bkg-share-area', this.el)[0];
-
     };
 
     HeaderBar.prototype.setExplorePercent = function (percent) {
@@ -216,6 +215,9 @@ define(function (require) {
         if (name) {
             var url = this._kgraph.getDetailAPI();
             jsonp(url, { act: 'tpuser', mt: 'use', 'ver': 'v1', q: name }, 'callback', function (data) {
+                if (config.isPlat) {
+                    return;
+                }
                 renderData = {
                     entities: data.data || [],
                     name: name

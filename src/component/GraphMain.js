@@ -600,7 +600,8 @@ define(function (require) {
                     vec2.copy(n.layout.position, n.entity.el.position);
                 }
             }
-            self._updateNodePositions();   
+            self._updateNodePositions();
+            self.unactiveAll();
 
             if (forceLayout.isStable()) {
                 self.stopForceLayout();
@@ -1653,10 +1654,14 @@ define(function (require) {
         });
 
         var onDrag = function () {
+            self.unactiveAll();
             for (var i = 0; i < node.edges.length; i++) {
                 if (node.edges[i].entity) {
                     node.edges[i].entity.update();
                 }
+            }
+            if (config.enableAnimation) {
+                self._extraEdgeBundle.update(zr);
             }
             vec2.copy(node.layout.position, node.entity.el.position);
             zr.refreshNextFrame();

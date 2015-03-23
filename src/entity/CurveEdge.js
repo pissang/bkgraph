@@ -218,7 +218,7 @@ define(function (require) {
 
         var zr = this.zr;
         var labelLineShape = this.getShape('labelLine');
-        for (var i = 4; i > 0; i--) {
+        for (var i = 3; i > 0; i--) {
             var circle = new CircleShape({
                 style: {
                     x: labelLineShape.style.cx,
@@ -228,11 +228,11 @@ define(function (require) {
                     opacity: this.states.hover.shapeStyle.labelLine.opacity * 0.8
                 },
                 hoverable: false,
-                zlevel: 2
+                zlevel: 3
             });
 
             this.addAnimation('ripplecircle', zr.animation.animate(circle.style, {loop: true})
-                .when(2000, {
+                .when(3000, {
                     r: baseRadius + 12,
                     opacity: 0
                 })
@@ -241,8 +241,8 @@ define(function (require) {
                     circle.modSelf();
                     zr.refreshNextFrame();
                 })
-                .delay(-800 * i)
-                .start('CubicInOut')
+                .delay(-1000 * i)
+                .start('Linear')
             );
 
             this.el.addChild(circle);
