@@ -1,7 +1,6 @@
 define(function (require) {
     
-    var supportCanvas = document.createElement('canvas').getContext;
-    var zrUtil = require('zrender/tool/util');
+    var zrUtil = require('zrender/core/util');
     
     var util = {
         indexOf: function (array, value) {
@@ -173,10 +172,6 @@ define(function (require) {
 
         trim: function (str) {
             return str.replace(/^\s+|\s+$/g, '');
-        },
-
-        supportCanvas: function () {
-            return supportCanvas;
         },
 
         getURLSearch: function() {

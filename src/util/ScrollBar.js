@@ -3,6 +3,9 @@ define(function (require) {
     var util = require('./util');
     var Sizzle = require('Sizzle');
 
+    var addEventListener = util.addEventListener;
+    var removeEventListener = util.removeEventListener;
+
     var ScrollBar = function (content) {
 
         this._$viewport = content.parentNode;
@@ -31,42 +34,45 @@ define(function (require) {
     };
 
     ScrollBar.prototype._init = function () {
-        if (util.getStyle(this._$viewport, 'position') !== 'absolute') {
-            this._$viewport.style.position = 'relative';
+        var $viewport = this._$viewport;
+        var $scrollBar = this._$scrollBar;
+        var $scrollButton = this._$scrollButton;
+        if (util.getStyle($viewport, 'position') !== 'absolute') {
+            $viewport.style.position = 'relative';
         }
-        util.addClass(this._$viewport, 'bkg-scrollbar-viewport');
+        util.addClass($viewport, 'bkg-scrollbar-viewport');
         util.addClass(this._$content, 'bkg-scrollbar-content');
 
-        this._$viewport.setAttribute('tabindex', 0);
+        $viewport.setAttribute('tabindex', 0);
 
-        this._$scrollButton = document.createElement('div');
-        this._$scrollButton.className = 'bkg-scrollbar-button';
-        this._$scrollBar = document.createElement('div');
-        this._$scrollBar.className = 'bkg-scrollbar-bar-y';
+        $scrollButton = document.createElement('div');
+        $scrollButton.className = 'bkg-scrollbar-button';
+        $scrollBar = document.createElement('div');
+        $scrollBar.className = 'bkg-scrollbar-bar-y';
 
-        this._$viewport.appendChild(this._$scrollBar);
-        this._$scrollBar.appendChild(this._$scrollButton);
+        $viewport.appendChild($scrollBar);
+        $scrollBar.appendChild($scrollButton);
 
-        util.addEventListener(this._$scrollButton, 'mousedown', this._onMouseDown);
+        addEventListener(this._$scrollButton, 'mousedown', this._onMouseDown);
 
-        util.addEventListener(this._$viewport, 'mousewheel', this._onMouseScroll);
-        util.addEventListener(this._$viewport, 'DOMMouseScroll', this._onMouseScroll);
-        util.addEventListener(this._$viewport, 'keydown', this._onKeyDown);
+        addEventListener($viewport, 'mousewheel', this._onMouseScroll);
+        addEventListener($viewport, 'DOMMouseScroll', this._onMouseScroll);
+        addEventListener($viewport, 'keydown', this._onKeyDown);
 
         this.resize();
     };
 
     ScrollBar.prototype._onMouseDown = function (e) {
-        util.addEventListener(document.body, 'mousemove', this._onMouseMove);
-        util.addEventListener(document.body, 'mouseup', this._onMouseUp);
+        addEventListener(document.body, 'mousemove', this._onMouseMove);
+        addEventListener(document.body, 'mouseup', this._onMouseUp);
 
         this._sx = e.screenX;
         this._sy = e.screenY;
     };
 
     ScrollBar.prototype._onMouseUp = function () {
-        util.removeEventListener(document.body, 'mouseup', this._onMouseUp);
-        util.removeEventListener(document.body, 'mousemove', this._onMouseMove);
+        removeEventListener(document.body, 'mouseup', this._onMouseUp);
+        removeEventListener(document.body, 'mousemove', this._onMouseMove);
     };
 
     ScrollBar.prototype._onMouseMove = function (e) {
@@ -148,10 +154,10 @@ define(function (require) {
 
     ScrollBar.prototype.destory = function(first_argument) {
         this._$viewport.removeChild(this._$scrollBar);
-        util.removeEventListener(this._$scrollButton, 'mousedown', this._onMouseDown);
-        util.removeEventListener(this._$viewport, 'mousewheel', this._onMouseScroll);
-        util.removeEventListener(this._$viewport, 'DOMMouseScroll', this._onMouseScroll);
-        util.removeEventListener(this._$viewport, 'keydown', this._onKeyDown);
+        removeEventListener(this._$scrollButton, 'mousedown', this._onMouseDown);
+        removeEventListener(this._$viewport, 'mousewheel', this._onMouseScroll);
+        removeEventListener(this._$viewport, 'DOMMouseScroll', this._onMouseScroll);
+        removeEventListener(this._$viewport, 'keydown', this._onKeyDown);
     };
 
     ScrollBar.prototype._dim = function (scroll) {

@@ -1,31 +1,26 @@
 define(function (require) {
 
     var zrender = require('zrender');
-    var Graph = require('echarts/data/Graph');
-    var Tree = require('echarts/data/Tree');
-    var TreeLayout = require('echarts/layout/Tree');
-    var zrUtil = require('zrender/tool/util');
-    var Group = require('zrender/Group');
-    var CircleShape = require('zrender/shape/Circle');
+    var Graph = require('../core/Graph');
     var Component = require('./Component');
-    var vec2 = require('zrender/tool/vector');
+    var zrUtil = require('zrender/core/util');
+    var vec2 = require('zrender/core/vector');
+    var Group = require('zrender/graphic/Group');
 
-    var ForceLayout = require('../layout/ForceLayout');
     var NodeEntity = require('../entity/Node');
     var CurveEdgeEntity = require('../entity/CurveEdge');
     var OutTipEntity = require('../entity/OutTip');
     var ExtraEdgeBundleEntity = require('../entity/ExtraEdgeBundle');
 
-    var Parallax = require('../util/Parallax');
     var bkgLog = require('../util/log');
     var util = require('../util/util');
     var intersect = require('../util/intersect');
     var jsonp = require('../util/jsonp');
     var cookies = require('../util/cookies');
 
-    var Cycle = require('./Cycle');
-
     var config = require('../config');
+
+    var arraySlice = Array.prototype.slice;
 
     var EPSILON = 1e-2;
     var isAroundZero = function (val) {
@@ -54,15 +49,13 @@ define(function (require) {
         // 包含补边
         this._graph = null;
 
-        // Graph for layouting
-        // 不包含补边（补边不影响布局
-        this._graphLayout = null;
-
         this._layouting = false;
 
         this._animating = false;
 
         this._root = null;
+
+        this._graphRoot = null;
 
         // 中心节点
         this._mainNode = null;
@@ -98,7 +91,6 @@ define(function (require) {
         el.style.width = kg.getWidth() + 'px';
         el.style.height = kg.getHeight() + 'px';
 
-        this._initBG();
         this._initZR();
 
         var self = this;
@@ -137,16 +129,16 @@ define(function (require) {
         return this._graph;
     };
 
+    GraphMain.prototype.getGraphRoot = function () {
+        return this._graphRoot;
+    };
+
     GraphMain.prototype.getZR = function () {
         return this._zr;
     };
 
     GraphMain.prototype.getMainNode = function () {
         return this._graph.getNodeById(this._mainNode.id);
-    };
-
-    GraphMain.prototype.getCircles = function () {
-        return this._circles;
     };
 
     GraphMain.prototype._initZR = function () {
@@ -165,108 +157,11 @@ define(function (require) {
         this._max = [zr.getWidth() / 2, zr.getHeight() / 2];
         var x0 = 0, y0 = 0, sx0 = 0, sy0 = 0;
 
-        var currentTime = new Date().getTime();
         zr.painter.refresh = function () {
-            // 默认只对第一层开启拖拽和缩放，所以需要手动同步所有层的位移和缩放
-            var layers = zr.painter.getLayers();
-            var layer0 = layers[0];
-            if (layer0) {
-                var position = layer0.position;
-                var scale = layer0.scale;
-                // 限制拖拽的范围
-                position[0] = Math.max(-self._max[0] * scale[0] + zr.getWidth() - 500, position[0]);
-                position[1] = Math.max(-self._max[1] * scale[1] + zr.getHeight() - 300, position[1]);
-                position[0] = Math.min(-self._min[0] * scale[0] + 500, position[0]);
-                position[1] = Math.min(-self._min[1] * scale[1] + 300, position[1]);
-
-                var isPanned = isNotAroundZero(position[0] - x0) || isNotAroundZero(position[1] - y0);
-                var isZoomed = isNotAroundZero(scale[0] - sx0) || isNotAroundZero(scale[1] - sy0);
-
-                for (var z in layers) {
-                    if (z !== 'hover') {
-                        // 层的位置没同步
-                        if (
-                            isNotAroundZero(position[0] - layers[z].position[0]) || isNotAroundZero(position[1] - layers[z].position[1])
-                            || isNotAroundZero(scale[0] - layers[z].scale[0]) || isNotAroundZero(scale[1] - layers[z].scale[1])
-                        ) {
-                            layers[z].dirty = true;
-                        }
-                        vec2.copy(layers[z].position, position);
-                        vec2.copy(layers[z].scale, scale);
-                    }
-                }
-
-                if (isPanned || isZoomed) {
-                    for (var z in layers) {
-                        if (z !== 'hover') {
-                            layers[z].dirty = true;   
-                        }
-                    }
-
-                    self._syncOutTipEntities();
-
-                    if (isPanned) {
-                        var time = new Date().getTime();
-                        // 至少隔两秒发送拖拽日志
-                        if ((time - currentTime) >= 2000 && self._mouseDown) {
-                            bkgLog({
-                                type: 'zhishitupupan',
-                                target: position[0] + ',' + position[1]
-                            });
-                            currentTime = time;
-                        }
-                    }
-                    if (isZoomed) {
-                        var time = new Date().getTime();
-                        // 至少隔两秒发送拖拽日志
-                        if ((time - currentTime) >= 2000) {
-                            bkgLog({
-                                type: 'zhishitupuzoom',
-                                target: scale[0]
-                            });
-                            currentTime = time;
-                        }
-                    }
-                }
-                x0 = position[0];
-                y0 = position[1];
-                sx0 = scale[0];
-                sy0 = scale[1];
-
-                // 背景的视差移动
-                if (self._parallax) {
-                    self._parallax.moveTo(x0 / sx0, y0 / sy0);
-                }
-            }
-
             self._culling();
             
             zrRefresh.apply(this, arguments);
         }
-
-        // 不显示hover层
-        var layers = zr.painter.getLayers();
-        for (var z in layers) {
-            if (z === 'hover') {
-                layers[z].dom.parentNode.removeChild(layers[z].dom);
-            }
-        }
-    }
-
-    GraphMain.prototype._initBG = function () {
-
-        var $bg = document.createElement('div');
-        $bg.className = 'bkg-graph-bg';
-
-        this.el.appendChild($bg);
-
-        $bg.innerHTML = '<div class="bkg-bg-layer"></div>';
-        this._parallax = new Parallax($bg);
-
-        this._parallax.scaleBase = 0.4;
-        this._parallax.scaleStep = 0.5;
-
-        this._parallax.setOffset(2000, 2000);
     }
 
     GraphMain.prototype.resize = function (w, h) {
@@ -281,7 +176,7 @@ define(function (require) {
 
     GraphMain.prototype.setData = function (data) {
         var graph = new Graph(true);
-        this._graphLayout = graph;
+        this._graph = graph;
         var zr = this._zr;
 
         var cx = this._kgraph.getWidth() / 2;
@@ -316,72 +211,26 @@ define(function (require) {
                 position: entity.position,
                 size: r
             };
-            // Fix the center node
-            if (entity.layerCounter === 0) {
-                n.layout.fixed = true;
-            }
-            if (!entity.position) {
-                noPosition = true;
-                if (entity.layerCounter === 0) {
-                    n.layout.position = [
-                        width / 2,
-                        height / 2
-                    ];
-                    n.position = Array.prototype.slice.call(n.layout.position);
-                }
-            }
         }
 
         for (var i = 0; i < data.relations.length; i++) {
             var relation = data.relations[i];
-            if (!relation.isExtra) {
-                graph.addEdge(relation.fromID, relation.toID, relation);
-            }
+            var e = graph.addEdge(relation.fromID, relation.toID, relation);
+            e.isExtra = relation.isExtra;
         }
 
-        // 加入补边
-        this._graph = this._graphLayout.clone();
+        // 平移所有节点，使得中心节点能够在屏幕中心
+        var offsetX = width / 2 - this._mainNode.layout.position[0];
+        var offsetY = height / 2 - this._mainNode.layout.position[1];
+
         this._graph.eachNode(function (n) {
-            // 共用布局
-            n.layout = this._graphLayout.getNodeById(n.id).layout;
-        }, this);
-        for (var i = 0; i < data.relations.length; i++) {
-            var relation = data.relations[i];
-            if (relation.isExtra) {
-                var e = this._graph.addEdge(relation.fromID, relation.toID, relation);
-                if (e) {
-                    e.isExtra = true;
-                }
-            }
-        }
-
-        if (noPosition) {
-            this.radialTreeLayout();
-        } else {
-            // 平移所有节点，使得中心节点能够在屏幕中心
-            var offsetX = width / 2 - this._mainNode.layout.position[0];
-            var offsetY = height / 2 - this._mainNode.layout.position[1];
-
-            this._graph.eachNode(function (n) {
-                n.layout.position[0] += offsetX;
-                n.layout.position[1] += offsetY;
-            })
-        }
+            n.layout.position[0] += offsetX;
+            n.layout.position[1] += offsetY;
+        });
 
         this.render();
 
         this._loadStorage();
-
-        // var circles = this._findCircles(config.circleKeywords.split(','));
-        // this._circles = circles;
-        // for (var i = 0; i < circles.length; i++) {
-        //     this._highlightCircle(circles[i]);
-        // }
-
-        // 刚打开时的展开动画
-        // if (config.enableAnimation && this.enableEntryAnimation) {
-            // this._entryAnimation();
-        // }
 
         // 发送首屏展现日志
         var title = [];
@@ -416,16 +265,20 @@ define(function (require) {
         var graph = this._graph;
 
         if (this._root) {
-            zr.delGroup(this._root);
+            zr.removeElement(this._root);
         }
         this._root = new Group();
-        zr.addGroup(this._root);
+        this._graphRoot = new Group();
+
+        this._root.addElement(this._graphRoot);
+
+        zr.addElement(this._root);
 
         // 补边使用bundle优化性能
         if (config.enableAnimation) {
             this._extraEdgeBundle = new ExtraEdgeBundleEntity();
             this._extraEdgeBundle.initialize(zr);
-            this._root.addChild(this._extraEdgeBundle.el);
+            this._graphRoot.addElement(this._extraEdgeBundle.el);
         }
 
         graph.eachEdge(function (e) {
@@ -446,196 +299,6 @@ define(function (require) {
                 this._createEdgeEntity(e);
             }
         }, this);
-
-        zr.refreshNextFrame();
-
-        zr.modLayer(0, {
-            panable: true,
-            zoomable: true,
-            maxZoom: 1.5,
-            minZoom: 0.6
-        });
-    };
-
-    /**
-     * 放射树状布局
-     */
-    GraphMain.prototype.radialTreeLayout = function () {
-        var cx = this._zr.getWidth() / 2;
-        var cy = this._zr.getHeight() / 2;
-        var tree = Tree.fromGraph(this._graphLayout)[0];
-
-        var root = tree.root;
-        // 第一层节点均匀排布，大的子树相离尽量远
-        if (root.children.length > 2) {
-            for (var i = 0; i < root.children.length; i++) {
-                var child = root.children[i];
-                child.__size = 0;
-                root.children[i].traverse(function () {
-                    child.__size++;
-                });
-            }
-            root.children.sort(function (a, b) {
-                return b.__size - a.__size;
-            });
-            var res = [root.children[0], root.children[1]];
-            var currentIdx = 1;
-            for (i = 2; i < root.children.length; i++) {
-                res.splice(currentIdx, 0, root.children[i]);
-                currentIdx += 2;
-                if (currentIdx > res.length) {
-                    currentIdx = 1;
-                }
-            }
-            root.children = res;
-        }
-
-        tree.traverse(function (treeNode) {
-            var graphNode = this._graphLayout.getNodeById(treeNode.id);
-            treeNode.layout = {
-                width: graphNode.layout.size * 2,
-                height: graphNode.layout.size * 2
-            };
-        }, this);
-        var layout = new TreeLayout();
-
-        layout.layerPadding = function (level) {
-            return config.layout.layerDistance[level] || 200;
-        };
-        layout.run(tree);
-
-        var min = [Infinity, Infinity];
-        var max = [-Infinity, -Infinity];
-        tree.traverse(function (treeNode) {
-            vec2.min(min, min, treeNode.layout.position);
-            vec2.max(max, max, treeNode.layout.position);
-        });
-        var width = max[0] - min[0];
-        if (width === 0) {
-            width = 0.01;
-        }
-        var height = max[1] - min[1];
-        tree.traverse(function (treeNode) {
-            var graphNode = this._graphLayout.getNodeById(treeNode.id);
-            var x = treeNode.layout.position[0];
-            var y = treeNode.layout.position[1];
-            var r = y;
-            var rad = x / width * Math.PI * 2;
-
-            graphNode.layout.position = [
-                // x, y
-                // 以中心节点为圆心
-                r * Math.cos(rad) + cx,
-                r * Math.sin(rad) + cy
-            ];
-            treeNode.layout.angle = rad;
-        }, this);
-        // 第一层节点均匀分布
-        // 这个是针对类似昆凌的图谱
-        if (tree.root.children.length <= 4) {
-            var gap = Math.PI * 2 / tree.root.children.length;
-            var angle = 0;
-            for (var i = 0; i < tree.root.children.length; i++) {
-                var child = tree.root.children[i];
-                var r = child.layout.position[1];
-                var graphNode = this._graphLayout.getNodeById(child.id);
-                if (i === 0) {
-                    angle = child.layout.angle;
-                } else {
-                    angle += gap;
-                }
-
-                graphNode.layout.position = [
-                    r * Math.cos(angle) + cx,
-                    r * Math.sin(angle) + cy
-                ];
-            }
-        }
-    }
-
-    /**
-     * 开始力导向布局
-     */
-    GraphMain.prototype.startForceLayout = function (cb) {
-        var graph = this._graphLayout;
-        var forceLayout = new ForceLayout();
-        forceLayout.center = [
-            this._kgraph.getWidth() / 2,
-            this._kgraph.getHeight() / 2
-        ];
-        forceLayout.gravity = 0;
-        forceLayout.scaling = Math.sqrt(graph.nodes.length / 100) * 12;
-        forceLayout.edgeLength = Math.max(graph.nodes.length / 100 * 150, 100);
-        forceLayout.preventNodeOverlap = true;
-        forceLayout.preventNodeEdgeOverlap = true;
-
-        graph.eachNode(function (n) {
-            n.layout.mass = 15;
-            n.layout.layer = n.data.layerCounter;
-        });
-        var layerDistance = config.layout.layerDistance.slice();
-        for (var i = 1; i < layerDistance.length; i++) {
-            layerDistance[i] = layerDistance[i - 1] + layerDistance[i];
-        }
-
-        forceLayout.layerConstraint = config.layout.layerConstraint;
-        forceLayout.layerDistance = layerDistance;
-
-        var factor = Math.sqrt(graph.nodes.length);
-        graph.eachEdge(function (e) {
-            e.layout = {
-                weight: 20
-            };
-        }, this);
-
-        forceLayout.init(graph);
-        forceLayout.temperature = 0.04;
-        this._layouting = true;
-        var self = this;
-        var count = 0;
-        forceLayout.onupdate = function () {
-            for (var i = 0; i < graph.nodes.length; i++) {
-                var n = graph.nodes[i];
-                if (n.layout.fixed && n.entity) {
-                    vec2.copy(n.layout.position, n.entity.el.position);
-                }
-            }
-            self._updateNodePositions();
-            self.unactiveAll();
-
-            if (forceLayout.isStable()) {
-                self.stopForceLayout();
-                cb && cb.call(self);
-                // console.log(count);
-            }
-            else {
-                if (self._layouting) {
-                    requestAnimationFrame(function () {
-                        forceLayout.step(10);
-                    });
-                    count += 10;
-                }
-            }
-        }
-        forceLayout.step(10);
-    };
-
-    /**
-     * 停止力导向布局
-     */
-    GraphMain.prototype.stopForceLayout = function () {
-        var graph = this._graphLayout;
-        var edgeNodes = [];
-        graph.eachNode(function (n) {
-            if (n.isEdgeNode) {
-                edgeNodes.push(n);
-            }
-        });
-        for (var i = 0; i < edgeNodes.length; i++) {
-            graph.removeNode(edgeNodes[i]);
-        }
-
-        this._layouting = false;
     };
 
     /**
@@ -667,8 +330,6 @@ define(function (require) {
         }
 
         this._currentActiveNode = null;
-
-        zr.refreshNextFrame();
     };
 
     /**
@@ -817,7 +478,6 @@ define(function (require) {
         }
 
         this._syncHeaderBarExplorePercent();
-        zr.refreshNextFrame();
     };
 
     /**
@@ -975,9 +635,9 @@ define(function (require) {
             return;
         }
         var entity = n.entity;
-        var layer = zr.painter.getLayer(0);
-        var pos = Array.prototype.slice.call(entity.el.position);
-        vec2.mul(pos, pos, layer.scale);
+        var graphRoot = zr._graphRoot;
+        var pos = arraySlice.call(entity.el.position);
+        vec2.mul(pos, pos, graphRoot.scale);
         vec2.sub(pos, [zr.getWidth() / 2, zr.getHeight() / 2], pos);
 
         this.moveTo(pos[0], pos[1], cb);
@@ -999,8 +659,8 @@ define(function (require) {
         pos[0] /= 2;
         pos[1] /= 2;
 
-        var layer = zr.painter.getLayer(0);
-        vec2.mul(pos, pos, layer.scale);
+        var graphRoot = zr._graphRoot;
+        vec2.mul(pos, pos, graphRoot.scale);
         vec2.sub(pos, [zr.getWidth() / 2, zr.getHeight() / 2], pos);
 
         this.moveTo(pos[0], pos[1], cb);
@@ -1011,17 +671,13 @@ define(function (require) {
      */
     GraphMain.prototype.moveTo = function (x, y, cb) {
         var zr = this._zr;
-        var layers = zr.painter.getLayers();
 
         if (config.enableAnimation) {
             var self = this;
             self._animating = true;
-            zr.animation.animate(layers[0])
+            this._graphRoot.animate()
                 .when(800, {
                     position: [x, y]
-                })
-                .during(function () {
-                    zr.refreshNextFrame();
                 })
                 .done(function () {
                     self._animating = false;
@@ -1029,7 +685,7 @@ define(function (require) {
                 })
                 .start('CubicInOut');   
         } else {
-            var pos = layers[0].position;
+            var pos = this._graphRoot.position;
             pos[0] = x;
             pos[1] = y;
             zr.refreshNextFrame();
@@ -1041,8 +697,7 @@ define(function (require) {
 
     GraphMain.prototype.moveLeft = function (cb) {
         var zr = this._zr;
-        var layer = zr.painter.getLayer(0);
-        var newPos = Array.prototype.slice.call(layer.position);
+        var newPos = arraySlice.call(this._graphRoot.position);
         newPos[0] += zr.getWidth() * 0.6;
 
         this.moveTo(newPos[0], newPos[1], cb);
@@ -1050,8 +705,7 @@ define(function (require) {
 
     GraphMain.prototype.moveRight = function (cb) {
         var zr = this._zr;
-        var layer = zr.painter.getLayer(0);
-        var newPos = Array.prototype.slice.call(layer.position);
+        var newPos = arraySlice.call(this._graphRoot.position);
         newPos[0] -= zr.getWidth() * 0.6;
 
         this.moveTo(newPos[0], newPos[1], cb);
@@ -1059,8 +713,7 @@ define(function (require) {
 
     GraphMain.prototype.moveTop = function (cb) {
         var zr = this._zr;
-        var layer = zr.painter.getLayer(0);
-        var newPos = Array.prototype.slice.call(layer.position);
+        var newPos = arraySlice.call(this._graphRoot.position);
         newPos[1] += zr.getHeight() * 0.6;
 
         this.moveTo(newPos[0], newPos[1], cb);
@@ -1068,8 +721,7 @@ define(function (require) {
 
     GraphMain.prototype.moveDown = function (cb) {
         var zr = this._zr;
-        var layer = zr.painter.getLayer(0);
-        var newPos = Array.prototype.slice.call(layer.position);
+        var newPos = arraySlice.call(this._graphRoot.position);
         newPos[1] -= zr.getHeight() * 0.6;
 
         this.moveTo(newPos[0], newPos[1], cb);
@@ -1077,7 +729,6 @@ define(function (require) {
 
     GraphMain.prototype.zoomIn = function () {
         var zr = this._zr;
-        var layer = zr.painter.getLayer(0);
         layer.__zoom = layer.__zoom || 1;
         this.zoomTo(layer.__zoom * 1.3);
     };
@@ -1099,8 +750,8 @@ define(function (require) {
 
         var zoomScale = zoom / layer.__zoom;
 
-        var newScale = Array.prototype.slice.call(layer.scale);
-        var newPos = Array.prototype.slice.call(layer.position);
+        var newScale = arraySlice.call(layer.scale);
+        var newPos = arraySlice.call(layer.position);
         newPos[0] -= (cx - newPos[0]) * (zoomScale - 1);
         newPos[1] -= (cy - newPos[1]) * (zoomScale - 1);
         newScale[0] *= zoomScale;
@@ -1123,17 +774,17 @@ define(function (require) {
             .start('CubicInOut');
 
         this.hideTip();
-    }
+    };
 
     GraphMain.prototype.uncollapse = function () {
-        var zr = this._zr;
-        this._graph.eachNode(function (n) {
+        var graph = this._graph;
+        graph.eachNode(function (n) {
             if (!n.entity) {
                 this._createNodeEntity(n);
                 n.canCollapse = true;
             }
         }, this);
-        this._graph.eachEdge(function (e) {
+        graph.eachEdge(function (e) {
             if (!e.entity) {
                 this._createEdgeEntity(e);
                 e.canCollapse = true;
@@ -1141,13 +792,11 @@ define(function (require) {
         }, this);
 
         this._syncHeaderBarExplorePercent();
-
-        zr.refreshNextFrame();
     };
 
     GraphMain.prototype.collapse = function () {
-        var zr = this._zr;
-        this._graph.eachNode(function (n) {
+        var graph = this._graph;
+        graph.eachNode(function (n) {
             if (n.canCollapse) {
                 n.entity.stopAnimationAll();
                 this._root.removeChild(n.entity.el);
@@ -1156,7 +805,7 @@ define(function (require) {
                 this._nodeEntityCount--;
             }
         }, this);
-        this._graph.eachEdge(function (e) {
+        graph.eachEdge(function (e) {
             if (e.canCollapse) {
                 e.entity.stopAnimationAll();
                 this._root.removeChild(e.entity.el);
@@ -1169,16 +818,12 @@ define(function (require) {
         }, this);
 
         this._syncHeaderBarExplorePercent();
-        zr.refreshNextFrame();
     }
 
     /**
      * hover节点的时候展开未展开的节点
      */
     GraphMain.prototype.expandNode = function (node) {
-        var zr = this._zr;
-        var self = this;
-
         var logTitle = [];
         for (var i = 0; i < node.edges.length; i++) {
             var e = node.edges[i];
@@ -1214,11 +859,12 @@ define(function (require) {
 
         var expandedSum = [];
         this._graph.eachNode(function (n, index) {
-            if (expandedSum[n.data.layerCounter]) {
-                expandedSum[n.data.layerCounter] ++;
+            var layerCounter = n.data.layerCounter;
+            if (expandedSum[layerCounter]) {
+                expandedSum[layerCounter] ++;
             }
             else {
-                expandedSum[n.data.layerCounter] = 1;
+                expandedSum[layerCounter] = 1;
             }
         });
 
@@ -1232,33 +878,10 @@ define(function (require) {
         }
 
         this._syncHeaderBarExplorePercent();
-        zr.refreshNextFrame();
 
         // if (node.outEdges || node.outEdges.length == 0) {
         //     this.showNodeEndTip(node);
         // }
-    }
-
-    GraphMain.prototype.toJSON = function () {
-        var graph = this._graph;
-        var res = {
-            viewport: {
-                x: 0,
-                y: 0,
-                width: this._zr.getWidth(),
-                height: this._zr.getHeight()
-            },
-            entities: [],
-            relations: []
-        };
-        graph.eachNode(function (n) {
-            n.data.position = n.layout.position;
-            res.entities.push(n.data);
-        });
-        graph.eachEdge(function (e) {
-            res.relations.push(e.data);
-        });
-        return res;
     };
 
     /**
@@ -1320,12 +943,13 @@ define(function (require) {
         var id = this._mainNode.id;
         var entities = [];
         var relations = [];
-        this._graph.eachNode(function (n) {
+        var graph = this._graph;
+        graph.eachNode(function (n) {
             if (n.entity) {
                 entities.push(n.id);
             }
         });
-        this._graph.eachEdge(function (e) {
+        graph.eachEdge(function (e) {
             if (e.entity) {
                 relations.push(e.node1.id + ',' + e.node2.id);
             }
@@ -1387,83 +1011,6 @@ define(function (require) {
         }
     };
 
-    GraphMain.prototype._findCircles = function (keywords) {
-        function matchRelation (name) {
-            for (var i = 0; i < keywords.length; i++) {
-                if (name.indexOf(keywords[i]) >= 0) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        var cycles = Cycle.findFromGraph(this._graph, 3);
-        var matchCircles = [];
-
-        for (var j = 0; j < cycles.length; j++) {
-            var cycle = cycles[j];
-
-            // 最多三条边
-            var len = cycle.nodes.length;
-            for (var i = 0; i < len; i++) {
-                var n1 = cycle.nodes[i];
-                var n2 = cycle.nodes[(i + 1) % len];
-
-                var e = this._graph.getEdge(n1, n2) || this._graph.getEdge(n2, n1);
-                if (e && matchRelation(e.data.relationName)) {
-                    continue;
-                }
-                break;
-            }
-            // console.log(cycle.nodes.map(function(n) {return n.data.name}));
-            // 环中所有边都符合关键词
-            if (i == cycle.nodes.length) {
-                matchCircles.push(cycle);
-
-                for (var k = 0; k < cycle.edges.length; k++) {
-                    cycle.edges[k].isSpecial = true;
-                }
-            }
-
-            // matchCircles.push(cycle);
-            // console.log(cycle.nodes.map(function (a) {return a.data.name}));
-        }
-
-        return matchCircles;
-    }
-
-    /**
-     * 刚进入时的动画效果
-     */
-    GraphMain.prototype._entryAnimation = function (cb) {
-        var zr = this._zr;
-        var self = this;
-        var clipShape = new CircleShape({
-            style: {
-                x: zr.getWidth() / 2,
-                y: zr.getHeight() / 2,
-                r: 70
-            }
-        });
-        this._root.clipShape = clipShape;
-        this._root.modSelf();
-        zr.refreshNextFrame();
-
-        zr.animation.animate(clipShape.style)
-            .when(1000, {
-                r: Math.max(zr.getWidth(), zr.getHeight())
-            })
-            .during(function () {
-                self._root.modSelf();
-                zr.refreshNextFrame();
-            })
-            .done(function () {
-                self._root.clipShape = null;
-                cb && cb();
-            })
-            .start();
-    }
-
     /**
      * 同步节点的屏外提示
      */
@@ -1486,7 +1033,7 @@ define(function (require) {
         }
         var left = -parseInt(util.getStyle(this.el, 'left'));
 
-        var layer0 = this._zr.painter.getLayer(0);
+        var layer0 = this._graphRoot;
         var rect = {
             x: (-layer0.position[0] + left) / layer0.scale[0],
             y: (-layer0.position[1] + top)/ layer0.scale[1],
@@ -1525,7 +1072,7 @@ define(function (require) {
                             label: other.data.name
                         });
                         other._outTipEntity.initialize(zr);
-                        this._root.addChild(other._outTipEntity.el);   
+                        this._root.addElement(other._outTipEntity.el);   
                     }
                     var p = other._outTipEntity.el.position;
                     vec2.copy(p, point);
@@ -1542,7 +1089,7 @@ define(function (require) {
                             p[0] -= 25;
                             break;
                     }
-                    other._outTipEntity.el.modSelf();
+                    other._outTipEntity.el.dirty();
                 } else if (other._outTipEntity) {
                     // 边与屏幕边缘没有交点
                     this._root.removeChild(other._outTipEntity.el);
@@ -1563,7 +1110,6 @@ define(function (require) {
         var radius = toNode.entity.radius;
         toNode.entity.setRadius(1);
         this._animating = true;
-        zr.refreshNextFrame();
         e.entity.animateLength(zr, 300, 0, fromNode.entity, function () {
             toNode.entity.animateRadius(radius, 500, function () {
                 self._animating = false;
@@ -1588,13 +1134,13 @@ define(function (require) {
 
         vec2.copy(nodeEntity.el.position, node.layout.position);
         var self = this;
-        nodeEntity.bind('mouseover', function () {
+        nodeEntity.on('mouseover', function () {
             if (self._animating) {
                 return;
             }
             if (self._lastHoverNode !== node) {
 
-                self.dispatch('mouseover:entity', node.data);
+                self.trigger('mouseover:entity', node.data);
 
                 self.expandNode(node);
 
@@ -1609,11 +1155,11 @@ define(function (require) {
                 });
             }
         });
-        nodeEntity.bind('mouseout', function () {
+        nodeEntity.on('mouseout', function () {
             self.unhoverNode();
         });
-        nodeEntity.bind('click', function () {
-            self.dispatch('click:entity', node);
+        nodeEntity.on('click', function () {
+            self.trigger('click:entity', node);
 
             self.hideTip();
             var isClicked = cookies.get('BKGraph_node_click_0') || 0;
@@ -1644,31 +1190,9 @@ define(function (require) {
 
             self.showEntityDetail(node, true);
         });
-        nodeEntity.bind('dragstart', function () {
-            node.layout.fixed = true;
-            util.addEventListener(document.body, 'mousemove', onDrag);
-        });
-        nodeEntity.bind('dragend', function () {
-            node.layout.fixed = false;
-            util.removeEventListener(document.body, 'mousemove', onDrag);
-        });
-
-        var onDrag = function () {
-            self.unactiveAll();
-            for (var i = 0; i < node.edges.length; i++) {
-                if (node.edges[i].entity) {
-                    node.edges[i].entity.update();
-                }
-            }
-            if (config.enableAnimation) {
-                self._extraEdgeBundle.update(zr);
-            }
-            vec2.copy(node.layout.position, node.entity.el.position);
-            zr.refreshNextFrame();
-        }
 
         node.entity = nodeEntity;
-        this._root.addChild(nodeEntity.el);
+        this._graphRoot.addElement(nodeEntity.el);
 
         this._nodeEntityCount++;
         return nodeEntity;
@@ -1695,8 +1219,8 @@ define(function (require) {
 
             edgeEntity.initialize(this._zr);
 
-            edgeEntity.bind('click', function () {
-                self.dispatch('click:relation', e);
+            edgeEntity.on('click', function () {
+                self.trigger('click:relation', e);
 
                 bkgLog({
                     type: 'zhishitupuclick',
@@ -1735,22 +1259,22 @@ define(function (require) {
                 this.showRelationDetail(e);
 
             }, this);
-            edgeEntity.bind('mouseover', function () {
+            edgeEntity.on('mouseover', function () {
 
                 if (self._lastHoverEdge !== e) {
-                    self.dispatch('mouseover:relation', e.data);
+                    self.trigger('mouseover:relation', e.data);
 
                     self.hoverEdge(e);
                 }
 
             });
-            edgeEntity.bind('mouseout', function () {
+            edgeEntity.on('mouseout', function () {
                 self.unhoverEdge();
             });
 
             e.entity = edgeEntity;
 
-            this._root.addChild(edgeEntity.el);
+            this._graphRoot.addElement(edgeEntity.el);
 
             return edgeEntity;
         }
@@ -1799,17 +1323,18 @@ define(function (require) {
         }
         var right = -parseInt(util.getStyle(this.el, 'right'));
 
-        var nodeLayer = zr.painter.getLayer(1);
         var width = zr.getWidth();
         var height = zr.getHeight();
-        nodeLayer.updateTransform();
 
-        var layer0 = this._zr.painter.getLayer(0);
+        var graphRoot = this._graphRoot;
+        var position = graphRoot.position;
+        var scale = graphRoot.scale;
+
         var rect = {
-            x: -layer0.position[0] / layer0.scale[0],
-            y: -layer0.position[1] / layer0.scale[1],
-            width: (zr.getWidth() - right) / layer0.scale[0],
-            height: zr.getHeight() / layer0.scale[1]
+            x: -position[0],
+            y: -position[1],
+            width: width / scale[0],
+            height: height / scale[1]
         }
 
         var imageLoadingCount = 0;
@@ -1824,7 +1349,6 @@ define(function (require) {
                     if (this._isFirstFrame) {
                         imageLoadingCount++;
                         n.entity.loadImage(
-                            zr,
                             // Success
                             function () {
                                 imageLoadingCount--;
@@ -1850,11 +1374,14 @@ define(function (require) {
                             }
                         );
                     } else {
-                        n.entity.loadImage(zr);
+                        n.entity.loadImage();
                     }
                 }
-                vec2.min(this._min, this._min, n.entity.el.position);
-                vec2.max(this._max, this._max, n.entity.el.position);
+                var pos = n.entity.el.position;
+                pos = n.entity.el.transformCoordToGlobal(pos[0], pos[1]);
+
+                vec2.min(this._min, this._min, pos);
+                vec2.max(this._max, this._max, pos);
             }
         }
         for (var i = 0; i < graph.edges.length; i++) {

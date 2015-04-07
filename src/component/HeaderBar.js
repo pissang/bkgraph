@@ -1,7 +1,7 @@
 define(function (require) {
 
     var Component = require('./Component');
-    var zrUtil = require('zrender/tool/util');
+    var zrUtil = require('zrender/core/util');
     var etpl = require('etpl');
     var util = require('../util/util');
     var bkgLog = require('../util/log');

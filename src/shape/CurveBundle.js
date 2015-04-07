@@ -1,21 +1,19 @@
 define(function (require) {
 
-    var Base = require('zrender/shape/Base');
-    var zrUtil = require('zrender/tool/util');
+    var Path = require('zrender/graphic/Path');
 
-    var CurveBundle = function (opts) {
-        Base.call(this, opts);
-    }
-
-    CurveBundle.prototype = {
+    var CurveBundle = Path.extend({
 
         type: 'curvebundle',
 
-        brushTypeOnly: 'stroke',
+        style: {
+            fill: null,
+            stroke: 'black'
+        },
 
-        buildPath: function (ctx, style) {
-            for (var i = 0; i < style.segments.length; i++) {
-                var points = style.segments[i];
+        buildPath: function (ctx, shape) {
+            for (var i = 0; i < shape.segments.length; i++) {
+                var points = shape.segments[i];
                 ctx.moveTo(points[0], points[1]);
                 ctx.quadraticCurveTo(
                     points[2], points[3],
@@ -23,9 +21,7 @@ define(function (require) {
                 );
             }
         }
-    };
-
-    zrUtil.inherits(CurveBundle, Base);
+    });
 
     return CurveBundle;
 });

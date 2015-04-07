@@ -4,8 +4,8 @@
 define(function (require) {
 
     var Eventful = require('zrender/mixin/Eventful');
-    var zrUtil = require('zrender/tool/util');
-    var Group = require('zrender/Group');
+    var zrUtil = require('zrender/core/util');
+    var Group = require('zrender/graphic/Group');
 
     var Entity = function () {
 
@@ -70,12 +70,12 @@ define(function (require) {
         }
     };
 
-    Entity.prototype.addShape = function (name, shape) {
+    Entity.prototype.addElement = function (name, shape) {
         this._shapes[name] = shape;
-        this.el.addChild(shape);
+        this.el.addElement(shape);
     };
 
-    Entity.prototype.getShape = function (name) {
+    Entity.prototype.getElement = function (name) {
         return this._shapes[name];
     };
 
@@ -103,21 +103,19 @@ define(function (require) {
                     zrUtil.merge(
                         shape.style, state.shapeStyle[shapeName], true
                     );
+                    shape.dirty(false);
                 }
             }
         }
-
         this._setAllShapeState(state, 'zlevel');
         this._setAllShapeState(state, 'z');
 
-        this.zr.modElement(this.el);
-
         if (previousState) {
             previousState.onleave && previousState.onleave.call(this, previousState, state);
-            this.dispatch('state:leave', previousState, state);
+            this.trigger('state:leave', previousState, state);
         }
         state.onenter && state.onenter.call(this, state, previousState);
-        this.dispatch('state:enter', state, previousState);
+        this.trigger('state:enter', state, previousState);
 
         this._currentState = sName;
     };

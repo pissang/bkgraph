@@ -52,34 +52,34 @@ define({
         normal: {
             shapeStyle: {
                 label: {
-                    color: '#000',
-                    textColor: '#fff'
+                    fill: '#000',
+                    textFill: '#fff'
                 },
                 outline: {
                     lineWidth: 1,
-                    strokeColor: '#e4e9f2'
+                    stroke: '#e4e9f2'
                 }
             }
         },
         hover: {
             shapeStyle: {
                 label: {
-                    color: '#ff860d'
+                    fill: '#ff860d'
                 },
                 outline: {
                     lineWidth: 2,
-                    strokeColor: '#ff860d'
+                    stroke: '#ff860d'
                 }
             }
         },
         active: {
             shapeStyle: {
                 label: {
-                    color: '#ff860d'
+                    fill: '#ff860d'
                 },
                 outline: {
                     lineWidth: 2,
-                    strokeColor: '#ff860d'
+                    stroke: '#ff860d'
                 }
             }
         }
@@ -90,12 +90,12 @@ define({
         normal: {
             shapeStyle: {
                 label: {
-                    color: '#3385ff',
-                    textColor: '#fff'
+                    fill: '#3385ff',
+                    textFill: '#fff'
                 },
                 outline: {
                     lineWidth: 2,
-                    strokeColor: '#3385ff'
+                    stroke: '#3385ff'
                 }
             },
             labelAlpha: 0.9
@@ -103,20 +103,20 @@ define({
         hover: {
             shapeStyle: {
                 label: {
-                    color: '#ff860d'
+                    fill: '#ff860d'
                 },
                 outline: {
-                    strokeColor: '#ff860d'
+                    stroke: '#ff860d'
                 }
             }
         },
         active: {
             shapeStyle: {
                 label: {
-                    color: '#ff860d'
+                    fill: '#ff860d'
                 },
                 outline: {
-                    strokeColor: '#ff860d'
+                    stroke: '#ff860d'
                 }
             }
         }
@@ -126,34 +126,40 @@ define({
     edgeStates: {
         normal: {
             shapeStyle: {
-                labelLine: {
-                    color: '#3385ff',
-                    strokeColor: '#3385ff',
-                    textColor: '#3385ff',
-                    opacity: 0.3,
+                curve: {
+                    stroke: '#3385ff',
+                    opacity: 0.5,
                     lineWidth: 1
+                },
+                label: {
+                    fill: '#3385ff',
+                    textFill: '#3385ff'
                 }
             }
         },
         hover: {
             shapeStyle: {
-                labelLine: {
-                    color: '#ff860d',
-                    strokeColor: '#ff860d',
-                    textColor: '#ff860d',
+                curve: {
+                    stroke: '#ff860d',
                     opacity: 1,
                     lineWidth: 1
+                },
+                label: {
+                    fill: '#ff860d',
+                    textFill: '#ff860d'
                 }
             }
         },
         active: {
             shapeStyle: {
-                labelLine: {
-                    color: '#ff860d',
-                    strokeColor: '#ff860d',
-                    textColor: '#ff860d',
+                curve: {
                     opacity: 1,
+                    stroke: '#ff860d',
                     lineWidth: 1
+                },
+                label: {
+                    fill: '#ff860d',
+                    textFill: '#ff860d'
                 }
             }
         }
@@ -163,34 +169,40 @@ define({
     extraEdgeStates: {
         normal: {
             shapeStyle: {
-                labelLine: {
-                    color: '#3385ff',
-                    strokeColor: '#3385ff',
-                    textColor: '#3385ff',
-                    opacity: 0.3,
-                    lineWidth: 0.4
+                curve: {
+                    stroke: '#3385ff',
+                    lineWidth: 0.4,
+                    opacity: 0.3
+                },
+                label: {
+                    textFill: '#3385ff',
+                    fill: '#3385ff'
                 }
             }
         },
         hover: {
             shapeStyle: {
-                labelLine: {
-                    color: '#ff860d',
-                    strokeColor: '#ff860d',
-                    textColor: '#ff860d',
-                    opacity: 1,
-                    lineWidth: 0.4
+                curve: {
+                    stroke: '#ff860d',
+                    lineWidth: 0.4,
+                    opacity: 1
+                },
+                label: {
+                    fill: '#ff860d',
+                    textFill: '#ff860d'
                 }
             }
         },
         active: {
             shapeStyle: {
-                labelLine: {
-                    color: '#ff860d',
-                    strokeColor: '#ff860d',
-                    textColor: '#ff860d',
-                    opacity: 1,
-                    lineWidth: 0.4
+                curve: {
+                    stroke: '#ff860d',
+                    lineWidth: 0.4,
+                    opacity: 1
+                },
+                label: {
+                    fill: '#ff860d',
+                    textFill: '#ff860d'
                 }
             }
         }

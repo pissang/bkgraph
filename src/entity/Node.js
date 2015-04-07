@@ -1,13 +1,13 @@
 define(function (require) {
 
     var Entity = require('./Entity');
-    var Group = require('zrender/Group');
-    var CircleShape = require('zrender/shape/Circle');
-    var ImageShape = require('zrender/shape/Image');
+    var Group = require('zrender/graphic/Group');
+    var ZImage = require('zrender/graphic/Image');
+    var Circle = require('zrender/graphic/shape/Circle');
     var CrescentShape = require('../shape/Crescent');
-    var zrUtil = require('zrender/tool/util');
+    var zrUtil = require('zrender/core/util');
+    var vec2 = require('zrender/core/vector');
     var zrColor = require('zrender/tool/color');
-    var vec2 = require('zrender/tool/vector');
 
     var util = require('../util/util');
     var config = require('../config');
@@ -38,14 +38,14 @@ define(function (require) {
         this.states = {
             normal: {
                 name: 'normal',
-                zlevel: 1,
                 z: 1,
                 // 自定义属性
-                labelAlpha: 0.6
+                labelAlpha: 0.6,
+                zlevel: 0
             },
             hover: {
                 name: 'hover',
-                zlevel: 3,
+                zlevel: 2,
                 onenter: function () {
                     this.animateRadius(this.originalRadius * 1.2, 500);
                     this.startActiveAnimation();
@@ -60,7 +60,7 @@ define(function (require) {
             },
             active: {
                 name: 'active',
-                zlevel: 3,
+                zlevel: 2,
                 onenter: function (state, previousState) {
                     if (previousState.name !== 'hover') {
                         this.animateRadius(this.originalRadius * 1.2, 500);
@@ -97,20 +97,17 @@ define(function (require) {
         var self = this;
         var r = this.radius;
 
-        var dragging = false;
-        var outlineShape = new CircleShape({
-            style: {
-                brushType: 'stroke',
+        var outline = new Circle({
+            shape: {
                 r: baseRadius,
-                x: 0,
-                y: 0
+                cx: 0,
+                cy: 0
             },
-            highlightStyle: {
-                opacity: 0
+            style: {
+                stroke: 'black',
+                fill: 'rgba(0, 0, 0, 0)'
             },
             z: 10,
-            zlevel: 1,
-            clickable: true,
             draggable: this.draggable,
             drift: function (dx, dy) {
                 self.el.position[0] += dx;
@@ -120,14 +117,14 @@ define(function (require) {
 
         function createEventHandler(name) {
             return function () {
-                self.dispatch(name);
+                self.trigger(name);
             }
         }
         for (var i = 0; i < events.length; i++) {
-            outlineShape['on' + events[i]] = createEventHandler(events[i]);
+            outline['on' + events[i]] = createEventHandler(events[i]);
         }
 
-        var imageShape = new ImageShape({
+        var zImage = new ZImage({
             style: {
                 image: defaultImage,
                 x: -baseRadius,
@@ -136,43 +133,41 @@ define(function (require) {
                 height: baseRadius * 2
             },
             z: 10,
-            hoverable: false,
-            zlevel: 1
+            hoverable: false
         });
 
         if (this.label) {
-            var labelShape = new CrescentShape({
-                style: {
+            var labelEl = new CrescentShape({
+                shape: {
+                    cx: 0,
+                    cy: 0,
                     height: 25,
-                    x: 0,
-                    y: 0,
-                    r: baseRadius,
-                    brushType: 'fill',
+                    r: baseRadius
+                },
+                style: {
                     text: this.label,
                     textPosition: 'inside',
                     textAlign: 'center',
-                    brushType: 'both',
                     textFont: '15px 微软雅黑'
                 },
                 z: 10,
-                hoverable: false,
-                zlevel: 1
+                hoverable: false
             });
         }
 
-        this.addShape('image', imageShape);
-        if (labelShape) {
-            this.addShape('label', labelShape);
+        this.addElement('image', zImage);
+        if (labelEl) {
+            this.addElement('label', labelEl);
         }
-        this.addShape('outline', outlineShape);
+        this.addElement('outline', outline);
 
         this.el.scale[0] = this.el.scale[1] = this.radius / baseRadius;
 
         // 设置标签透明度
-        this.bind('state:enter', function (state) {
-            if (labelShape) {
-                labelShape.style.color = zrColor.alpha(
-                    state.shapeStyle.label.color, state.labelAlpha
+        this.on('state:enter', function (state) {
+            if (labelEl) {
+                labelEl.style.fill = zrColor.alpha(
+                    state.shapeStyle.label.fill, state.labelAlpha
                 );
             }
         });
@@ -182,7 +177,7 @@ define(function (require) {
         }
     }
 
-    NodeEntity.prototype.loadImage = function (zr, success, error) {
+    NodeEntity.prototype.loadImage = function (success, error) {
         if (this._imageLoaded) {
             return;
         }
@@ -191,10 +186,9 @@ define(function (require) {
         var self = this;
         var image = new Image();
         image.onload = function () {
-            var imageShape = self.getShape('image');
-            imageShape.style.image = image;
-            imageShape.modSelf();
-            zr.refreshNextFrame();
+            var zImage = self.getElement('image');
+            zImage.style.image = image;
+            zImage.dirty();
 
             success && success();
         }
@@ -206,20 +200,13 @@ define(function (require) {
 
     NodeEntity.prototype.setDraggable = function (draggable) {
         this.draggable = draggable;
-        this.getShape('outline').draggable = draggable;
+        this.getElement('outline').draggable = draggable;
     };
 
     NodeEntity.prototype.setRadius = function (r) {
         this.radius = r;
         this.el.scale[0] = this.el.scale[1] = r / baseRadius;
-        this.el.modSelf();
-    };
-
-    NodeEntity.prototype.setZLevel = function (zlevel) {
-        this.getShape('outline').zlevel = zlevel;
-        this.getShape('image').zlevel = zlevel;
-        this.getShape('label').zlevel = zlevel;
-        this.el.modSelf();
+        this.el.dirty();
     };
 
     NodeEntity.prototype.animateRadius = function (r, time, cb) {
@@ -235,7 +222,6 @@ define(function (require) {
             })
             .during(function () {
                 self.setRadius(self.radius);
-                zr.refreshNextFrame();
             })
             .done(function () {
                 cb && cb();
@@ -245,7 +231,6 @@ define(function (require) {
     };
 
     NodeEntity.prototype.startActiveAnimation = function () {
-        var zr = this.zr;
         if (this._animatingCircles.length) {
             return;
         }
@@ -256,57 +241,54 @@ define(function (require) {
             var y0 = Math.sin(rad) * 8;
             var x1 = Math.cos(rad + Math.PI) * 8;
             var y1 = Math.sin(rad + Math.PI) * 8;
-            var circle = new CircleShape({
+            var circle = new Circle({
+                shape: {
+                    cx: 0,
+                    cy: 0,
+                    r: baseRadius + 5
+                },
                 style: {
-                    x: 0,
-                    y: 0,
-                    r: baseRadius + 5,
-                    color: this.states.hover.shapeStyle.outline.strokeColor,
+                    fill: this.states.hover.shapeStyle.outline.stroke,
                     opacity: 0.5
                 },
                 hoverable: false,
+                z: -1,
                 zlevel: 2
             });
 
-            this.addAnimation('glowcircle', zr.animation.animate(circle.style, {loop: true})
+            this.el.addElement(circle);
+
+            this.addAnimation('glowcircle', circle.animate('shape', true))
                 .when(1000, {
-                    x: x1,
-                    y: y1
+                    cx: x1,
+                    cy: y1
                 })
                 .when(3000, {
-                    x: x0,
-                    y: y0
+                    cx: x0,
+                    cy: y0
                 })
                 .when(4000, {
-                    x: 0,
-                    y: 0
-                })
-                .during(function () {
-                    // mod一个就行了
-                    circle.modSelf();
-                    zr.refreshNextFrame();
+                    cx: 0,
+                    cy: 0
                 })
                 .delay(-500 * i)
-                .start()
-            );
+                .start();
 
-            this.el.addChild(circle);
             this._animatingCircles.push(circle);
         }
     }
 
     NodeEntity.prototype.stopActiveAnimation = function () {
         var zr = this.zr;
-        if (this._animatingCircles.length) {
-            for (var i = 0; i < this._animatingCircles.length; i++) {
-                var circle = this._animatingCircles[i];
-                this.el.removeChild(circle);
+        var animatingCircles = this._animatingCircles;
+        if (animatingCircles.length) {
+            for (var i = 0; i < animatingCircles.length; i++) {
+                var circle = animatingCircles[i];
+                this.el.removeElement(circle);
             }
-            this._animatingCircles.length = 0;
+            animatingCircles.length = 0;
 
             this.stopAnimation('glowcircle');
-
-            this.zr.refreshNextFrame();
         }
     }
 
@@ -314,11 +296,12 @@ define(function (require) {
     var max = [0, 0];
     NodeEntity.prototype.isInsideRect = function (rect) {
         var r = this.radius;
+        var elPosition = this.el.position;
 
-        min[0] = this.el.position[0] - r;
-        min[1] = this.el.position[1] - r;
-        max[0] = this.el.position[0] + r;
-        max[1] = this.el.position[1] + r;
+        min[0] = elPosition[0] - r;
+        min[1] = elPosition[1] - r;
+        max[0] = elPosition[0] + r;
+        max[1] = elPosition[1] + r;
 
         return !(
             min[0] > rect.x + rect.width

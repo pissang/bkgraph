@@ -1,23 +1,27 @@
 define(function (require) {
 
     var Entity = require('./Entity');
-    var BezierCurveShape = require('zrender/shape/BezierCurve');
-    var Group = require('zrender/Group');
-    var zrUtil = require('zrender/tool/util');
-    var curveTool = require('zrender/tool/curve');
-    var LabelCurveShape = require('../shape/LabelCurve');
-    var CircleShape = require('zrender/shape/Circle');
+    var Group = require('zrender/graphic/Group');
+    var zrUtil = require('zrender/core/util');
+    var curveTool = require('zrender/core/curve');
+    var CircleShape = require('zrender/graphic/shape/Circle');
+    var CurveShape = require('zrender/graphic/shape/BezierCurve');
 
     var util = require('../util/util');
     var intersect = require('../util/intersect');
     var config = require('../config');
 
-    var vec2 = require('zrender/tool/vector');
-    var v1 = vec2.create();
-    var v2 = vec2.create();
-    var v3 = vec2.create();
-    var min = vec2.create();
-    var max = vec2.create();
+    var vec2 = require('zrender/core/vector');
+    var vec2Create = vec2.create;
+    var vec2Set = vec2.set;
+    var vec2Min = vec2.min;
+    var vec2Max = vec2.max;
+
+    var v1 = vec2Create();
+    var v2 = vec2Create();
+    var v3 = vec2Create();
+    var min = vec2Create();
+    var max = vec2Create();
 
     var baseRadius = 8;
 
@@ -46,12 +50,12 @@ define(function (require) {
         this.states = {
             normal: {
                 name: 'normal',
-                zlevel: 1,
+                zlevel: 0,
                 z: 0,
             },
             hover: {
                 name: 'hover',
-                zlevel: 3,
+                zlevel: 2,
                 onenter: function (state, previousState) {
                     this.animateTextPadding(12, 300);
                     this.startActiveAnimation();
@@ -65,7 +69,7 @@ define(function (require) {
             },
             active: {
                 name: 'active',
-                zlevel: 3,
+                zlevel: 2,
                 onenter: function (state, previousState) {
                     if (previousState.name !== 'hover') {
                         this.animateTextPadding(12, 300);
@@ -99,27 +103,35 @@ define(function (require) {
         Entity.prototype.initialize.call(this, zr);
 
         var self = this;
-        var labelLineShape = new LabelCurveShape({
+        var curve = new CurveShape({
+            shape: {}
+        });
+
+        var label = new CircleShape({
+            shape: {
+                r: 8
+            },
             style: {
-                r: 8,
                 text: util.truncate(this.label, 10),
                 textFont: '13px 微软雅黑',
                 textPadding: 5,
-                dropletPadding: 0
-            },
-            clickable: true,
-            onclick: function () {
-                self.dispatch('click')
-            },
-            onmouseover: function () {
-                self.dispatch('mouseover');
-            },
-            onmouseout: function () {
-                self.dispatch('mouseout');
+                textPosition: 'right'
             }
         });
 
-        this.addShape('labelLine', labelLineShape);
+        var el = this.el;
+        el.on('click', function () {
+            self.trigger('click');
+        });
+        el.on('mouseover', function () {
+            self.trigger('mouseover');
+        });
+        el.on('mouseout', function () {
+            self.trigger('mouseout');
+        });
+
+        this.addElement('label', label);
+        this.addElement('curve', curve);
 
         this.update();
 
@@ -137,54 +149,54 @@ define(function (require) {
                 true
             );
         }
-        this.el.modSelf();
+        this.el.dirty();
     };
 
     CurveEdgeEntity.prototype.animateLength = function (zr, time, delay, fromEntity, cb) {
-        var curve = this.getShape('labelLine');
-        var curveStyle = curve.style;
-        var x0, y0, x2, y2;
-        var x1 = curveStyle.cpX1;
-        var y1 = curveStyle.cpY1;
+        var curve = this.getElement('curve');
+        var curveShape = curve.shape;
+        var x1, y1, x3, y3;
+        var x2 = curveShape.x2;
+        var y2 = curveShape.y2;
         var animateFromSource = fromEntity === this.sourceEntity;
         if (animateFromSource) {
-            var x0 = curveStyle.xStart;
-            var x2 = curveStyle.xEnd;
-            var y0 = curveStyle.yStart;
-            var y2 = curveStyle.yEnd;
+            var x1 = curveShape.x1;
+            var x3 = curveShape.x3;
+            var y1 = curveShape.y1;
+            var y3 = curveShape.y3;
         } else {
-            var x0 = curveStyle.xEnd;
-            var x2 = curveStyle.xStart;
-            var y0 = curveStyle.yEnd;
-            var y2 = curveStyle.yStart;
+            var x1 = curveShape.x3;
+            var x3 = curveShape.x1;
+            var y1 = curveShape.y3;
+            var y3 = curveShape.y1;
         }
         var self = this;
         var obj = {t: 0};
-        
+
         this.addAnimation('length', zr.animation.animate(obj)
             .when(time || 1000, {
                 t: 1
             })
             .during(function (target, t) {
                 // Subdivide
-                var x01 = lerp(x0, x1, t);
                 var x12 = lerp(x1, x2, t);
-                var x012 = lerp(x01, x12, t);
-                var y01 = lerp(y0, y1, t);
+                var x23 = lerp(x2, x3, t);
+                var x123 = lerp(x12, x23, t);
                 var y12 = lerp(y1, y2, t);
-                var y012 = lerp(y01, y12, t);
-                curveStyle.cpX1 = x01;
-                curveStyle.cpY1 = y01;
+                var y23 = lerp(y2, y3, t);
+                var y123 = lerp(y12, y23, t);
+
+                curveShape.x2 = x12;
+                curveShape.y2 = y12;
                 if (animateFromSource) {
-                    curveStyle.xEnd = x012;
-                    curveStyle.yEnd = y012;   
+                    curveShape.x3 = x123;
+                    curveShape.y3 = y123;   
                 } else {
-                    curveStyle.xStart = x012;
-                    curveStyle.yStart = y012;
+                    curveShape.x1 = x123;
+                    curveShape.y1 = y123;
                 }
 
-                self.el.modSelf();
-                zr.refreshNextFrame();
+                curve.dirty();
             })
             .delay(delay)
             .done(function () {
@@ -196,71 +208,72 @@ define(function (require) {
 
     CurveEdgeEntity.prototype.animateTextPadding = function (textPadding, time, cb) {
         var self = this;
-        var zr = this.zr;
         this.stopAnimation('textPadding');
-        this.addAnimation('textPadding', zr.animation.animate(this.getShape('labelLine').style))
+        this.addAnimation('textPadding', this.getElement('label').animate('style'))
             .when(time, {
                 textPadding: textPadding
-            })
-            .during(function () {
-                self.el.modSelf();
-                zr.refreshNextFrame();
             })
             .done(cb)
             .start('ElasticOut');
     };;
 
-    CurveEdgeEntity.prototype.startActiveAnimation = function (e) {
+    CurveEdgeEntity.prototype.startActiveAnimation = function () {
 
         if (this._animatingCircles.length) {
             return;
         }
 
-        var zr = this.zr;
-        var labelLineShape = this.getShape('labelLine');
+        var labelShape = this.getElement('label');
+
+        var labelLineHoverStyle = this.states.hover.shapeStyle.label;
         for (var i = 3; i > 0; i--) {
             var circle = new CircleShape({
+                shape: {
+                    cx: labelShape.shape.cx,
+                    cy: labelShape.shape.cy,
+                    r: baseRadius
+                },
                 style: {
-                    x: labelLineShape.style.cx,
-                    y: labelLineShape.style.cy,
-                    r: baseRadius,
-                    color: this.states.hover.shapeStyle.labelLine.strokeColor,
-                    opacity: this.states.hover.shapeStyle.labelLine.opacity * 0.8
+                    fill: labelLineHoverStyle.fill,
+                    opacity: 0.8
                 },
                 hoverable: false,
-                zlevel: 3
+                z: -1,
+                zlevel: 2
             });
 
-            this.addAnimation('ripplecircle', zr.animation.animate(circle.style, {loop: true})
+            this.el.addElement(circle);
+
+            this.addAnimation('ripplecircle', circle.animate('shape', true)
                 .when(3000, {
-                    r: baseRadius + 12,
-                    opacity: 0
-                })
-                .during(function () {
-                    // mod一个就行了
-                    circle.modSelf();
-                    zr.refreshNextFrame();
+                    r: baseRadius + 12
                 })
                 .delay(-1000 * i)
                 .start('Linear')
             );
 
-            this.el.addChild(circle);
+            this.addAnimation('ripplecircle', circle.animate('style', true)
+                .when(3000, {
+                    opacity: 0
+                })
+                .delay(-1000 * i)
+                .start('Linear')
+            );
+
             this._animatingCircles.push(circle);
         }
     };
 
-    CurveEdgeEntity.prototype.stopActiveAnimation = function (zr) {
-        if (this._animatingCircles.length) {
-            for (var i = 0; i < this._animatingCircles.length; i++) {
-                var circle = this._animatingCircles[i];
-                this.el.removeChild(circle);
+    CurveEdgeEntity.prototype.stopActiveAnimation = function () {
+        var animatingCircles = this._animatingCircles;
+        if (animatingCircles.length) {
+            for (var i = 0; i < animatingCircles.length; i++) {
+                var circle = animatingCircles[i];
+                this.el.removeElement(circle);
             }
-            this._animatingCircles.length = 0;
+            animatingCircles.length = 0;
 
             this.stopAnimation('ripplecircle');
-
-            this.zr.refreshNextFrame();
         }
     };
 
@@ -268,29 +281,30 @@ define(function (require) {
         var sourceEntity = this.sourceEntity;
         var targetEntity = this.targetEntity;
 
-        var curve = this.getShape('labelLine');
+        var curve = this.getElement('curve');
+        var label = this.getElement('label');
         this._setCurvePoints(curve, p1, p2);
 
-        p1 = intersect.curveCircle(curve.style, p1, sourceEntity.originalRadius);
-        p2 = intersect.curveCircle(curve.style, p2, targetEntity.originalRadius);
+        p1 = intersect.curveCircle(curve.shape, p1, sourceEntity.originalRadius);
+        p2 = intersect.curveCircle(curve.shape, p2, targetEntity.originalRadius);
 
         this._setCurvePoints(curve, p1, p2);
 
-        curve.style.cx = curveTool.quadraticAt(
-            curve.style.xStart, curve.style.cpX1, curve.style.xEnd, 0.5
+        var curveShape = curve.shape;
+        label.shape.cx = curveTool.quadraticAt(
+            curveShape.x1, curveShape.x2, curveShape.x3, 0.5
         );
-        curve.style.cy = curveTool.quadraticAt(
-            curve.style.yStart, curve.style.cpY1, curve.style.yEnd, 0.5
+        label.shape.cy = curveTool.quadraticAt(
+            curveShape.y1, curveShape.y2, curveShape.y3, 0.5
         );
-        // curve.style.a = 8;
-        // curve.style.b = 14;
     };
 
     CurveEdgeEntity.prototype._setCurvePoints = function (curve, p1, p2) {
-        curve.style.xStart = p1[0];
-        curve.style.yStart = p1[1];
-        curve.style.xEnd = p2[0];
-        curve.style.yEnd = p2[1];
+        var curveShape = curve.shape;
+        curveShape.x1 = p1[0];
+        curveShape.y1 = p1[1];
+        curveShape.x3 = p2[0];
+        curveShape.y3 = p2[1];
 
         var inv = 1;
         if (this.isExtra) {
@@ -298,25 +312,25 @@ define(function (require) {
         }
 
         inv *= (this.layerCounter % 2 == 0) ? 1 : -1;
-        curve.style.cpX1 = (p1[0] + p2[0]) / 2 - inv * (p1[1] - p2[1]) / 4;
-        curve.style.cpY1 = (p1[1] + p2[1]) / 2 - inv * (p2[0] - p1[0]) / 4;
+        curveShape.x2 = (p1[0] + p2[0]) / 2 - inv * (p1[1] - p2[1]) / 4;
+        curveShape.y2 = (p1[1] + p2[1]) / 2 - inv * (p2[0] - p1[0]) / 4;
     };
 
     CurveEdgeEntity.prototype.intersectRect = function (rect) {
-        return intersect.curveRect(this.getShape('labelLine').style, rect);
+        return intersect.curveRect(this.getElement('curve').style, rect);
     }
 
     CurveEdgeEntity.prototype.isInsideRect = function (rect) {
-        var style = this.getShape('labelLine').style;
-        vec2.set(v2, style.cpX1, style.cpY1);
-        vec2.set(v3, style.xEnd, style.yEnd);
-        vec2.set(min, style.xStart, style.yStart);
-        vec2.set(max, style.xStart, style.yStart);
+        var shape = this.getElement('curve').shape;
+        vec2Set(v2, shape.x2, shape.y2);
+        vec2Set(v3, shape.x3, shape.y3);
+        vec2Set(min, shape.x1, shape.y1);
+        vec2Set(max, shape.x1, shape.y1);
 
-        vec2.min(min, min, v2);
-        vec2.min(min, min, v3);
-        vec2.max(max, max, v2);
-        vec2.max(max, max, v3);
+        vec2Min(min, min, v2);
+        vec2Min(min, min, v3);
+        vec2Max(max, max, v2);
+        vec2Max(max, max, v3);
         return !(max[0] < rect.x || max[1] < rect.y || min[0] > (rect.x + rect.width) || min[1] > (rect.y + rect.height));
     }
 

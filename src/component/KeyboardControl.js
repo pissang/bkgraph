@@ -1,7 +1,7 @@
 define(function (require) {
     
     var Component = require('./Component');
-    var zrUtil = require('zrender/tool/util');
+    var zrUtil = require('zrender/core/util');
     var util = require('../util/util');
     var bkgLog = require('../util/log');
 
@@ -12,11 +12,10 @@ define(function (require) {
 
     KeyboardControl.prototype.type = 'KEYBOARDCONTROL';
 
-    KeyboardControl.prototype.initialize = function (kg, data) {
+    KeyboardControl.prototype.initialize = function (kg) {
 
         this._kgraph = kg;
 
-        // PENDING
         var graphMain = kg.getComponentByType('GRAPH');
         if (!graphMain) {
             return;

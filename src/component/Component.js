@@ -4,7 +4,7 @@
 define(function (require) {
 
     var Eventful = require('zrender/mixin/Eventful');
-    var zrUtil = require('zrender/tool/util');
+    var zrUtil = require('zrender/core/util');
 
     var Component = function () {
         Eventful.call(this);

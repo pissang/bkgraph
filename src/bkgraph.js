@@ -9,21 +9,16 @@ define(function (require) {
     }
 
     var GraphMain = require('./component/GraphMain');
-    var PanControl = require('./component/PanControl');
-    var ZoomControl = require('./component/ZoomControl');
-    var SearchBar = require('./component/SearchBar');
     var SideBar = require('./component/SideBar');
     var HeaderBar = require('./component/HeaderBar');
     var KeyboardControl = require('./component/KeyboardControl');
+    var PanControl = require('./component/PanControl');
     var Loading = require('./component/Loading');
-    var Intro = require('./component/Intro');
     var Tip = require('./component/Tip');
     var etpl = require('etpl');
     var jsonp = require('./util/jsonp');
     var util = require('./util/util');
     var bkgLog = require('./util/log');
-
-    var http = require('zrender/tool/http');
 
     // etpl truncate
     etpl.addFilter('truncate', util.truncate);
@@ -64,52 +59,25 @@ define(function (require) {
 
         var self = this;
 
-        // if (typeof(url) === 'string' && url.indexOf('http') == 0) {
+        bkgLog({
+            type: 'zhishitupuapistart'
+        });
+        jsonp(url, 'callback', function (data) {
 
             bkgLog({
-                type: 'zhishitupuapistart'
+                type: 'zhishitupuapiend'
             });
-            jsonp(url, 'callback', function (data) {
+            if (!data) {
+                self.removeComponent(loading);
+                return;
+            }
+            data = self._fixData(data);
+            self._rawData = data;
 
-                bkgLog({
-                    type: 'zhishitupuapiend'
-                });
-                if (!data) {
-                    self.removeComponent(loading);
-                    return;
-                }
-                data = self._fixData(data);
-                self._rawData = data;
+            self.initialize(data);
 
-                self.initialize(data);
-
-                onsuccess && onsuccess(self);
-            });
-        // }
-        // else if (typeof(url) === 'string' && url !== '') {
-                
-        //     http.get(url, function (data) {
-        //         if (typeof(JSON) !== 'undefined' && JSON.parse) {
-        //             data = JSON.parse(data);
-        //         } else {
-        //             data = eval('(' + data + ')');
-        //         }
-        //         data = self._fixData(data);
-        //         self._rawData = data;
-
-        //         self.initialize(data);
-        //         onsuccess && onsuccess(self);
-        //     });
-        // } else {
-        //     var data = url;
-        //     data = this._fixData(data);
-
-        //     this._rawData = data;
-
-        //     this.initialize(data);
-
-        //     onsuccess && onsuccess(this);
-        // }
+            onsuccess && onsuccess(self);
+        });
     }
 
     BKGraph.prototype._fixData = function (data) {
@@ -213,13 +181,6 @@ define(function (require) {
                 graphMain.showEdgeClickTip(mainRelations[0].id);
             });
         }
-
-        // Intro Component is defaultly included (except location has releation param)
-        // if (!params['relation']) {
-        //     var intro = new Intro();
-        //     this.addComponent(intro);
-        // }
-
     }
 
     BKGraph.prototype.addComponent = function (component) {
@@ -314,13 +275,10 @@ define(function (require) {
 
 
     var bkgraph = {
-        SearchBar: SearchBar,
         SideBar: SideBar,
-        ZoomControl: ZoomControl,
-        PanControl: PanControl,
         KeyboardControl: KeyboardControl,
+        PanControl: PanControl,
         HeaderBar: HeaderBar,
-        Intro: Intro,
 
         init: init
     };

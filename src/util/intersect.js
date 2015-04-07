@@ -1,7 +1,7 @@
 define(function (require) {
 
-    var vec2 =  require('zrender/tool/vector');
-    var curveTool = require('zrender/tool/curve');
+    var vec2 =  require('zrender/core/vector');
+    var curveTool = require('zrender/core/curve');
 
     var EPSILON = 1e-4;
 
@@ -85,12 +85,12 @@ define(function (require) {
     };
 
     var curveRect = function (curve, rect) {
-        var x0 = curve.xStart;
-        var y0 = curve.yStart;
-        var x1 = curve.cpX1;
-        var y1 = curve.cpY1;
-        var x2 = curve.xEnd;
-        var y2 = curve.yEnd;
+        var x0 = curve.x1;
+        var y0 = curve.y1;
+        var x1 = curve.x2;
+        var y1 = curve.y2;
+        var x2 = curve.x3;
+        var y2 = curve.y3;
 
         // Intersect with top
         var x = curveXAtY(x0, y0, x1, y1, x2, y2, rect.y);
@@ -129,12 +129,12 @@ define(function (require) {
     }
 
     var curveCircle = function(curve, center, radius) {
-        var x0 = curve.xStart;
-        var y0 = curve.yStart;
-        var x1 = curve.cpX1;
-        var y1 = curve.cpY1;
-        var x2 = curve.xEnd;
-        var y2 = curve.yEnd;
+        var x0 = curve.x1;
+        var y0 = curve.y1;
+        var x1 = curve.x2;
+        var y1 = curve.y2;
+        var x2 = curve.x3;
+        var y2 = curve.y3;
         var interval = 0.1;
 
         var d = Infinity;

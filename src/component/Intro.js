@@ -1,8 +1,8 @@
 define(function (require) {
     
     var Component = require('./Component');
-    var zrUtil = require('zrender/tool/util');
-    var vec2 = require('zrender/tool/vector');
+    var zrUtil = require('zrender/core/util');
+    var vec2 = require('zrender/core/vector');
     var util = require('../util/util');
     var cookies = require('../util/cookies');
 

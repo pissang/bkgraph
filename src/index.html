@@ -4,12 +4,12 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <link rel="stylesheet" type="text/css" href="./css/index.css" />
-        <!-- <link rel="stylesheet" type="text/css" href="./css/bkgraph.css" /> -->
-        <link rel="stylesheet/less" type="text/css" href="./css/bkgraph.less" />
+        <link rel="stylesheet" type="text/css" href="./css/bkgraph.css" />
+        <!-- <link rel="stylesheet/less" type="text/css" href="./css/bkgraph.less" /> -->
         <script src="../dep/esl.js"></script>
-
+    <!--
         <script src="../dep/less.min.js"></script>
-
+    -->
     </head>
     <body>
         <div id='viewport'></div>
@@ -17,10 +17,9 @@
             require.config({
                 paths: {
                     etpl: '../dep/etpl/src/main',
-                    _: '../dep/lodash',
                     Sizzle: '../dep/sizzle',
                     mock: '../mock',
-                    'zrender/dep/excanvas': '../../zrender/src/dep/excanvas2',
+                    // 'zrender/dep/excanvas': '../../zrender/src/dep/excanvas2',
                 },
                 packages: [
                     {
@@ -56,6 +55,7 @@
                     // g.addComponent(new bkg.HeaderBar());
                     // g.addComponent(new bkg.SearchBar());
                     g.addComponent(new bkg.KeyboardControl());
+                    g.addComponent(new bkg.PanControl());
 
                     // var intro = new bkg.Intro();
                     // g.addComponent(intro);

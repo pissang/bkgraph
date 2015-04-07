@@ -2,7 +2,7 @@ define(function(require) {
 
     var cookie = require('./cookies');
     var config = require('../config');
-    var zrUtil = require('zrender/tool/util');
+    var zrUtil = require('zrender/core/util');
 
     return function(data){
 
