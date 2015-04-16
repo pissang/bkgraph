@@ -5,7 +5,7 @@
                 <div class="bkg-relation-entity">
                     <div class="bkg-relation-entity-from">
                         <a href="http://www.baidu.com/s?wd=${fromEntity.name|url}" target="_blank" data-area="relation-info-entity" title="${fromEntity.name}_百度搜索" class="bkg-hoverable">
-                            <img src="${fromEntity.image }" alt="">
+                            <img src="${fromEntity.image }" alt="" crossOrigin="anonymous" >
                             <h5>${fromEntity.name}</h5>
                         </a>
                     </div>
@@ -14,7 +14,7 @@
                     </div>
                     <div class="bkg-relation-entity-to">
                         <a href="http://www.baidu.com/s?wd=${toEntity.name|url}" target="_blank" data-area="relation-info-entity" title="${toEntity.name}_百度搜索" class="bkg-hoverable">
-                            <img src="${toEntity.image }" alt="">
+                            <img src="${toEntity.image }" alt="" crossOrigin="anonymous" >
                             <h5>${toEntity.name}</h5>
                         </a>
                     </div>
@@ -25,14 +25,14 @@
                 <p>
                     <!-- <span>关系简介</span>  -->
                     ${relationExplaination.text|truncate(50)}
-                    <a href="${relationExplaination.url}" class="bkg-more" title="更多" data-area="relation-info-desc" target="_blank">更多 ></a>
+                    <a href="${relationExplaination.url}" class="bkg-more" title="查看详情" data-area="relation-info-desc" target="_blank">查看详情 ></a>
                 </p>
             </div>
             <!-- /if -->
         </div>
     <!-- else -->
         <div class="bkg-person-info">
-            <a class="bkg-person-pic bkg-hoverable" href="http://www.baidu.com/s?wd=${name|url}" data-area="entity-baike-pic" target="_blank" title="${name}_百度搜索"><img src="${image}" /></a>
+            <a class="bkg-person-pic bkg-hoverable" href="http://www.baidu.com/s?wd=${name|url}" data-area="entity-baike-pic" target="_blank" title="${name}_百度搜索"><img src="${image}" crossOrigin="anonymous" /></a>
             <div class="bkg-person-description">
                 <p>
                     <span class="bkg-person-name">

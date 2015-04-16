@@ -38,7 +38,7 @@
         <h4><a href="${weibo.latestWeiboUrl}" title="新浪微博" data-area="entity-weibo" target="_blank">新浪微博</a></h4>
     </div>
     <div class="bkg-weibo-info">
-        <img class="bkg-left" src="${weibo.image}" alt="">
+        <img class="bkg-left" src="${weibo.image}" alt="" crossOrigin="anonymous" >
         <div class="bkg-right">
             <h5>
                 ${weibo.name}
@@ -73,7 +73,7 @@
         <!-- if: ${idx} < 4 -->
         <li>
             <a href="${work.movieRedir}" class="bkg-hoverable" target="_blank" title="${work.movieName}" data-area="entity-representativeWork">
-                <img src="${work.movieImage}" alt="" />
+                <img src="${work.movieImage}" alt="" crossOrigin="anonymous" />
                 <span class="bkg-work-type">${work.movieType|truncate(4)}</span>
                 <span class="bkg-work-title">${work.movieName|truncate(4)}</span>
             </a>
@@ -119,7 +119,7 @@
     <!-- for: ${representativeWork} as ${work}, ${idx} -->
         <li>
             <a href="${work.movieRedir}" target="_blank" title="${work.movieName}" data-area="entity-latestwork">
-                <img src="${work.movieImage}" class="bkg-hoverable" alt="" />
+                <img src="${work.movieImage}" class="bkg-hoverable" alt="" crossOrigin="anonymous" />
                 <span class="bkg-work-title">${work.movieName}</span>
             </a>
         </li>
@@ -140,7 +140,7 @@
         <!-- if: ${idx} < 3 -->
         <li>
             <a href="${item.videoRedir}" class="bkg-hoverable"  target="_blank" title="${item.videoName}" data-area="entity-show">
-                <img src="${item.videoImage}" alt="" />
+                <img src="${item.videoImage}" alt="" crossOrigin="anonymous" />
                 <span class="bkg-show-title">${item.videoName|truncate(6)}</span>
             </a>
         </li>
@@ -151,7 +151,7 @@
             <!-- if: ${idx} < 3 -->
             <li>
                 <a href="${work.movieRedir}" class="bkg-hoverable" target="_blank" title="${work.movieName}" data-area="entity-representativeWork">
-                    <img src="${work.movieImage}" alt="" />
+                    <img src="${work.movieImage}" alt="" crossOrigin="anonymous" />
                     <span class="bkg-show-title">${work.movieName|truncate(6)}</span>
                 </a>
             </li>
@@ -211,7 +211,7 @@
                 <!-- if: ${index} < 4 -->
                 <li>
                     <a href="http://www.baidu.com/s?wd=${recTag.name|url}" target="_blank" data-area="entity-recommendation" title="${recTag.name}_百度搜索" class="bkg-hoverable">
-                        <img src="${recTag.image}" alt="">
+                        <img src="${recTag.image}" alt="" crossOrigin="anonymous" >
                         <h5>${recTag.name|truncate(6)}</h5>
                     </a>
                     <a href="http://www.baidu.com/s?wd=${recTag.name|url}" target="_blank" data-area="entity-recommendation" title="${recTag.reason}" class="bkg-rec-reason">
@@ -253,7 +253,7 @@
         <!-- for: ${recommendation.content} as ${rec}, ${index} -->
         <li>
             <a class="bkg-rec-tag-pic" href="http://www.baidu.com/s?wd=${rec.fromName|url}%20${rec.toName|url}%20${rec.relationName|url}" target="_blank" data-area="relation-recommendation" title="${rec.fromName} ${rec.toName} ${rec.relationName}_百度搜索">
-                <img src="${rec.image}" class="bkg-hoverable" alt="">
+                <img src="${rec.image}" class="bkg-hoverable" alt="" crossOrigin="anonymous" >
                 <!-- <h5></h5> -->
             </a>
             <a href="http://www.baidu.com/s?wd=${rec.fromName|url}%20${rec.toName|url}%20${rec.relationName|url}" target="_blank" data-area="relation-recommendation" title="${rec.fromName} ${rec.toName} ${rec.relationName}_百度搜索">

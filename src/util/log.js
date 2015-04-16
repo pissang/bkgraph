@@ -3,6 +3,7 @@ define(function(require) {
     var cookie = require('./cookies');
     var config = require('../config');
     var zrUtil = require('zrender/tool/util');
+    var index = 0;
 
     return function(data){
 
@@ -17,7 +18,7 @@ define(function(require) {
             referrer: document.referrer
         };
 
-        data.extend = (data.extend || '') + '.t_' + new Date().getTime();
+        data.extend = (data.extend || '') + '.t_' + new Date().getTime() + '_' + (index++);
         data = zrUtil.merge(data, common);
         for(var i in data){
             if(data.hasOwnProperty(i)){

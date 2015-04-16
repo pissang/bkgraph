@@ -7,6 +7,7 @@ define(function (require) {
     var bkgLog = require('../util/log');
     var Sizzle = require('Sizzle');
     var jsonp = require('../util/jsonp');
+    var Feedback = require('./Feedback');
 
     var renderSearchResult = etpl.compile(require('text!../html/searchResult.html'));
     var renderHeaderBar = etpl.compile(require('text!../html/headerBar.html'));
@@ -192,6 +193,9 @@ define(function (require) {
 
         this._$share = Sizzle('.bkg-share', this.el)[0];
         this._$shareList = Sizzle('.bkg-share-area', this.el)[0];
+
+        this._$feedback = Sizzle('.bkg-feedback', this.el)[0];
+        this._feedback = new Feedback(this._$feedback);
     };
 
     HeaderBar.prototype.setExplorePercent = function (percent) {
@@ -305,6 +309,10 @@ define(function (require) {
                 area: 'headerbar-' + linkArea
             });
         }
+    };
+
+    HeaderBar.prototype.resize = function (w, h) {
+        this._feedback && this._feedback.resize(w, h);
     };
 
     zrUtil.inherits(HeaderBar, Component);

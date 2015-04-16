@@ -190,6 +190,8 @@ define(function (require) {
 
         var self = this;
         var image = new Image();
+        var src = this.image;
+        image.crossOrigin = 'anonymous';
         image.onload = function () {
             var imageShape = self.getShape('image');
             imageShape.style.image = image;
@@ -201,7 +203,11 @@ define(function (require) {
         image.onerror = function () {
             error && error();
         }
-        image.src = this.image;
+        image.src = src;
+        if (image.complete || image.complete === undefined) {
+            image.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+            image.src = src;
+        }
     };
 
     NodeEntity.prototype.setDraggable = function (draggable) {
