@@ -215,8 +215,7 @@ define({
         nodeEnd: '显示已经到头了哦~'
     },
 
-    enableAnimation: !!document.createElement('canvas').getContext,
-    // enableAnimation: true,
+    supportCanvas: !!document.createElement('canvas').getContext,
 
     voteAPI: 'http://api.open.baidu.com/pae/component/api/vote',
     voteProjectHuoying: 'ks_huoying',

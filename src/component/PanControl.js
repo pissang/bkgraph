@@ -41,6 +41,13 @@ define(function (require) {
             addEventListener(el, 'mousedown', this._onMouseDown);
         },
 
+        getOffset: function () {
+            return {
+                x: this._x,
+                y: this._y
+            };
+        },
+
         _onMouseDown: function (e) {
             addEventListener(document.body, 'mousemove', this._onMouseMove);
             addEventListener(document.body, 'mouseup', this._onMouseUp);
