@@ -1310,13 +1310,15 @@ define(function (require) {
             var height = zr.getHeight();
 
             var panControl = this._kgraph.getComponentByType('PANCONTROL');
+            var zoomControl = this._kgraph.getComponentByType('ZOOMCONTROL');
             var offset = panControl ? panControl.getOffset() : {x: 0, y: 0};
+            var zoom = zoomControl ? zoomControl.getZoom() : 1;
 
             var rect = {
-                x: -offset.x,
-                y: -offset.y,
-                width: width,
-                height: height
+                x: -offset.x / zoom,
+                y: -offset.y / zoom,
+                width: width / zoom,
+                height: height / zoom
             }
 
             var imageLoadingCount = 0;

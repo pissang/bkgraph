@@ -48,6 +48,13 @@ define(function (require) {
             };
         },
 
+        setOffset: function (x, y) {
+            this._x = x;
+            this._y = y;
+
+            this._update();
+        },
+
         _onMouseDown: function (e) {
             addEventListener(document.body, 'mousemove', this._onMouseMove);
             addEventListener(document.body, 'mouseup', this._onMouseUp);
@@ -67,6 +74,18 @@ define(function (require) {
             this._x += dx;
             this._y += dy;
 
+            this._update();
+
+            this._sx = x;
+            this._sy = y;
+        },
+
+        _onMouseUp: function (e) {
+            removeEventListener(document.body, 'mousemove', this._onMouseMove);
+            removeEventListener(document.body, 'mouseup', this._onMouseUp);
+        },
+
+        _update: function () {
             var zr = this._graphMain.getZR();
             if (zr.painter.getVMLRoot) {
                 // VML 优化
@@ -80,14 +99,6 @@ define(function (require) {
                 target.position[1] = this._y;
                 target.dirty();
             }
-
-            this._sx = x;
-            this._sy = y;
-        },
-
-        _onMouseUp: function (e) {
-            removeEventListener(document.body, 'mousemove', this._onMouseMove);
-            removeEventListener(document.body, 'mouseup', this._onMouseUp);
         }
     };
 

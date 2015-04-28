@@ -13,6 +13,7 @@ define(function (require) {
     var HeaderBar = require('./component/HeaderBar');
     var KeyboardControl = require('./component/KeyboardControl');
     var PanControl = require('./component/PanControl');
+    var ZoomControl = require('./component/ZoomControl');
     var Loading = require('./component/Loading');
     var Tip = require('./component/Tip');
     var etpl = require('etpl');
@@ -278,6 +279,7 @@ define(function (require) {
         SideBar: SideBar,
         KeyboardControl: KeyboardControl,
         PanControl: PanControl,
+        ZoomControl: ZoomControl,
         HeaderBar: HeaderBar,
 
         init: init
